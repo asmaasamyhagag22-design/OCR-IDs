@@ -82,22 +82,6 @@ This matters more than anything else in this section. Most numbers in the
 reports are **exploratory** and are labelled that way in place. They are not
 held-out results and must not be quoted as accuracy.
 
-| | Status |
-|---|---|
-| One-time external test, 321 records | **The only clean external result.** 266/290 usable = 91.72% exact, 82.87% end to end over all 321. Marked `CONSUMED_ONCE`: it was opened once, after the candidate was frozen and committed, and may never be reused. |
-| Internal validation, 618 cards | A validated result for Fixed14-v2: 576/618 = 93.20%. Consumed; not reusable. |
-| External validation, 699 / 647 records | **Exploratory.** It chose epochs and model families in Phase 2M-C, so measuring it again cannot turn it into a hold-out. Everything in the Phase 2M-E report rests on it. |
-| Locked audit, 377 cards | Never opened. The last clean reserve. |
-
-So: 93.82%, 99.18% digit accuracy, and every figure in the Phase 2M-E error
-anatomy are **exploratory**, on opened selection data. The number to quote for
-the current recognizer is 91.72% on the one-time external test, with its
-denominator stated.
-
-The Phase 2M-E report also sets out, with the measurements behind it, why a bare
-"99% on the same data" claim is not comparable to any of these without a stated
-metric, a stated denominator, and an identity-clean split.
-
 ### Research code and production code are separated
 
 `src/extraction/pipeline.py` and the production path are unchanged by the recent
