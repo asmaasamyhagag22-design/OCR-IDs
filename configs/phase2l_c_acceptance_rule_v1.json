@@ -1,0 +1,68 @@
+{
+  "schema_version": "phase2l_c_acceptance_rule_v1",
+  "rule_id": "PHASE2L_C_ACCEPTANCE_RULE_V1",
+  "committed_before_internal_validation_access": true,
+  "rule_text": [
+    "PHASE2L_C_ACCEPTANCE_RULE_V1",
+    "The candidate passes only if all conditions hold:",
+    "1. Net exact gain over frozen PP-OCRv5 is at least +50 cards on the full 618-card internal validation.",
+    "2. Newly exact > regressed exact, with a one-sided paired sign test p-value < 0.01.",
+    "3. Regressed baseline-exact cards do not exceed: min(25 cards, 5% of PP-OCRv5 baseline-exact cards).",
+    "4. Candidate short outputs = 0. Candidate empty outputs = 0. Candidate overlong outputs = 0.",
+    "5. No access failure, denominator change, label mismatch, privacy violation, or truth-dependent selection occurs.",
+    "6. Both systems are evaluated on the identical frozen 618-card population using the same truth normalization and exact-match contract.",
+    "Do not alter this rule after accessing the validation split."
+  ],
+  "machine_readable": {
+    "population_cards": 618,
+    "minimum_net_exact_gain": 50,
+    "sign_test": {
+      "form": "one_sided_exact_binomial_p_half_on_discordant_pairs",
+      "statistic": "P(X >= newly_exact | n = newly_exact + regressed_exact, p = 0.5)",
+      "require_newly_exact_greater_than_regressed_exact": true,
+      "p_value_strictly_below": 0.01
+    },
+    "regression_cap": {
+      "formula": "regressed_exact <= min(25, 0.05 * pp_ocrv5_baseline_exact)",
+      "absolute_cap_cards": 25,
+      "baseline_exact_fraction": 0.05,
+      "rounding": "none; compared as a real number"
+    },
+    "candidate_malformed_outputs_allowed": {"short": 0, "empty": 0, "overlong": 0},
+    "integrity_conditions": [
+      "access_failures == 0",
+      "denominator == 618 for both systems",
+      "label_mismatches == 0",
+      "privacy_violations == 0",
+      "truth_dependent_selection == false"
+    ],
+    "identical_population": {
+      "ordered_card_list_hash_equal_for_both_systems": true,
+      "truth_normalization": "phase2l_a.normalize_digits applied to the frozen Phase 2H lookup value",
+      "prediction_normalization": "phase2l_a.normalize_digits",
+      "exact_match": "normalized prediction string == normalized 14-digit truth string",
+      "digit_accuracy": "positional: position k correct iff k < len(prediction) and prediction[k] == truth[k]; denominator 14 per card"
+    }
+  },
+  "decision_mapping": {
+    "FIXED14_V2_VALIDATED": "every condition 1-6 passes",
+    "FIXED14_V2_VALIDATION_FAILED": "no protocol violation, and any of conditions 1-4 fails, or condition 5 fails only through a genuine access or runtime failure",
+    "PHASE2L_C_EVALUATION_INVALID": "candidate or evaluator hash changes, population or denominator changes, label mismatch, privacy violation, truth-dependent selection, a condition-6 failure, or a second evaluation attempt"
+  },
+  "frozen_candidate": {
+    "config": "configs/phase2l_b_fixed14_v2.json",
+    "config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+    "seed": 271828,
+    "weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b",
+    "weights_size_bytes": 538296,
+    "decoding": "deterministic argmax over [14,10]"
+  },
+  "frozen_comparator": {
+    "model": "arabic_PP-OCRv5_mobile_rec",
+    "view": "original_rgb",
+    "lane": "A",
+    "source": "artifacts/phase2i_b/candidates.jsonl",
+    "source_sha256": "8834287e0259190bf4a21f3476fe450ac9077fe2c63c5be5185d3d0c1e1b373c",
+    "provenance": "equals internal_validation.candidate_file_sha256 in tracked reports/phase2i_b_metrics.json (commit a9dd15e)"
+  }
+}

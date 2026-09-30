@@ -1,0 +1,271 @@
+{
+  "schema_version": "phase4_integration_rule_v1",
+  "phase": "4-I - BC-final integrated with a contributed digit model",
+  "utc_date": "2026-09-27",
+  "committed_before": [
+    "any reading by the contributed model",
+    "any crop, fusion, routing, fallback or latency number",
+    "any number on the 168 controls in this phase"
+  ],
+  "append_only": "later sections amend earlier ones by name and state their reason; nothing above an amendment is edited",
+  "draft_review": "a stats-reviewer read an earlier uncommitted draft and returned FAIL (B1-B4 blocking, N1-N10). The owner's update of 2026-09-27 (D-008) arrived at the same time. This first committed version resolves both; the resolutions are listed at the end.",
+  "owner_decisions": {
+    "D-005": "the audit card with no image is an admission failure",
+    "D-006": "the contributed model is a component (superseded in part by D-008)",
+    "D-007": "the missing card outside criterion 1; R1 is the default fusion rule; two routing variants chosen by criterion 2 then friction (item 1, criterion 4 on the fused reading, is superseded by D-008)",
+    "D-008": "attribution waived; licence and permission; training data possibly contaminated; the audit gate stays on BC-final alone and the fused system is descriptive; the crop is reconstructed; the one-card gate"
+  },
+  "frozen_inputs": {
+    "bc_final": {
+      "weights_sha256": "00e23a14b3e9cf976864241f3e494ce383cdc52c8bbd2e52e54b53d03657d4df",
+      "seed": 3101,
+      "inference": "single view, no TTA"
+    },
+    "v2_weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b",
+    "contributed_model": {
+      "directory": "artifacts/second_model/rec_digits_finetuned (ignored, never committed)",
+      "inference.json": "b315c53bb574b8229288c784b0519558b29e608f808490546316c2ca4914e2f6",
+      "inference.pdiparams": "185b6080fb37b35037185b1567508bbc049a92abd2246a95124971338fa1a917",
+      "inference.yml": "797da0591093b0745d0f1db98c54e74980a1e403e0d98dfc5953072543a7f33e"
+    },
+    "paddle_text_detector": "artifacts/PP-OCRv5_mobile_det_infer, already used by src/extraction/hybrid.py; its file hashes are pinned in the Linux environment record before crop K2 is run",
+    "typo_generator_seed": 20260922
+  },
+  "populations": {
+    "controls": "the 168 internal real controls, scripts/phase2m_c.py internal_pools()[2], in that order. Card level; one record per card. The number of distinct identity components among them is reported, and every interval states that it treats cards as independent.",
+    "controls_status": "read as a gate 13+ times; after this phase they are also a selection set for fusion and routing",
+    "contamination": "POSSIBLY CONTAMINATED (D-008). The contributed model's training data are 'synthetic per the author; unverified; the author is unreachable', and a string in the bundle README matched a card in the official labelled set. Every ministry-data number for the contributed model or the fused system carries this label, the 168 included.",
+    "development_pool": "permitted development calibration cards: InternalAccess calibration minus controls, audit and consumed (the scripts/phase4_audit.py rehearsal_cards pool). Most are replay-training cards for v2 and its descendants; the count that are is reported wherever the pool decides something.",
+    "never": "the audit 377 (except through the one sealed read of configs/phase4_audit_rule_v1.json), the internal 618/636, the external test 321. The external validation 647 is not used for anything in this phase."
+  },
+  "admission": {
+    "admitted": "the frozen adapter's detector produced a band (7b N2). One definition for step 1, step 2's counts, step 3, and every audit quantity.",
+    "not_admitted": "no band. In every count and criterion it is both-wrong for both models and for the fused reading, and it is not admitted. The admission fallback exists only in the competition CLI and never enters a count."
+  },
+  "contributed_model_inference": {
+    "source": "reconstructed from the bundle's inference.json and inference.yml only. The README is never opened. No author code exists.",
+    "recovered": {
+      "kind": "recognition only: PP-LCNetV3 backbone, SVTR neck, MultiHead with a CTC head at inference (the PP-OCRv4/v5 mobile recognition family)",
+      "input": "float32 N x 3 x 48 x W (NCHW), dynamic width; yml RecResizeImg image_shape [3, 48, 320]; image mode BGR",
+      "output": "softmax over 13 classes per time step: CTC blank, '/', the ten Arabic-Indic digits, space",
+      "normalization": "none inside the graph. Preprocessing is the framework's standard RecResizeImg: resize to height 48 keeping the aspect ratio, width capped at 320, (x/255 - 0.5)/0.5, right-padded with zeros to width 320. This is the framework's standard operator named by the yml, not the author's code."
+    },
+    "decoding": "greedy CTC: per time step the argmax class; collapse repeats; drop blanks. Characters mapped: Arabic-Indic digits to ASCII.",
+    "reading": "a 14-digit reading only if the decoded string is exactly 14 ASCII digits after mapping. Any other character (including '/' and space) or length makes it 'not 14 digits'. Nothing is stripped or padded.",
+    "raw_score": "for each emitted character, the maximum over the time steps collapsed into it of that character's posterior; the reading's raw score is the minimum over its emitted characters. For BC-final: the minimum over the 14 slots of the per-slot softmax maximum. A reading that is not 14 digits has no raw score.",
+    "contributed_error": "when the contributed path fails on a card (exception, crash, timeout, or an abandoned worker), the card's contributed reading is 'not 14 digits' for fusion and routing; the count is reported beside every fused quantity (audit amendment 7g D)"
+  },
+  "step_0_crop": {
+    "candidates": {
+      "K1": "our materialized band: the exact input tensor BC-final reads, as src/extraction/fixed14_v3_shadow.py _CapturingProxy captures it inside the one adapter call (the broad band of configs/phase2l_b_fixed14_v2.json, letterboxed), converted to 3-channel uint8 BGR, then the standard RecResizeImg. No extra rectification or cut.",
+      "K2": "Paddle's own detection: PP-OCRv5 mobile det on the canonical card; the detected text box whose centre is nearest the centre of the broad-band bbox, cut by its minimum-area rectangle, converted to BGR, then the standard RecResizeImg. If det returns no box, the card is 'not 14 digits' under K2."
+    },
+    "selection": "on the development_pool cards the detector admits, with their development labels: the candidate whose contributed-model reading is exact on more cards wins; a tie goes to K1. Never chosen on the 168 or the audit.",
+    "reported": "exact counts per candidate with Clopper-Pearson, the discordant cards and the sign test, the pool size, and how many pool cards are replay-training cards. Labelled possibly contaminated.",
+    "canonical_card_source": "the capturing proxy today holds only the letterboxed band tensor, not the canonical card. K2 needs the canonical card from the same rectification; it may be captured inside the one adapter call only if that needs no edit to a hash-sealed module and no second rectification. Otherwise STOP and ask the owner; K1 alone is then the candidate."
+  },
+  "structural_validity": {
+    "function": "src.extraction.national_id.decode(reading).structurally_valid, applied only to a reading that already passed the exactly-14-ASCII-digits check",
+    "checks": "century, calendar date, governorate code",
+    "never": "the check digit (tests/test_no_checksum.py)"
+  },
+  "step_1_complementarity": {
+    "where": "end to end from the 168 control photos, in Linux, with the crop step 0 chose",
+    "report": [
+      "exact 14-digit card accuracy of each model, k/168 with Clopper-Pearson (scripts/phase2m_h.py exact_interval)",
+      "both right, only BC-final right, only the contributed model right, both wrong",
+      "ORACLE = either right, labelled ORACLE and never called an accuracy",
+      "admitted and not-admitted counts"
+    ],
+    "stop_condition": "D-008: if ORACLE - BC-final exact <= 1 card, the token is INTEGRATION_NOT_WORTH_IT:oracle_adds_at_most_one_card_over_bc_final. Steps 2 to 5 do not run, no fused output is sealed in the audit read, and the evidence goes to the owner for the supervisor.",
+    "sensitivity": "the same table with BC-final read from the pre-materialized bands, reported beside it, deciding nothing. BC-final's end-to-end error count is not known yet; 9 of 168 is the band count."
+  },
+  "step_2_fusion": {
+    "R1": "the BC-final reading. The contributed reading replaces it only when BC-final's reading is not 14 digits or is structurally invalid, and the contributed reading is 14 digits and structurally valid.",
+    "R2": "if the two readings agree, that reading. On disagreement: the structurally valid 14-digit reading if exactly one is; otherwise the higher normalized confidence; an exact tie goes to BC-final.",
+    "never_abstain": "competition CLI only: if the chosen rule leaves no 14-digit reading, the BC-final 14-slot argmax is output. In counts, such a card counts as the chosen rule's reading, exact or not.",
+    "confidence_normalization_for_R2": {
+      "normalized": "the percentile of a raw score within the same model's raw scores on a reference set: the fraction of reference scores less than or equal to it (weak inequality)",
+      "reference_for_measurement": "cross-fold and unlabelled: a card in fold f is normalized against the other fold's admitted control scores, per model. No label is read to build it.",
+      "reference_for_the_cli": "all admitted control scores, per model, unlabelled, frozen as a table",
+      "why": "the two models' probabilities are not on a common scale. Neither model's reference scores come from its own training cards (the development pool would have given BC-final its replay-training scores and biased R2 toward the contributed model).",
+      "validation": "the instrument-validator checks it on synthetic ground truth and for order preservation on real content before R2 decides anything. On FAIL, R2 is withdrawn and R1 stands.",
+      "cli_versus_measured": "the CLI and the sealed audit use the table built from all 168 admitted control scores, not the cross-fold tables that were measured; the sealed fused system is therefore close to, not exactly, the instrument evaluated. Stated in the report."
+    },
+    "cross_fit": {
+      "folds": "fold(card) = int(sha256('phase4_integration_fold:' + card_id), 16) % 2",
+      "selection": "D-007: R1 is the default. R2 replaces it only if R2 has strictly more exact cards than R1 on fold 0 AND strictly more on fold 1. Otherwise R1.",
+      "cross_fitted_estimate": "per fold, the rule the other fold would choose, read on this fold; the two folds summed. When R2 is selected it equals the in-sample count and protects nothing, and is labelled so."
+    },
+    "report": "the selected rule, card level, against each single model: k/168 with Clopper-Pearson, the discordant counts and the exact two-sided sign test (scripts/phase2m_e.py sign_test_two_sided). 'Better' or 'worse' only under D-003. A comparison for R1 is pre-declared; one for a selected R2 is labelled 'conditional on selection on these cards'.",
+    "resolution_warning": "a two-sided sign test needs at least 6-0 discordant cards for p < 0.05 (6-0: 0.03125; 5-0: 0.0625)"
+  },
+  "step_3_routing": {
+    "messages": {
+      "check_the_number_you_typed": "not accepted, and the two readings agree",
+      "retake_the_photo": "not accepted, and the two readings disagree, or not admitted",
+      "human_review": "after two retakes (three capture attempts). A product flow; every number here is first-capture only, because no repeat-capture data exist."
+    },
+    "variants": {
+      "V_either": "accept if either reading matches the typed ID",
+      "V_bc": "accept only if BC-final's reading matches the typed ID, or both match"
+    },
+    "V_bc_note": "as written, 'or both match' is contained in 'BC-final matches', so V_bc accepts exactly when BC-final matches, and the contributed reading only chooses the message. If the owner intended a stricter 'both must match' variant, it is added by amendment before any routing number; with no answer, the literal V_bc stands.",
+    "populations": {
+      "honest": "typed = the delivered label, all 168 controls",
+      "typo": "scripts/phase2m_h.py typo_population(truth, seed=20260922), truth in the populations.controls order, as 2M-H"
+    },
+    "report_per_1000": "honest: accepted, check-number, retake, not admitted. Typo: silent acceptance, check-number, retake; structurally valid typos separately. Each variant beside the single-model design (scripts/phase2m_h.py route() at 0.966875). Possibly contaminated.",
+    "selection": {
+      "criterion_2_at_audit_scale": {
+        "passes_when": "the point estimate of P(more than 1 silent acceptance among structurally valid typo users from admitted captures, in a simulated audit of 377 cards) is at most 0.05 under S1 at every admission value AND under S2, as 7e required of its criteria",
+        "per_card_rate": "for each admitted control card i and variant V: p_i(V) = the fraction of 20,000 typo draws (scripts/phase2m_h.py inject_typo, rng = numpy default_rng([20260927, i]), i the card's index in populations.controls order) that are structurally valid and that V accepts although the typed value is not the true ID. Structural validity is the test the frozen typo code uses (scripts/phase2m_h.py typo_buckets).",
+        "S1_plug_in": "each simulated card is not admitted with probability a, for a in {0.00, 0.10, 0.20}; an admitted card is an admitted control drawn uniformly with replacement, and is silently accepted with probability p_i(V)",
+        "S2_predictive": "a = 0.10; per simulated audit, the admitted controls are reweighted by Dirichlet(1, ..., 1) (the Bayesian bootstrap) and cards are drawn with those weights",
+        "simulation": "200,000 simulated audits per scenario and variant, seed 20260927, Monte Carlo standard error reported beside each value",
+        "caveat": "the per-card rates come from possibly contaminated contributed readings, so V_either's risk may be understated"
+      },
+      "validation": "the instrument-validator checks this calculator before it decides: synthetic per-card rates with analytic answers (a binomial tail when every p_i is equal), monotonicity in the per-card rates, and V_either >= V_bc on every draw",
+      "first": "criterion 2 at audit scale, as above",
+      "second": "among passing variants, lower honest-user friction: per 1000 honest users not accepted on the first capture",
+      "tie": "V_bc",
+      "if_neither_passes": "the variant with the lower predicted probability, a tie going to V_bc; STOP and show the owner before anything is built on it",
+      "also_reported": "the single-draw criterion-2 count on the 168 typo population, descriptively"
+    },
+    "stated_in_advance": "V_either accepts a superset of V_bc: never fewer silent acceptances, never more friction. The audit-scale criterion is what can make V_bc win.",
+    "d001_note": "D-001 is unchanged (D-008). The certified audit number is BC-final's single-model routing (route() at 0.966875), and parity gate (a) applies to it. Two-model routing, if it ships, ships with an audit number that is descriptive and cannot be certified."
+  },
+  "step_4_competition_package": {
+    "cli": "image folder in, CSV out. Columns: image, fused_reading, bc_final_reading, contributed_reading, agreement. Fully offline (DISABLE_MODEL_SOURCE_CHECK=True, local weights). Always a 14-digit fused reading.",
+    "admission_fallback": {
+      "when": "the detector produces no band (CLI only; never in a count)",
+      "F_A": "treat the whole image, EXIF-oriented, resized to 630 x 1000, as the canonical card and cut the broad band from it",
+      "F_B": "F_A at each of the four right-angle rotations, keeping the rotation with the highest normalized BC-final score",
+      "selection": "on development_pool images where the detector fails, with development labels: more exact BC-final cards wins; a tie, no such image, or a FAIL of the normalization goes to F_A",
+      "reported": "the number of such images and how many are replay-training cards"
+    },
+    "tests": "every path: agreement, each fusion branch, contributed reading not 14 digits, structurally invalid, detector failure into each fallback, unreadable file, CSV schema",
+    "latency": "per image, both models together, one image at a time with warmed models, over the 168 control photos, three repeats: median, p95, mean. The 8000-image time is 8000 x mean, labelled an extrapolation from this environment.",
+    "if_step_1_stops": "no package is built until the owner decides its form"
+  },
+  "step_5_audit": {
+    "governing_rule": "configs/phase4_audit_rule_v1.json amendment_7g (D-008): one read seals BC-final alone and the fused system; the gate is BC-final alone, unchanged; the fused numbers are descriptive and possibly contaminated",
+    "fused_descriptive_quantities": {
+      "exact_card_accuracy": "the selected fusion rule's fused reading, over admitted cards and over all audit cards (not admitted is not exact)",
+      "false_mismatch": "admitted honest users the selected routing variant does not accept",
+      "silent_typo": "structurally valid typo users from admitted captures the selected variant accepts; the typed values are the same ones BC-final's audit typo arm uses (same generator, seed 20260922, card order), so the two systems are paired",
+      "against_v2": "the fused reading against v2 on the same cards: discordant counts, the sign test, and the 7e score statistic, reported and never a criterion",
+      "missing_card": "D-005/D-007: an admission failure; in the admission-failure rate, the all-card accuracy and the v2 comparison; not in the false-mismatch denominator"
+    },
+    "no_regrounding": "the 7e criterion design is not re-run: the gate stays on BC-final alone, whose criteria and design are unchanged",
+    "routing_after_the_seal": "no routing decision is sealed in the loop; both systems' routing is computed after the seal, from sealed readings and the labels read then (amendment 7g A)"
+  },
+  "pending_before_measurement": [
+    "a Linux environment (none exists on this machine: no WSL distribution, no Docker)",
+    "the owner's answer on V_bc (default: the literal V_bc)",
+    "the D-005 pin, by amendment to configs/phase4_audit_rule_v1.json",
+    "the Linux design of the audit read, approved by the owner before any read code changes"
+  ],
+  "draft_review_resolutions": {
+    "B1": "admission is one definition everywhere; the fallback is CLI-only (admission)",
+    "B2": "moot under D-008: the gate stays on BC-final alone, so the 7e design is not re-run (step_5_audit.no_regrounding)",
+    "B3": "criterion 2 is judged at audit scale with a 0.05 budget, with a STOP when neither variant passes (step_3_routing.selection)",
+    "B4": "the normalization reference is the other fold's unlabelled control scores, not the development pool (confidence_normalization_for_R2)",
+    "N1": "cross_fitted_estimate and report label a selected R2",
+    "N2": "raw_score and the weak-inequality percentile are pinned",
+    "N3": "F_B falls back to F_A on a normalization FAIL; replay counts are reported",
+    "N4": "the stop names steps 2 to 5 and what happens to the package",
+    "N5": "the 9 of 168 is labelled the band count",
+    "N6": "the V_bc default and the selection tie rules are declared",
+    "N7": "D-001 is unchanged by the owner (D-008); d001_note",
+    "N8": "identity components are reported and independence is stated",
+    "N9": "the typo population uses the controls order",
+    "N10": "decode() is applied only after the 14-ASCII-digit check",
+    "re_review_B-1": "process isolation, per-card timeout, restart and three-way parity in the read environment (audit amendment 7g D)",
+    "re_review_B-2": "the audit-scale criterion-2 calculation is fully declared (step_3_routing.selection.criterion_2_at_audit_scale)",
+    "re_review_B-3": "only readings are sealed in the loop; routing is computed after the seal (7g A; step_5_audit.routing_after_the_seal)",
+    "re_review_non_blocking": "manifest pin list and self-test-failure choice (7g A, D); field-by-field parity (7g D); paired typo arm; CLI-versus-measured table; the canonical card source for K2 (step_0_crop.canonical_card_source)",
+    "third_review": "the worker restart is bounded and the worker abandoned after 3 consecutive failures, with the midnight check covering the capped worst case; contributed_error is 'not 14 digits'; BC-final's raw score for R2 is declared (audit amendment 7g D)",
+    "fourth_review": "the contributed path's worst case is 2 x 377 x T in the midnight check; the BC-final raw-score call cannot raise and is flagged instead; no fused step can raise into the loop (audit amendment 7g D)"
+  },
+  "amendment_1": {
+    "utc_date": "2026-09-27",
+    "status": "ADOPTED by the owner (the owner, project owner) in chat on 2026-09-27. Decision log D-009.",
+    "committed_before": "any routing, criterion-2 or friction number. No number of any kind exists in this phase.",
+    "why": "the owner corrected her wording: V_bc, 'BC-final matches, or both match', reduces to 'BC-final matches'. Three variants are declared instead.",
+    "supersedes": "step_3_routing.variants, step_3_routing.V_bc_note, step_3_routing.selection.first, .second, .tie and .if_neither_passes, step_3_routing.stated_in_advance, and the V_bc item of pending_before_measurement; the names V_either and V_bc in step_3_routing.selection.validation and criterion_2_at_audit_scale.caveat, which now read V1 and V2",
+    "variants": {
+      "V1": "accept if either reading matches the typed ID",
+      "V2": "accept if BC-final's reading matches the typed ID",
+      "V3": "accept only if both readings match the typed ID"
+    },
+    "messages": "unchanged (step_3_routing.messages): not accepted with agreeing readings is 'check the number you typed'; not accepted with disagreeing readings, or not admitted, is 'retake the photo'. A card that is not accepted and where only one reading matches has disagreeing readings, so it is sent to retake.",
+    "selection": {
+      "eligible": "a variant is eligible when it passes step_3_routing.selection.criterion_2_at_audit_scale, unchanged: the point estimate of P(more than 1 silent acceptance in 377 cards) is at most 0.05 in every declared scenario (S1 at a in {0, 0.10, 0.20}, and S2). For V3 a typo is silently accepted only when both readings equal the typed value.",
+      "choose": "among eligible variants, the lowest honest-user friction: per 1000 honest users not accepted on the first capture",
+      "tie": "equal friction goes to the lower predicted silent-acceptance risk, the maximum of the variant's point estimates over the four declared scenarios; if that also ties, V2",
+      "none_eligible": "STOP and tell the owner. No variant is chosen and nothing is built on routing."
+    },
+    "stated_in_advance": "V3 accepts a subset of what V2 accepts, and V2 a subset of V1. So silent-acceptance risk is ordered V3 <= V2 <= V1 and friction V1 <= V2 <= V3, on every draw. The rule therefore picks the least strict variant that passes the safety simulation. The per-card rates come from possibly contaminated readings of the second model, so V1's risk may be understated.",
+    "validation": "the instrument-validator check of the criterion-2 calculator (step_3_routing.selection.validation, with V_either read as V1 and V_bc as V2) also verifies V3 <= V2 <= V1 on every coupled simulated audit",
+    "simulation_coupling": "the three variants share the simulation's randomness: the same seed, the same simulated card draws, and one uniform U per simulated card, with the card silently accepted under variant V when U < p_i(V). The per-card rates p_i(V) use the same typo draws for every variant. So the ordering V3 <= V2 <= V1 holds on every simulated audit, and Monte Carlo noise cannot invert the risk tie-break.",
+    "contributed_error_under_V3": "under V3, a card with contributed_error cannot be accepted, so if V3 is selected the fused audit's false_mismatch is reported with and without contributed_error cards. Descriptive only; the gate is unaffected.",
+    "review": "a stats-reviewer read this amendment before commit: PASS, with three non-blocking notes, all adopted above"
+  },
+  "amendment_2": {
+    "utc_date": "2026-09-27",
+    "committed_before": "any number computed in the Linux environment",
+    "why": "the Paddle-dependent measurements run in WSL2 Ubuntu. Before any of them is used, the Linux environment must reproduce this Windows machine's existing results. The criteria are declared here first.",
+    "environment": "WSL2 Ubuntu; Python 3.11.9 installed by uv (the system Python is not used); the Windows venv's exact pins minus tensorflow-intel (Windows-only) and the project's editable install (the code runs from the mounted worktree). Recorded in reports/phase4_integration_env.json.",
+    "parity_bands": {
+      "what": "BC-final single view on the 168 control bands, in populations.controls order, through scripts/phase2m_h.py single_image_infer and the same softmax, against the Windows artifacts/phase2m_h/controls_prob_plain.npy",
+      "pass": "the argmax is identical on every card and slot, and every card's weakest margin falls on the same side of 0.966875",
+      "reported": "max |delta probability|, max |delta margin|",
+      "labels": "not read; parity is judged on the model outputs only"
+    },
+    "parity_rehearsal": {
+      "what": "the 20 rehearsal development photos (scripts/phase4_audit.py rehearsal_cards(20)) through the full pipeline and single_read, against the Windows sealed artifacts/phase4_audit/rehearsal/predictions.npz, whose sha256 72bae623... is checked first",
+      "pass": "for every card: card_id, status, admission_status, admitted, the v2 reading and the BC-final reading are identical, and the margin falls on the same side of 0.966875",
+      "not_required": "a byte-identical seal: margins are floats computed on different platforms",
+      "reported": "max |delta margin|, seconds per image, bundle load time",
+      "output": "artifacts/phase4_integration/linux/, never over the Windows rehearsal files"
+    },
+    "on_fail": "STOP and tell the owner. No Linux measurement is used until the difference is explained."
+  },
+  "amendment_3": {
+    "utc_date": "2026-09-27",
+    "committed_before": "any step-0 (crop choice) number",
+    "owner_decision": "D-012: the second model runs in its own worker venv with paddlepaddle 3.3.1",
+    "evidence": "the bundle is a PIR v4 program using the op linear_v2 (the PP-OCRv5 models that load in the project venv are PIR v1 and have no linear_v2). Under paddlepaddle 3.3.0 every load path (paddle.inference with IR optimisation on or off, the new executor, paddle.jit.load) fails in pd_op_to_kernel_pass with 'op [] kernel output args (0) defs should equal op outputs (1)'. Under 3.3.1 it loads and returns a (1, 40, 13) softmax for a 48 x 320 input.",
+    "worker_environment": {
+      "venv": "WSL ~/venvs/second-model-py3119, built by uv: Python 3.11.9, paddlepaddle 3.3.1, numpy 1.26.4, opencv-python-headless 4.10.0.84, setuptools 65.5.0, and paddleocr 3.3.2 with paddlex 3.3.13 for K2's detector; recorded with hashes in reports/phase4_integration_env.json",
+      "project_venv": "unchanged at paddlepaddle 3.3.0. BC-final, v2 and the frozen pipeline never run in the worker venv, and the second model never runs in the project venv.",
+      "relation_to_7g": "audit amendment 7g D already runs the contributed model and K2's detector in a separate worker process; that process now also has its own venv"
+    },
+    "recognizer": "paddle.inference Config(inference.json, inference.pdiparams), CPU, oneDNN disabled, batch 1; preprocessing and greedy CTC exactly as contributed_model_inference declares",
+    "step_0_execution": {
+      "pool": "the 771 development_pool cards. Labelled: the 720 with a target in the Phase 2L-A manifest (scripts/phase2m_c.py l2a_manifest), all exactly 14 ASCII digits. The other 51 are excluded and counted. No other label source is read.",
+      "stages": "capture (project venv) -> read (worker venv) -> score (project venv). Labels are read only in the score stage, after both candidates' readings are written.",
+      "capture": "each pool card once through the frozen compare_image. Recorded: admitted (a band was produced); the band tensor (the K1 input); and the canonical card the adapter chose (the K2 input). That card is taken from a pass-through wrapper around src.extraction.official_eval.choose_quarter_turns, which calls the original and returns its result object unchanged. No sealed file is edited, and there is no second rectification.",
+      "pass_through_check": "before capture, the 20 rehearsal photos run with the wrapper in place. Every sealed field must equal the Windows seal, under amendment 2's rehearsal criteria. If not, K2 is withdrawn and K1 is the crop.",
+      "K1_input": "the band tensor converted RGB to BGR",
+      "K2_box": "the detector runs on the canonical card converted RGB to BGR. Chosen box: the polygon whose centroid (the mean of its points) is nearest, by Euclidean distance, to the centre of the broad_band bbox in canonical coordinates. Ties go to the higher detection score, then the lower index. Crop: the cv2.minAreaRect of that polygon, corners ordered top-left, top-right, bottom-right, bottom-left; width = max of the top and bottom edges, height = max of the left and right edges; perspective warp with INTER_CUBIC and BORDER_REPLICATE; rotated 90 degrees counter-clockwise when height/width >= 1.5 (the PaddleOCR rotate-crop convention). No box means K2 is 'not 14 digits'.",
+      "scoring": "admitted labelled cards only. Exact means the reading equals the target. More exact cards wins; a tie goes to K1 (step_0_crop.selection, unchanged).",
+      "reported": "per candidate: exact k/n with Clopper-Pearson; discordant counts and the exact two-sided sign test (descriptive); pool, labelled, admitted and replay-training counts; K2's no-box count; each candidate's not-14-digits count. Labelled possibly contaminated.",
+      "storage": "captured tensors and cards stay under the ignored artifacts/phase4_integration/step0/, keyed by pool index. No card_id or label is printed."
+    }
+  },
+  "amendment_4": {
+    "utc_date": "2026-09-27",
+    "committed_before": "any step-1 number, and before the step-0 result exists",
+    "why": "step_1_complementarity says what is reported and when to stop; this fixes how it is executed, in the same three stages as step 0",
+    "cards": "the 168 controls in populations.controls order. Their photos are opened through InternalAccess (controls are calibration cards).",
+    "capture": "project venv. Each control photo once through the frozen compare_image. Recorded: admitted; BC-final's end-to-end reading (bc_final_national_id); and the chosen crop's input, which is the band tensor for K1, or for K2 the canonical card from the amendment-3 pass-through wrapper.",
+    "read": "worker venv. The second model on the step-0 chosen crop only. The crop that was not chosen is never read on the 168.",
+    "score": "project venv. The only label read is the controls' manifest target (the populations.controls rows). A card that is not admitted is wrong for both models. Exact means the reading equals the target.",
+    "report": "step_1_complementarity.report, plus admitted and not-admitted counts and the number of distinct identity components, with intervals that treat cards as independent. Labelled possibly contaminated.",
+    "stop": "D-008: if ORACLE - BC-final exact <= 1 card, the token is INTEGRATION_NOT_WORTH_IT:oracle_adds_at_most_one_card_over_bc_final. Steps 2 to 5 do not run.",
+    "sensitivity": "the same 2 x 2 table with BC-final read from the pre-materialized bands (the argmax of artifacts/phase2m_h/controls_prob_plain.npy, which Linux reproduced exactly under amendment 2). Descriptive, decides nothing.",
+    "output": "artifacts/phase4_integration/step1/ (card level); reports/phase4_integration_step1.json (aggregate only)"
+  }
+}

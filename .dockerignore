@@ -1,0 +1,56 @@
+# The Fixed14 OCR service image holds code, configs and the model weights it
+# needs, and nothing else (configs/phase4_service_rule_v1.json `hard_lines`).
+# Everything is excluded, then the image's inputs are re-included one by one.
+# scripts/phase4_service_docker.sh builds from a staged context (git archive of
+# HEAD plus the dereferenced weight files); this file applies there as well.
+**
+
+!Dockerfile
+!requirements-linux.txt
+!requirements-linux-opencv-headless.txt
+!docker/model_files.sha256
+
+# application code (the second model's code is evidence only, D-014)
+!src/**
+src/extraction/second_model.py
+**/__pycache__
+**/*.pyc
+!scripts/phase2l_a.py
+!scripts/phase2l_b.py
+
+# model configs and pipeline configs
+!configs/phase2l_b_fixed14_v2.json
+!configs/phase2m_h_frozen_candidate.json
+!configs/phase2m_h_rule_v1.json
+!configs/phase2m_c_fixed14_v3_frozen_candidate.json
+!configs/phase2m_c_fixed14_v3_rule_v1.json
+!configs/field_regions_v4.json
+!configs/field_regions_v5.json
+!config/extraction_policy_v1.json
+!config/governorates_v1.json
+
+# model weights, named one by one (artifacts/ is otherwise excluded)
+!artifacts/phase2m_g/runs/BCFINAL_seed3101/final.weights.h5
+!artifacts/phase2l_b/models/candidate_v2_conditioned_160x576_seed271828/final.weights.h5
+!artifacts/phase2m_c/frozen/fixed14_v3.weights.h5
+!artifacts/arabic_PP-OCRv5_mobile_rec_infer/inference.json
+!artifacts/arabic_PP-OCRv5_mobile_rec_infer/inference.pdiparams
+!artifacts/arabic_PP-OCRv5_mobile_rec_infer/inference.yml
+!artifacts/latin_PP-OCRv3_mobile_rec_infer/inference.json
+!artifacts/latin_PP-OCRv3_mobile_rec_infer/inference.pdiparams
+!artifacts/latin_PP-OCRv3_mobile_rec_infer/inference.yml
+!third_party/DocCornerNet-CoordClass/model.py
+!third_party/DocCornerNet-CoordClass/LICENSE
+!third_party/DocCornerNet-CoordClass/checkpoints/mobilenetv2_224_best/config.json
+!third_party/DocCornerNet-CoordClass/checkpoints/mobilenetv2_224_best/best_model.weights.h5
+
+# never, even if a pattern above would match: data, reports, tests, venvs, git, scratch
+data/
+reports/
+tests/
+.venv/
+.git/
+local/
+scratch/
+# the phase 4 final pass's private diagnostic folders (D-060), deleted at the end of that phase
+artifacts/phase4_final/

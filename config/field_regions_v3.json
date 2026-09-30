@@ -1,0 +1,57 @@
+{
+  "config_version": "field_regions_v3",
+  "canonical_size": [1000, 630],
+  "coordinate_space": "Relative to the Phase 1 rectified canonical card. rect is [x, y, w, h] with every component in [0, 1]; pixel bbox = [round(x*W), round(y*H), round((x+w)*W), round((y+h)*H)].",
+  "calibration_status": "phase2a_layout_audited_semantics_incomplete",
+  "supersedes": "field_regions_v2",
+  "calibration_note": "Phase 2A visually audited v2 on all 7 accepted Phase 1 rectified cards at 0, 90, 180, and 270 degrees. Geometry is unchanged from v2. The three proposed printed-birth-date boxes did not surround an independently printed birth-date field, so v3 disables their field semantics while retaining the boxes as non-readable audit landmarks. No OCR tuning, preprocessing, or PSM change was made.",
+  "observed_bands": {
+    "note": "Median normalized rects of the text bands seen across the 7 rectified cards, with the number of cards supporting each. Geometry only.",
+    "bands": [
+      {"support": 7, "rect": [0.284, 0.059, 0.369, 0.097]},
+      {"support": 6, "rect": [0.084, 0.281, 0.721, 0.056]},
+      {"support": 5, "rect": [0.437, 0.384, 0.094, 0.067]},
+      {"support": 4, "rect": [0.673, 0.486, 0.261, 0.064]},
+      {"support": 6, "rect": [0.148, 0.689, 0.735, 0.162]},
+      {"support": 4, "rect": [0.108, 0.917, 0.790, 0.070]}
+    ]
+  },
+  "content_types": {
+    "digits": "Numeric only. OCR is whitelisted to ASCII digits; Arabic-Indic and Extended Arabic-Indic digits are folded to ASCII at read time and the fold is recorded as a note.",
+    "date_digits": "Numeric plus the separators / - . and space, so the group structure that disambiguates field order survives.",
+    "arabic_text": "Arabic script only: letters plus tatweel and tashkeel. OCR runs with lang=ara. Diacritics are kept in the value and removed only in the comparison form.",
+    "none": "Not read. Drawn on the debug overlay so the layout can be checked, e.g. the portrait."
+  },
+  "role_note": "No current v3 layout declares an independently printed birth-date field. Date of birth is derived from national-ID digits and must be emitted with state derived. Exactly one id_number region is permitted per layout. externally_verified is reserved for a later comparison with independent application data.",
+  "layouts": {
+    "front": {
+      "description": "Portrait on the left, name and address block on the right, national ID number across the lower band. Band positions fitted; field identities unconfirmed.",
+      "regions": [
+        {"name": "portrait", "label_en": "Portrait", "label_ar": "الصورة", "rect": [0.040, 0.200, 0.260, 0.600], "content": "none", "role": "none", "psm": 6, "calibration": "prior", "semantics": "unconfirmed"},
+        {"name": "header_line", "label_en": "Card header", "label_ar": "بطاقة تحقيق الشخصية", "rect": [0.260, 0.045, 0.420, 0.125], "content": "none", "role": "none", "psm": 6, "calibration": "fitted", "note": "Present on 7/7 cards. Not read; drawn so the overlay shows the fit."},
+        {"name": "first_name", "label_en": "First name", "label_ar": "الاسم", "rect": [0.330, 0.265, 0.620, 0.085], "content": "arabic_text", "role": "name", "psm": 6, "calibration": "fitted", "semantics": "unconfirmed"},
+        {"name": "full_name", "label_en": "Full name", "label_ar": "الاسم بالكامل", "rect": [0.330, 0.370, 0.620, 0.095], "content": "arabic_text", "role": "name", "psm": 6, "calibration": "fitted", "semantics": "unconfirmed"},
+        {"name": "address_line_1", "label_en": "Address line 1", "label_ar": "محل الإقامة", "rect": [0.330, 0.470, 0.620, 0.095], "content": "arabic_text", "role": "address", "psm": 6, "calibration": "fitted", "semantics": "unconfirmed"},
+        {"name": "address_line_2", "label_en": "Address line 2", "label_ar": "محل الإقامة (تابع)", "rect": [0.330, 0.565, 0.620, 0.095], "content": "arabic_text", "role": "address", "psm": 6, "calibration": "fitted", "semantics": "unconfirmed"},
+        {"name": "national_id_number", "label_en": "National ID number", "label_ar": "الرقم القومي", "rect": [0.130, 0.675, 0.760, 0.185], "content": "digits", "role": "id_number", "psm": 6, "expected_length": 14, "calibration": "fitted", "semantics": "unconfirmed", "note": "Fitted to the wide lower band present on 6/7 cards."},
+        {"name": "unassigned_lower_left_band", "label_en": "Unassigned lower-left band", "label_ar": "", "rect": [0.080, 0.895, 0.450, 0.100], "content": "none", "role": "none", "psm": 6, "priority": 10, "calibration": "fitted", "semantics": "audited_not_birth_date", "note": "v2 proposed this as a printed birth date. Phase 2A found that it surrounds a serial band on the audited front cards, so it is not read."},
+        {"name": "unassigned_front_right_band", "label_en": "Unassigned front-right band", "label_ar": "", "rect": [0.600, 0.360, 0.380, 0.110], "content": "none", "role": "none", "psm": 6, "priority": 20, "calibration": "prior", "semantics": "audited_not_birth_date", "note": "v2 proposed this as a printed birth date. Phase 2A found that it overlaps the name block, so it is not read."},
+        {"name": "card_serial_number", "label_en": "Card serial / factory number", "label_ar": "الرقم المسلسل", "rect": [0.540, 0.895, 0.400, 0.100], "content": "digits", "role": "serial", "psm": 6, "min_length": 6, "max_length": 20, "calibration": "prior", "semantics": "unconfirmed"}
+      ]
+    },
+    "back": {
+      "description": "Detail block on the right, serial across the lower half. No rectified back was available to fit against, so every rect here is still a prior.",
+      "regions": [
+        {"name": "job_title", "label_en": "Occupation", "label_ar": "الوظيفة", "rect": [0.300, 0.150, 0.660, 0.100], "content": "arabic_text", "role": "other", "psm": 6, "calibration": "prior", "semantics": "unconfirmed"},
+        {"name": "marital_status", "label_en": "Marital status", "label_ar": "الحالة الاجتماعية", "rect": [0.300, 0.275, 0.400, 0.090], "content": "arabic_text", "role": "other", "psm": 6, "calibration": "prior", "semantics": "unconfirmed"},
+        {"name": "religion", "label_en": "Religion", "label_ar": "الديانة", "rect": [0.710, 0.275, 0.250, 0.090], "content": "arabic_text", "role": "other", "psm": 6, "calibration": "prior", "semantics": "unconfirmed"},
+        {"name": "gender_printed", "label_en": "Printed gender", "label_ar": "النوع", "rect": [0.300, 0.380, 0.280, 0.090], "content": "arabic_text", "role": "printed_gender", "psm": 6, "calibration": "prior", "semantics": "unconfirmed"},
+        {"name": "unassigned_back_middle_right", "label_en": "Unassigned back middle-right", "label_ar": "", "rect": [0.610, 0.380, 0.350, 0.090], "content": "none", "role": "none", "psm": 6, "priority": 10, "calibration": "prior", "semantics": "audited_not_birth_date", "note": "v2 proposed this as a printed birth date. Phase 2A found no independently printed birth-date field in this box, so it is not read."},
+        {"name": "issue_date", "label_en": "Issue date", "label_ar": "تاريخ الإصدار", "rect": [0.300, 0.490, 0.350, 0.090], "content": "date_digits", "role": "other", "psm": 6, "calibration": "prior", "semantics": "unconfirmed"},
+        {"name": "expiry_date", "label_en": "Expiry date", "label_ar": "تاريخ الانتهاء", "rect": [0.615, 0.490, 0.345, 0.090], "content": "date_digits", "role": "other", "psm": 6, "calibration": "prior", "semantics": "unconfirmed"},
+        {"name": "national_id_number", "label_en": "National ID number", "label_ar": "الرقم القومي", "rect": [0.300, 0.600, 0.600, 0.120], "content": "digits", "role": "id_number", "psm": 6, "expected_length": 14, "calibration": "prior", "semantics": "unconfirmed"},
+        {"name": "card_serial_number", "label_en": "Card serial / factory number", "label_ar": "الرقم المسلسل", "rect": [0.050, 0.830, 0.500, 0.120], "content": "digits", "role": "serial", "psm": 6, "min_length": 6, "max_length": 20, "calibration": "prior", "semantics": "unconfirmed"}
+      ]
+    }
+  }
+}

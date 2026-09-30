@@ -1,0 +1,616 @@
+{
+  "schema_version": "phase2m_e_error_anatomy_rule_v1",
+  "phase": "2M-E",
+  "purpose": "Diagnostic only. No training, no fine-tuning, no threshold or policy freezing, no output selection that uses truth. Ensembles, TTA and reject curves are measurements.",
+  "committed_before": [
+    "any validation-level result computed in Phase 2M-E",
+    "any error-kind tabulation",
+    "any alignment measurement",
+    "any decision-mapping evaluation"
+  ],
+  "production_changed": false,
+  "amendments": [
+    {
+      "id": 1,
+      "utc": "2026-09-20",
+      "section": "card-level majority (work item A3)",
+      "what_changed": "A3 asks for 'card-level majority'. The first implementation scored a card as majority-exact when a majority of its copies were individually exact. That is a different statistic from the one a majority-vote deployment would obtain, and on two-copy cards it can never be satisfied by a one-of-two split. The amendment adds the vote itself: per card, the copies vote on the whole predicted 14-digit string, the most common string wins, and a tie is broken by the earliest copy in split order. Both quantities are now reported side by side and neither replaces the other.",
+      "reason": "the original wording was ambiguous and the first reading did not measure what the work item is for; no threshold in the decision mapping depends on either quantity",
+      "affects_decision_mapping": false,
+      "added_after_seeing": "the first anatomy run, which is why it is recorded here rather than edited into the original text"
+    },
+    {
+      "id": 2,
+      "utc": "2026-09-20",
+      "section": "addendum measurements (items 1 to 5)",
+      "what_changed": "Five descriptive measurements are added after the primary finding was reached, each computed from artifacts this phase already produced. (1) Record-level fixability: a wrong record is alignment_only when every wrong position in it is a shift or a collision, glyph_only when every wrong position is a substitution or a neighbour, and mixed otherwise; the upper bound assumes a perfect repair of a class that breaks nothing. (2) Anchor decomposition: the anchor-to-own-digit displacement in pitches is split exactly into a global line-centre error, a line-width error times unit_k, the fixed per-slot layout pattern and a per-record remainder. (3) Every view and ensemble is re-reported at card level with an exact two-sided sign test on the discordant cards, and the shift sweep is extended to -8, -6, -4, -3, -2, -1, 0, +1, +2, +3, +4, +6, +8 px. (4) The realized content advantage is the capped content term at the own digit column minus the same term at the adjacent digit column toward which the anchor is displaced, compared with the position-prior advantage between the same two columns. (5) The layout pattern is re-estimated on the 664 internal replay cards by an ink-phase method that uses only the two global anchors, calibrated first on external validation where the annotated truth is known.",
+      "reason": "the addendum was requested after the finding, so its definitions are recorded here rather than edited into the original text; they are descriptive, they add no threshold, and the primary finding is not re-derived from them",
+      "affects_decision_mapping": false,
+      "added_after_seeing": "the full Phase 2M-E result set, including the decision token"
+    },
+    {
+      "id": 3,
+      "utc": "2026-09-21",
+      "section": "addendum 2 (items 1 to 5), predeclared before any of its results were computed",
+      "governing_principle": "every threshold below is stated at record level or at card level. No threshold in this amendment is stated at position level, because addendum 1 showed the position-level share (59.5 percent alignment) and the record-level share (15 of 40) answer different questions and the position share overstates what a repair can reach.",
+      "item_1_train_anatomy": {
+        "scope": "the 2673 materialized external-train records, primary model, inference mode, no augmentation",
+        "measure": "record-level error-kind families (alignment_only, glyph_only, mixed) with 95 percent binomial (Wilson) intervals, next to the same shares on external validation",
+        "decision": {
+          "TRAIN_MIX_MATCHES_VALIDATION": "all three record-level family shares have overlapping 95 percent intervals between train and validation",
+          "TRAIN_MIX_DIVERGES": "at least one family share has non-overlapping intervals"
+        },
+        "reading": "a matching mix means the model fails the same way on data it was fine-tuned on, so UNDERFIT is a structural limit rather than a shortage of exposure; a train mix with a materially larger glyph_only share points at capacity in the digit head"
+      },
+      "item_2_cross_tab": {
+        "scope": "the 647 external-validation records",
+        "measure": "2x2 contingency of (right band edge leaves the source image) against (line-centre error in the worst decile), with a Fisher exact two-sided p, and whether each of the 4 records carrying every shift position falls in the clipped set",
+        "decision": {
+          "CLIPPING_EXPLAINS_CENTRE_ERROR": "Fisher exact p below 0.01 and the clipped records are enriched in the worst decile",
+          "CLIPPING_DOES_NOT_EXPLAIN_IT": "otherwise"
+        },
+        "if_the_4_shift_records_are_not_clipped": "report what else they share: line-rect collinearity rms, source pixels per digit, band ink statistics, and the line-rect length and height, each against the exact-record distribution"
+      },
+      "item_3_symmetric_context_probe": {
+        "primary_metric": "the line-centre error distribution and its median bias in pitches",
+        "secondary_and_confounded": "exact-sequence counts, which are not comparable because the frozen v3 was fine-tuned on the 0.16/0.04 geometry, so any change mixes the geometry effect with a train/serve mismatch",
+        "decision": {
+          "CONTEXT_ASYMMETRY_IS_A_CAUSE": "the symmetric context brings the median line-centre bias inside plus or minus 0.03 pitch AND does not increase the 90th percentile absolute centre error",
+          "CONTEXT_ASYMMETRY_IS_NOT_A_CAUSE": "otherwise"
+        },
+        "no_candidate": "the re-materialized bands are a probe. Nothing is trained on them, frozen from them or selected with them."
+      },
+      "item_4_glyph_track": {
+        "scope": "the 22 glyph_only records and the 30 substitution cells of the primary model on validation",
+        "measures": [
+          "per-digit-class error rate normalized by that class frequency in the validation labels",
+          "confusion conditioned on source_px_per_digit quartile and on Roboflow augmented copy versus original",
+          "vertical extent: the AUC of the model's own logit difference for a confusable pair against whether the true cell is taller than the per-record median ink height. Nothing is fitted; the discriminant is the model's existing logits"
+        ],
+        "decision": {
+          "VERTICAL_EXTENT_DISCARDED": "the AUC is below 0.60 for the 1-versus-0 and 1-versus-4 pairs",
+          "VERTICAL_EXTENT_RETAINED": "the AUC is 0.60 or above"
+        },
+        "second_blinded_review": "one sheet per substitution cell, the single digit cell only, same five verdict options, same blinding discipline, not filled in during this phase"
+      },
+      "item_5_control_run": {
+        "status": "a control run, never a candidate. Nothing is frozen, nothing is selected, and external validation is not consulted for any selection decision",
+        "protocol": "continue stage B from the frozen v3 checkpoint at constant Adam 1e-4 with global_clipnorm 5.0 and the Phase 2M-C augmentation and batch mix, monitoring external-train exact only",
+        "step_cap": 2664,
+        "step_cap_note": "24 further epochs of 111 steps, three times the original stage B budget",
+        "evaluation": "external-train exact every 2 epochs; external validation is not evaluated at all",
+        "early_stop": "stop when external-train exact has not improved over 6 consecutive evaluations",
+        "decision": {
+          "OPTIMIZATION_HEADROOM": "external-train wrong records fall by at least 20 percent relative, that is by at least 35 of the 171",
+          "OPTIMIZATION_PLATEAU": "the reduction is smaller than that"
+        },
+        "weights_disposition": "retained under the ignored artifacts tree for reproducibility and never promoted, never hashed into a frozen-candidate config"
+      },
+      "affects_the_phase_2m_e_decision_token": false,
+      "reason": "the addendum 2 work was requested after the Phase 2M-E finding. Its thresholds are fixed here before any of its numbers exist."
+    },
+    {
+      "id": 4,
+      "utc": "2026-09-21",
+      "section": "addendum 2 follow-ups, and one standing rule",
+      "standing_rule_instrument_validation": {
+        "rule": "any measurement instrument must be validated against rendered content of known dimensions before a decision is read from it",
+        "applies_from": "this amendment onward, to every phase",
+        "why": "the addendum 2 item 4 ink-height estimator saturated at the full row range on its first version, and its replacement still fails a physical sanity check: it reports the zero glyph as taller than the one glyph, which is inverted for the printed Arabic-Indic forms. A decision was nearly read from an instrument that had never been checked against a known quantity."
+      },
+      "item_3_reporting_correction": {
+        "what_was_wrong": "the declared threshold for the symmetric-context probe compared the median centre bias against plus or minus 0.03 pitch. That test cannot separate the hypotheses it was written for: the change in bias under the probe geometry (0.0833 pitch) is algebraically the same quantity as the part of the geometric shift the estimator did not track (0.8188 minus 0.7355 = 0.0833). The threshold therefore restates the estimator's fixed component and carries no independent information about the cause of the original bias.",
+        "declared_outcome_is_kept_on_record": "CONTEXT_ASYMMETRY_IS_NOT_A_CAUSE, as it evaluated",
+        "but_it_is_not_probative": true,
+        "what_item_3_actually_establishes": "the line-centre estimator is 90 percent content-driven and 10 percent fixed",
+        "sole_refutation_of_the_context_asymmetry_hypothesis": "item 2, where the clipped and unclipped populations have the same centre-error distribution and the Fisher exact p is 0.20",
+        "item_3_must_not_be_reported_as_a_second_refutation": true
+      },
+      "followup_2_annotation_convention": {
+        "question": "is the +0.092 pitch centre bias the model's error or the annotation's convention",
+        "measure": "mean signed offset between the ink centroid of each digit cell and that cell's annotated box centre, in pitches, over the 647 external-validation records, using the addendum 5 ink estimator after it has passed the standing validation rule above",
+        "sign_convention": "positive means the ink sits to the right of the annotated box centre, the same direction as the measured model bias",
+        "decision": {
+          "ANNOTATION_CONVENTION": "the mean signed ink offset is within 0.03 pitch of +0.092",
+          "MODEL_BIAS": "the mean signed ink offset is within 0.03 pitch of zero",
+          "PARTIAL": "otherwise; report the share of the model bias the annotation offset accounts for"
+        }
+      },
+      "followup_3_training_set_quality": {
+        "underfit_is_held": "the UNDERFIT conclusion is held until the control run finishes",
+        "third_explanation": "label error and unreadable images inside the training set itself, which neither capacity nor optimization can fix",
+        "blinded_sheets": "a random 20 of the 171 wrong external-train records, seeded, same sheet design and same five verdict options as the existing 24 card sheets and 30 substitution cell sheets, sent as one batch",
+        "threshold_caveat": "the 99.0 percent UNDERFIT threshold in amendment 0 assumed a clean training set. If the training labels carry error, the attainable train exact is below 100 percent and the threshold is too strict by that amount."
+      },
+      "followup_5_augmentation_geometry": {
+        "rotation_proxy": "the angle of the least-squares line through the 14 annotated box centres, in degrees from horizontal. The band corrects this through its rotated rectangle.",
+        "shear_proxy": "per record, the mean over its 14 cells of the box aspect ratio divided by the population median aspect ratio for that same digit class, which controls for digit identity. The band does not correct shear.",
+        "reported_against": [
+          "substitution rate per 1000 cells",
+          "wrong-record rate"
+        ],
+        "also_reported_against": "source_px_per_digit, since the highest-resolution quartile carries the most substitutions",
+        "status": "descriptive; no threshold"
+      },
+      "followup_6_estimator_degradation": {
+        "measure": "correlation of absolute centre error with source_px_per_digit over all 647 records, with the relationship shown by quartile",
+        "question": "does the content-driven line-centre estimator degrade as the line gets smaller",
+        "status": "descriptive; no threshold"
+      },
+      "no_training_beyond_the_control_run_already_in_flight": true
+    },
+    {
+      "id": 5,
+      "utc": "2026-09-21",
+      "section": "follow-up on item 4: digit-identity analysis, predeclared before the matrix was built",
+      "scope": "the external-train wrong positions, 362 of them across 171 records, which is the larger sample; the 74 validation wrong positions are reported beside it but decide nothing",
+      "item_1_confusion_matrix": {
+        "measure": "the full 10 by 10 truth-to-prediction matrix over wrong positions, each cell divided by the count of that true digit in the data, so a cell is a per-opportunity rate",
+        "reported": "the whole matrix, not a top-pairs list"
+      },
+      "item_2_position_control": {
+        "why": "digit frequency in this identifier is strongly position-dependent: slot 1 is 2 or 3, slots 2 to 7 are a date, slots 8 and 9 are a governorate code, and slots 11 to 14 are close to uniform. A per-class error rate is therefore confounded with slot difficulty.",
+        "measure": "each confusion pair conditioned on slot index, and a per-class rate recomputed as the frequency-weighted average of its within-slot rates, so every class is compared at the same mix of positions",
+        "decision": {
+          "PER_CLASS_RATES_SURVIVE": "the rank order of the top three classes by error rate is unchanged after the position control",
+          "PER_CLASS_RATES_ARE_CONFOUNDED": "the rank order changes"
+        }
+      },
+      "item_3_directionality": {
+        "declared_minimum_count": 5,
+        "measure": "for every ordered pair with at least 5 occurrences on external train, report the count in both directions",
+        "classification": {
+          "DECISION_BOUNDARY": "both directions occur, and the smaller direction is at least a third of the larger",
+          "BIAS": "the smaller direction is below a third of the larger, including zero"
+        }
+      },
+      "item_4_shape_versus_distortion": {
+        "measure": "for each pair above the declared minimum, the rate among augmented Roboflow-train copies against originals, and the median per-record rotation and shear proxy of the records carrying that pair against the population median",
+        "classification": {
+          "DISTORTION_DRIVEN": "the pair occurs at least twice as often per opportunity on augmented copies as on originals, or its records sit above the 75th percentile of the shear proxy",
+          "SHAPE_DRIVEN": "otherwise"
+        },
+        "caveat": "the originals are only 86 validation records and a minority of train records, so a pair with few original opportunities cannot be classified and is reported as UNDETERMINED"
+      },
+      "changes_no_decision_by_itself": true,
+      "purpose": "to decide where capacity or loss weighting would go, if the blinded 30-cell review returns that the glyphs are legible",
+      "instrument_validation_note": {
+        "what_the_standing_rule_caught": "the ink-height estimator passes on rendered glyphs, where it recovers the zero as 25 px against the one at 39 px and correlates 0.92 with the rendered heights, but on real bands it inverts that ordering. The instrument is sound and the real bands break it.",
+        "consequence": "validation on clean rendered content is necessary and not sufficient. The standing rule is extended: an instrument must also be validated on degraded content representative of the data it will be read on.",
+        "item_4_vertical_extent_decision": "stands as declared, VERTICAL_EXTENT_RETAINED, and is reported as untrustworthy on real bands for this reason"
+      }
+    },
+    {
+      "id": 6,
+      "utc": "2026-09-21",
+      "section": "amendment 5 item 2 is withdrawn: its instrument failed the standing validation",
+      "what_failed": {
+        "instrument": "direct standardisation of per-class error rates to a common slot mix",
+        "validation": "synthetic labels drawn from the real class-by-slot opportunity mix, with every class given exactly the same true error rate of 0.01, so a sound estimator must return equal rates",
+        "unrestricted_version": "returned rates spanning 0.0072 to 0.1174, a 16.4-fold spread across classes that are equal by construction, because class-by-slot strata with as few as one opportunity receive full weight",
+        "minimum_support_30_version": "much better, coverage about 1.0, but still spans up to 3.2-fold over five trials, above the 3-fold criterion",
+        "conclusion": "at 362 wrong positions the per-class rate cannot be ranked reliably, with or without a position control"
+      },
+      "withdrawn": "the PER_CLASS_RATES_SURVIVE / PER_CLASS_RATES_ARE_CONFOUNDED decision. Its evaluated value, PER_CLASS_RATES_ARE_CONFOUNDED, is recorded as not trustworthy and must not be reported as a finding.",
+      "replacement_procedure": {
+        "step_1": "report the raw per-class rate, which the same harness shows is unbiased, spanning only 1.67-fold on truly equal classes",
+        "step_2": "test whether the classes differ at all before ranking them: a Monte Carlo goodness-of-fit against the null that every class shares the pooled error rate, using the real per-class opportunity counts, 20000 replicates, seed 20260921, statistic chi-square",
+        "step_3": "report the minimum-support-30 standardised rates beside the raw ones, with the validated noise floor stated next to them",
+        "decision": {
+          "PER_CLASS_DIFFERENCES_ESTABLISHED": "Monte Carlo p below 0.01",
+          "PER_CLASS_DIFFERENCES_NOT_ESTABLISHED": "otherwise, in which case no class ranking is reported and no loss weighting may be justified by this phase"
+        }
+      },
+      "unaffected": "the confusion matrix, the per-slot pair distributions, the directionality classification and the shape-versus-distortion classification are raw counts and ratios, not standardised rates, and stand as declared in amendment 5",
+      "standing_rule_restated": "validate the instrument, on content whose answer is known, before reading any decision from it. This is the second instrument in this addendum to fail that check after a decision had already been computed."
+    },
+    {
+      "id": 7,
+      "utc": "2026-09-21",
+      "section": "owner verdicts for the 24 card sheets: the mapping, fixed before unblinding",
+      "state_at_the_time_of_writing": {
+        "verdicts_returned": 24,
+        "of": 24,
+        "blind_distribution": {
+          "A": 15,
+          "B": 9
+        },
+        "note": "A and B are the sheet positions and carry no meaning without the private key, which has not been joined to the verdicts at the time this amendment is committed",
+        "other_batches_outstanding": {
+          "substitution_cells": 30,
+          "wrong_training_records": 20
+        }
+      },
+      "coverage": "the 24 sheets are not a sample. There were exactly 24 external-validation cards with any wrong copy under the primary model, and every one of them has a sheet, so the review covers the whole population of wrong cards. One representative wrong copy per card was shown.",
+      "verdict_meaning": {
+        "the label": "the annotation is right and the model is wrong: a genuine model error",
+        "the prediction": "the annotation is wrong and the model was right: a label error",
+        "neither": "both strings are wrong",
+        "unreadable or cannot tell": "an image-quality failure, not attributable to either"
+      },
+      "decision": {
+        "LABEL_ERROR_MATERIAL": "at least 25 percent of the reviewed cards resolve to the prediction",
+        "LABELS_SOUND": "fewer than 10 percent resolve to the prediction",
+        "MIXED": "between those"
+      },
+      "corrected_reporting": {
+        "card_level": "corrected cards all-copies-exact = 269 plus the cards whose verdict chose the prediction, reported beside the raw 269 of 293 and labelled as a correction, not a new measurement",
+        "record_level": "a label-error card only converts those of its wrong copies whose prediction equals the string the owner endorsed; this is checked per copy rather than assumed",
+        "denominator_caveat": "a wrong annotation means the record was never scorable against a correct truth, so the corrected figure is an upper bound on what the model would have scored against clean annotation",
+        "status": "still EXPLORATORY. External validation remains opened selection data and a label correction does not change that."
+      },
+      "consequences_to_state_if_label_errors_are_found": [
+        "the same annotation source produced the external train labels and the one-time external test labels, so a label-error rate measured here bears on the 91.72 percent test figure as well",
+        "the UNDERFIT threshold of 99.0 percent assumed a clean training set, as amendment 4 already noted",
+        "the CARD_CONCENTRATED secondary finding was explicitly held pending this review"
+      ],
+      "what_this_review_cannot_settle": "the owner judged whole 14-digit strings from a crop and a band. It resolves label versus model, not the alignment versus glyph question, which the 30 substitution-cell sheets address."
+    },
+    {
+      "id": 8,
+      "utc": "2026-09-21",
+      "section": "the 30 substitution-cell and 20 training-record verdicts: parsing and mapping, fixed before unblinding",
+      "state_at_the_time_of_writing": {
+        "substitution_cells": {
+          "sheets": 30,
+          "answered": 28,
+          "blank": 2,
+          "blind_distribution": {
+            "A": 12,
+            "B": 15,
+            "single_digit_entry": 1
+          }
+        },
+        "wrong_training_records": {
+          "sheets": 20,
+          "answered": 19,
+          "blank": 1,
+          "blind_distribution": {
+            "A": 11,
+            "B": 8
+          }
+        },
+        "note": "A and B are sheet positions and carry no meaning without the private key, which has not been joined to these verdicts at the time this amendment is committed"
+      },
+      "parsing_rules": {
+        "single_digit_entry": "one sheet carries a bare digit instead of A or B. A verdict that is a single digit is matched against the two candidates shown on that sheet: if it equals exactly one of them, that candidate is the verdict; if it equals neither, it counts as neither. The two candidates on a substitution sheet always differ, so a digit cannot match both.",
+        "blank": "a blank verdict is excluded from the denominator and reported as unanswered, never imputed",
+        "everything_else": "as in amendment 7"
+      },
+      "substitution_cells_decision": {
+        "question": "are the 30 cells the error-kind rule called substitutions actually legible, which is the precondition the digit-identity follow-up set for any capacity or loss weighting",
+        "GLYPHS_LEGIBLE": "fewer than 20 percent of answered cells come back unreadable or cannot tell",
+        "GLYPHS_AMBIGUOUS": "20 percent or more do",
+        "second_axis": "of the legible cells, the share resolving to the prediction is a cell-level label error rate, and it is compared with the 4.2 percent found at card level. A large disagreement between the two would mean the card sheets and the cell sheets are measuring different things and neither should be trusted alone.",
+        "consequence_if_legible": "the substitution ceiling is in the model, so capacity or loss weighting is a defensible next step, aimed at the classes the validated Monte Carlo test established as differing, which were 4 and 7",
+        "consequence_if_ambiguous": "the substitution ceiling is partly in the data, and no amount of capacity fixes it"
+      },
+      "training_records_decision": {
+        "question": "is there label error or unreadable material inside the training set, the third explanation for UNDERFIT that neither capacity nor optimization covers",
+        "TRAINING_LABELS_SOUND": "fewer than 10 percent of answered records resolve to the prediction",
+        "TRAINING_LABEL_ERROR_MATERIAL": "25 percent or more do",
+        "MIXED": "between those",
+        "implied_ceiling": "a record whose label is wrong can never be scored exact against that label, so the attainable external-train exact is at most 2673 minus the implied number of label-error records. This is reported against the 99.0 percent UNDERFIT threshold, which amendment 4 already recorded as assuming a clean training set.",
+        "sample_caveat": "these 20 are a seeded random sample of the 171 wrong training records, unlike the 24 card sheets which were the whole population, so the rate carries sampling error and is reported with a Wilson interval"
+      }
+    },
+    {
+      "id": 9,
+      "utc": "2026-09-21",
+      "section": "post-review follow-ups; the control run is still in flight as this is committed",
+      "run_state_at_commit": {
+        "last_evaluation_step": 1110,
+        "train_exact": 2588,
+        "deltas_so_far": [
+          30,
+          20,
+          18,
+          10,
+          8
+        ]
+      },
+      "item_1_underfit_threshold_corrected": {
+        "original": "train exact below 0.990 on the 2673 external-train records",
+        "why_it_was_wrong": "it assumed clean training labels. The blinded sample of 19 answered wrong training records puts the label-error rate at 21.1 percent, Wilson interval 8.5 to 43.3 percent, which over the 171 wrong training records implies 36 label-error records, interval 15 to 74.",
+        "corrected_ceiling_records": {
+          "low": 2599,
+          "point": 2637,
+          "high": 2658
+        },
+        "corrected_ceiling_rate": {
+          "low": 0.97228,
+          "point": 0.98653,
+          "high": 0.99456
+        },
+        "corrected_threshold": "UNDERFIT holds when train exact sits materially below the attainable ceiling, not below a fixed 0.990. Materially is defined as more than 1.0 point below the low end of the ceiling band.",
+        "status_of_the_original_declaration": "the original UNDERFIT was evaluated against an unattainable bar and is marked as such. It survives the correction because the measured 93.60 percent sits 5.05 points below even the point-estimate ceiling, far outside the interval.",
+        "reporting": "the control run is reported against the corrected ceiling band, never against 0.990"
+      },
+      "item_2_control_run_reading": {
+        "what_could_not_be_changed": "the run was launched before this instruction arrived. It writes only the final weights, so intermediate checkpoints do not exist and cannot be recovered without re-running. The per-evaluation log is complete and is what the plateau question needs.",
+        "what_the_run_still_obeys": "its committed early stop of six non-improving evaluations and its 2664 step cap, both from amendment 3",
+        "checkpoint_rule_for_any_future_run": "every evaluation writes a checkpoint",
+        "selection": "external validation is not evaluated and is not used to select anything",
+        "plateau_definition": "the last three evaluation deltas in train exact are each 5 records or fewer",
+        "decision_against_the_corrected_ceiling": {
+          "BELOW_EVEN_THE_LOWEST_CEILING": "final train exact below 2599: optimization headroom remains and no label-fitting concern arises",
+          "INSIDE_THE_CEILING_BAND": "between 2599 and 2658: consistent with having fitted everything the labels permit",
+          "ABOVE_THE_CEILING_BAND": "above 2658: the model is fitting records the blinded review says carry wrong labels. That is a finding about memorization, not a win, and it would make the run evidence against training longer, not for it."
+        }
+      },
+      "item_3_label_error_geometry": {
+        "question": "do the 4 label-error training records sit in the top shear quartile or among augmented copies, which would mean the train folder is genuinely dirtier because only it was augmented, rather than the 4 being small-sample noise",
+        "measure": "for the 4 training and the validation label errors: augmented versus original status, shear-proxy quartile, absolute rotation, and source pixels per digit, each against the distribution of the wrong records they were drawn from",
+        "status": "descriptive; no threshold; needs no new review sheets"
+      },
+      "item_4_no_claim_of_a_dirtier_training_set": {
+        "rule": "the point estimates are 21.1 percent on training and 4.2 percent on validation, the two-proportion test gives z = 1.72 and p = 0.086, and the sample cannot settle it. No claim that the training set is dirtier may be made in any report from this phase.",
+        "if_more_sheets_are_built": "declare the target precision first. To halve the current Wilson half-width of about 17 points, to roughly 8 points, needs on the order of 75 answered training sheets in total, so about 55 more."
+      },
+      "item_5_first_glyph_experiment": {
+        "before_any_capacity_change": "class reweighting or logit adjustment, not more parameters",
+        "targets": [
+          "the 4 and 7 class difference the Monte Carlo test established",
+          "the zero attraction: 27.1 percent of wrong positions predict 0, and 0 draws 98 wrong predictions against 37 errors on true zeros, a 2.65 attractor ratio"
+        ],
+        "why_first": "it is cheaper, it is reversible, and it tests the class-imbalance hypothesis directly rather than confounding it with capacity",
+        "capacity_comes_after": "and only on top of the longer schedule, never on the 8-epoch baseline, because the control run shows the baseline had not converged",
+        "precondition_met": "the blinded 30-cell review returned GLYPHS_LEGIBLE, which is the condition the digit-identity follow-up set for doing any of this"
+      }
+    },
+    {
+      "id": 10,
+      "utc": "2026-09-21",
+      "section": "two further control-run readings and a ceiling correction, declared while the run is live",
+      "run_state_at_commit": {
+        "last_evaluation_step": 1554,
+        "train_exact": 2609,
+        "already_inside_the_ceiling_band": true
+      },
+      "item_1_known_label_error_probe": {
+        "why_it_beats_the_aggregate": "the aggregate count cannot separate learning from memorization. Nineteen specific training records carry a human verdict, so they can.",
+        "population": {
+          "model_was_right_and_the_label_wrong": 4,
+          "label_was_right": 15
+        },
+        "measure_on_the_final_control_model": [
+          "how many of the 4 now reproduce the wrong label, which is direct evidence of memorization regardless of what the aggregate count does",
+          "how many of the 15 are now read correctly, which is genuine learning"
+        ],
+        "reading": "any of the 4 flipping to the wrong label is memorization. The two counts are reported separately and never netted against each other.",
+        "ceiling_is_a_lower_bound_not_an_upper_one": {
+          "what_the_36_counts": "label errors among records the BASELINE got wrong, because the 171 wrong records are the only pool the review sampled",
+          "what_it_misses": "records whose label is wrong and whose wrong label the baseline already reproduced. Those score as exact, never enter the wrong-record pool, and are invisible to this design.",
+          "consequence": "36 is a lower bound on the training label errors, so the perfect-reader ceiling of 2637 is an OVER-estimate and the true ceiling may be lower",
+          "therefore": "the 2658 memorization threshold declared in amendment 9 is LENIENT, not conservative. A model can be memorizing wrong labels well below it, and the probe above is what detects that, not the aggregate."
+        }
+      },
+      "item_2_single_transfer_reading": {
+        "why_this_is_a_measurement_and_not_a_selection": "the run writes final weights only, so there is no checkpoint to choose between. One read of one fixed model cannot select anything.",
+        "declared_now": {
+          "reads": 1,
+          "model": "the final control weights",
+          "split": "external validation",
+          "unit": "card level",
+          "comparison": "paired two-sided sign test against frozen v3 on the same cards, discordant cards only",
+          "also_reported": "the record-level error families on the result, the same anatomy as the frozen v3",
+          "forbidden": "no threshold, operating point or policy may be tuned on this read, and no checkpoint may be selected with it"
+        },
+        "question": "does the training gain from 2502 to the final count transfer to validation at all",
+        "status": "EXPLORATORY. External validation is opened selection data and one more read does not change that."
+      },
+      "item_3_ceiling_upper_bound_corrected": {
+        "was": 0.99456,
+        "is": 0.99438,
+        "why": "the upper bound must be quoted from the integer record count, 2658 of 2673 = 99.44 percent. The earlier figure came from the unrounded 14.548 label-error records.",
+        "band_to_quote": {
+          "low": "2599 of 2673 = 97.23 percent",
+          "point": "2637 of 2673 = 98.65 percent",
+          "high": "2658 of 2673 = 99.44 percent"
+        }
+      },
+      "item_4_standing_rule_for_future_runs": {
+        "checkpointing": "write a checkpoint at every evaluation, not only at the end",
+        "memorization_monitor": "at every evaluation, log the model's prediction on each known-label-error record and on each verified-correct-label record from the blinded review, so memorization is visible as it happens rather than inferred afterwards",
+        "applies_from": "this amendment onward, to every training run in any phase",
+        "note": "the run currently in flight predates this rule and satisfies neither; that is recorded rather than worked around"
+      }
+    }
+  ],
+  "scope": {
+    "primary_model": "B_seed3101",
+    "primary_model_meaning": "the frozen Fixed14-v3 candidate (Phase 2M-C stage B, seed 3101, best epoch 6)",
+    "runs": [
+      "B_seed3101",
+      "B_seed3202",
+      "C_seed3101",
+      "C_seed3202"
+    ],
+    "evaluation_split": "external_validation",
+    "evaluation_records": 647,
+    "status_of_every_validation_number": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT",
+    "forbidden_inputs": [
+      "external test bands, labels, logits or predictions (the 321-record consumed one-time test)",
+      "the consumed internal validation (618 cards)",
+      "the locked audit (377 cards)"
+    ],
+    "single_permitted_test_related_input": "artifacts/phase2m_c/external_test_meta.jsonl, read for structural counts only (identity group, duplicate group, member path, source pixels per digit); never its labels, bands or predictions",
+    "access_ledger": "artifacts/phase2m_e/access_ledger.json (a new Phase 2M-E ledger, not the Phase 2M-C one)"
+  },
+  "error_kinds": {
+    "domain": "every digit position k in 0..13 of every external-validation record whose prediction p differs from the truth t at that position",
+    "precedence": [
+      "shift",
+      "collision",
+      "neighbour",
+      "substitution"
+    ],
+    "precedence_meaning": "a wrong position is assigned the first kind in this order whose condition holds",
+    "definitions": {
+      "shift": "the position lies inside a maximal run of consecutive positions k for which p[k] == t[k+s] for a single fixed s in {-1, +1}, and that run contains at least 2 wrong positions",
+      "collision": "the slot copied a correct neighbour that the neighbour own slot also predicted: p[k] == t[k-1] == p[k-1], or p[k] == t[k+1] == p[k+1]",
+      "neighbour": "p[k] equals t[k-1] or t[k+1], but the position is neither a shift nor a collision",
+      "substitution": "any other wrong position"
+    },
+    "correct_positions_are_labelled": "ok and are excluded from every kind denominator"
+  },
+  "tta": {
+    "views": [
+      {
+        "name": "shift_0px",
+        "transform": "identity"
+      },
+      {
+        "name": "shift_minus_3px",
+        "transform": "horizontal translation of -3 px in the 160x576 tensor, cv2.warpAffine, BORDER_REPLICATE"
+      },
+      {
+        "name": "shift_plus_3px",
+        "transform": "horizontal translation of +3 px in the 160x576 tensor, cv2.warpAffine, BORDER_REPLICATE"
+      }
+    ],
+    "combination": "arithmetic mean of per-view softmax probabilities, then argmax per slot",
+    "vertical_or_scale_views": "none"
+  },
+  "ensembles": {
+    "combination": "arithmetic mean of per-model softmax probabilities, then argmax per slot",
+    "members": {
+      "ensemble_B_pair": [
+        "B_seed3101",
+        "B_seed3202"
+      ],
+      "ensemble_all_four": [
+        "B_seed3101",
+        "B_seed3202",
+        "C_seed3101",
+        "C_seed3202"
+      ],
+      "ensemble_B_pair_with_tta": [
+        "B_seed3101",
+        "B_seed3202"
+      ]
+    },
+    "status": "measurement only; no ensemble is frozen, selected or promoted in this phase"
+  },
+  "reject_curve": {
+    "fractions": [
+      0.0,
+      0.01,
+      0.02,
+      0.05,
+      0.1
+    ],
+    "ranking_statistic": "per record, the minimum over the 14 slots of (top-1 probability minus top-2 probability); records with the smallest value are rejected first",
+    "tie_break": "stable sort by the ranking statistic, then by record index",
+    "models": [
+      "primary B_seed3101 single view",
+      "the best ensemble by validation exact among the declared ensembles"
+    ],
+    "reported": [
+      "accepted",
+      "exact on accepted",
+      "exact rate on accepted",
+      "wrong records caught"
+    ],
+    "status": "measurement only; no operating point is frozen"
+  },
+  "residual_bins": {
+    "statistic": "per record, the maximum absolute residual of the 14 true digit-box centres from the best least-squares uniform 14-slot grid along the fitted line direction, expressed in digit pitches",
+    "edges_pitch": [
+      0.0,
+      0.15,
+      0.25,
+      0.35,
+      null
+    ],
+    "null_means": "unbounded upper edge",
+    "second_statistic": "mean absolute residual at wrong versus correct positions"
+  },
+  "bootstrap": {
+    "method": "cluster bootstrap resampling whole identity groups (cards) with replacement",
+    "statistic": "record-level exact rate = exact records / records in the resampled set",
+    "reps": 2000,
+    "seed": 20260920,
+    "interval": "percentile 2.5 and 97.5",
+    "reported_next_to": "Wilson score interval at 95 percent computed on the records as if independent"
+  },
+  "geometry": {
+    "chain": "line_rect_from_digit_boxes -> band_quad(context 0.16 left, 0.04 right of line length, band 180x650) -> warp_quad to 180x650 with pad 245 -> phase2l_a.letterbox to 160x576 with pad 245",
+    "pixel_centre_convention": "a source point maps through the band perspective transform to band pixel coordinates; the letterbox resize maps band x to tensor x by tensor_x = (band_x + 0.5) * 576 / 650 - 0.5 and band y to tensor y by tensor_y = (band_y + 0.5) * 160 / 180 - 0.5; the letterbox for this exact aspect places content at left = 0 and top = 0 with no padding",
+    "normalized_column_coordinate": "u = (tensor_x + 0.5) / 576, the same coordinate the ConditionedOrderedSlots layer uses for its anchors",
+    "feature_column": "u * W - 0.5 with W = 144 (horizontal stride 4 over a 576 px tensor)"
+  },
+  "alignment_measures": {
+    "attention_centroid": "sum over columns of weight times (column index + 0.5), converted to u by dividing by W",
+    "attention_argmax": "the column with the largest attention weight",
+    "offset_pitch": "(attention centroid in u minus the true digit-box centre in u) divided by the box-derived pitch in u",
+    "assignment_error": "the true digit-box centre nearest the slot attention argmax is not the slot own digit",
+    "adjacent_overlap": "sum over columns of min(weight of slot k, weight of slot k+1)",
+    "content_saturation": "fraction of (record, slot, column) content-term entries with absolute value at least 0.95 times the configured content_logit_cap, reported for slots whose position is correct and for slots whose position is wrong"
+  },
+  "structure_validity": {
+    "checks": [
+      "century digit is 2 or 3",
+      "the implied birth date is a real calendar date",
+      "the governorate code is in the 27-governorate plus 88 table"
+    ],
+    "check_digit": "never used",
+    "interpretation": "the external identities are fictional and carry intentional semantic inconsistencies, so these are descriptive rates and not correctness tests, and no prediction is ever rewritten or selected with them"
+  },
+  "blinded_review": {
+    "population": "every external-validation card (identity group) with at least one wrong copy under the primary model",
+    "sheet_contents": [
+      "the source-image crop around the digit line",
+      "the materialized 160x576 band",
+      "two candidate 14-digit strings in a random order under a neutral review ID"
+    ],
+    "candidates": [
+      "the annotation label",
+      "the primary model prediction"
+    ],
+    "order_seed": 20260920,
+    "blinding": "the sheet never says which candidate is the label",
+    "verdicts": [
+      "A correct",
+      "B correct",
+      "neither",
+      "unreadable",
+      "cannot tell"
+    ],
+    "template_is_filled_in_this_phase": false,
+    "location": "artifacts/phase2m_e/review/ (ignored tree only)"
+  },
+  "decision_mapping": {
+    "wrong_position_denominator": "all wrong digit positions of the primary model on the 647 external-validation records",
+    "wrong_record_denominator": "all external-validation records the primary model gets wrong",
+    "evaluation_order": [
+      "ALIGNMENT_DOMINANT",
+      "GLYPH_DOMINANT",
+      "UNDERFIT",
+      "VARIANCE",
+      "CARD_CONCENTRATED"
+    ],
+    "primary_finding": "the first finding in evaluation_order whose condition holds; MIXED if none holds",
+    "secondary_findings": "every other finding whose condition also holds",
+    "conditions": {
+      "ALIGNMENT_DOMINANT": "shift + collision positions are at least 50 percent of wrong positions AND more than 50 percent of those shift and collision positions show an assignment error in C2",
+      "GLYPH_DOMINANT": "substitution positions are at least 60 percent of wrong positions AND the assignment-error rate over wrong positions is below 50 percent",
+      "UNDERFIT": "primary exact-sequence rate on the 2673 materialized external-train records, inference mode and no augmentation, is below 0.990",
+      "VARIANCE": "that train exact rate is at least 0.995 AND the primary validation exact rate is below 0.95",
+      "CARD_CONCENTRATED": "at least 50 percent of wrong validation records belong to cards all of whose copies are wrong",
+      "MIXED": "none of the above holds"
+    }
+  },
+  "decision_tokens": {
+    "complete": "PHASE2M_E_ANATOMY_COMPLETE:<primary finding>",
+    "blocked": "PHASE2M_E_BLOCKED:<reason>"
+  },
+  "frozen_state_hashes": {
+    "v2_config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+    "v2_weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b",
+    "v3_weights_sha256": "27cbcf9f93890d85a91f63c3c1a07ed1f8a7a4e85803ad3d90b60394ffdc492a",
+    "v3_candidate_config_sha256_lf": "dc968ce313a4ff685620a66b288fa8d96b461a9376dcc0b4d238b7a7ad435362",
+    "v3_rule_config_sha256_lf": "e4bdac468adf311151313650c0313935419f08627e6568c0616eb2113348d2aa",
+    "checked": "at entry and again at exit, exactly as src/extraction/fixed14_v3_shadow.verify_shadow_candidates checks them in the Phase 2M-D demo"
+  }
+}

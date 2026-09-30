@@ -1,0 +1,19 @@
+{
+  "schema_version": "synthetic_id_allowlist_v1",
+  "purpose": "New, deliberately synthetic national IDs that may enter tracked files. The commit guard blocks any structurally valid 14-digit run that is new to HEAD; an entry here is the owner saying this one is invented, not observed. Values already in HEAD when the guard was installed need no entry.",
+  "never_add": "a value transcribed from, predicted from, or looked up against a real card. Those are the leak the guard exists to stop, and tier 1 will reject them whatever this file says.",
+  "ids": [
+    {
+      "value": "29005121234567",
+      "why": "synthetic test fixture, in HEAD before the guard; recorded at the owner's request after the 2026-09-27 pre-push scan (tier 1 clean against the labelled set). tests/test_governance_hooks.py FIXTURE_AT_HEAD"
+    },
+    {
+      "value": "29901011234571",
+      "why": "synthetic test fixture, in HEAD before the guard; recorded at the owner's request after the 2026-09-27 pre-push scan (tier 1 clean against the labelled set). the 2M-H synthetic identity (tests/test_phase2m_h.py, tests/test_phase4_audit.py)"
+    },
+    {
+      "value": "29805052222221",
+      "why": "synthetic test fixture, in HEAD before the guard; recorded at the owner's request after the 2026-09-27 pre-push scan (tier 1 clean against the labelled set). tests/test_phase2m_h.py SYNTHETIC"
+    }
+  ]
+}

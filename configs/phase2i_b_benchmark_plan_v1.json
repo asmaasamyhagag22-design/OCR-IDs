@@ -1,0 +1,82 @@
+{
+  "schema_version": "phase2i_b_benchmark_plan_v1",
+  "phase": "2I-B",
+  "created_before_comparative_results": true,
+  "production_mutation": false,
+  "fine_tuning": false,
+  "locked_audit_access": false,
+  "target": {
+    "metric": "exact_whole_set_card_accuracy",
+    "population": 1952,
+    "required_exact": 1855,
+    "frozen_exact": 1487,
+    "gap": 368
+  },
+  "nested_development_split": {
+    "source": "artifacts/phase2f/split_manifest.jsonl",
+    "source_sha256": "cc19d7d419a3e028cf8030e7557a656399d73ede300d4f127e3b90ccba578a1c",
+    "algorithm": "sha256(tag + ':' + identity_component), first 32 bits modulo 5",
+    "tag": "phase2i-b-nested-development-v1",
+    "calibration_buckets": [2, 3, 4],
+    "internal_validation_buckets": [0, 1],
+    "grouping": "identity_component; exact and near-duplicate links inherited from Phase 2F",
+    "internal_validation_is_external": false
+  },
+  "lanes": {
+    "A": "recognizer-only on every Phase 2H selected development crop that reached OCR",
+    "B": "development intersection of Phase 2H correctly-framed failure inventory",
+    "C": "69 development admission residuals using frozen Phase 2I-A shadow candidates only",
+    "D": "all 1198 previously exact development controls"
+  },
+  "recognizers": [
+    "arabic_PP-OCRv5_mobile_rec",
+    "PP-OCRv5_server_rec",
+    "en_PP-OCRv5_mobile_rec",
+    "latin_PP-OCRv3_mobile_rec",
+    "arabic_PP-OCRv3_mobile_rec",
+    "tesseract_5_4_0_eng_psm7_digits"
+  ],
+  "preprocessing": {
+    "original_rgb": {"operation": "identity"},
+    "clahe_gray_rgb": {"operation": "CLAHE", "clip_limit": 2.0, "tile_grid": [8, 8]},
+    "unsharp_mild_rgb": {"operation": "unsharp_mask", "gaussian_sigma": 1.0, "amount": 0.6},
+    "gamma_0_85_rgb": {"operation": "gamma", "gamma": 0.85},
+    "upscale_2x_lanczos_rgb": {"operation": "integer_upscale", "scale": 2, "interpolation": "Lanczos4"}
+  },
+  "configuration_schedule": {
+    "all_development_original": [
+      "arabic_PP-OCRv5_mobile_rec",
+      "PP-OCRv5_server_rec",
+      "en_PP-OCRv5_mobile_rec",
+      "latin_PP-OCRv3_mobile_rec",
+      "arabic_PP-OCRv3_mobile_rec",
+      "tesseract_5_4_0_eng_psm7_digits"
+    ],
+    "calibration_all_views": [
+      "arabic_PP-OCRv5_mobile_rec",
+      "PP-OCRv5_server_rec",
+      "en_PP-OCRv5_mobile_rec",
+      "tesseract_5_4_0_eng_psm7_digits"
+    ],
+    "internal_validation": "one frozen final challenger configuration plus frozen agreement policies"
+  },
+  "runtime_selection_policies": {
+    "challenger_fixed": "return the one frozen challenger output",
+    "preserve_current_on_disagreement": "return current output whenever normalized full-string outputs differ",
+    "exact_agreement_review_disagreement": "auto-accept only identical full-string outputs; otherwise NEEDS_REVIEW",
+    "three_way_exact_agreement": "auto-accept only identical full-string outputs from the frozen three configurations; otherwise NEEDS_REVIEW"
+  },
+  "selection_prohibitions": [
+    "ground_truth",
+    "filenames",
+    "card_ids",
+    "identity_lookup",
+    "dataset_position",
+    "truth-driven per-card route choice",
+    "digit repair",
+    "generative enhancement"
+  ],
+  "candidate_generation": "all crops, views, raw reads, confidence, provenance, latency and resource data are generated before truth is loaded",
+  "evaluation": "truth is loaded only in a separate process and raw values never enter aggregate reports",
+  "oracle_label": "diagnostic_upper_bound_not_production_accuracy"
+}

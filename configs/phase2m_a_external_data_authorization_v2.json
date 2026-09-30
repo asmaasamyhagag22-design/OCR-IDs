@@ -1,0 +1,75 @@
+{
+  "archive_sha256": "3105756894a4e119ab0ae5e360c16da839dbdc4fd612c3cfd881d386bd01f271",
+  "attribution": {
+    "license": "CC BY 4.0",
+    "required_in_future_dataset_card": true,
+    "required_in_future_model_report": true,
+    "source_urls": [
+      "https://universe.roboflow.com/egyptian-national-ids/egyptian-national-ids",
+      "https://universe.roboflow.com/egyptianids/nid-ar-digits"
+    ]
+  },
+  "decision": "EXTERNAL_DATA_AUTHORIZED_AND_TRAINING_READY",
+  "eligibility": {
+    "eligible_exact_14_records": 3912,
+    "excluded_records": 601,
+    "exclusion_counts": {
+      "incomplete_or_unreadable_line": 2,
+      "invalid_boxes": 2,
+      "missing_annotation": 1,
+      "not_exact_14": 596
+    }
+  },
+  "fixed14_v2": {
+    "config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+    "preserved": true,
+    "reported_exact_match_percent": 93.2,
+    "weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b"
+  },
+  "local_record": {
+    "aggregate_description": "README records describe a digit-annotation computer-vision export for training and declare CC BY 4.0.",
+    "cc_by_4_0_declarations": 2,
+    "readme_bundle_sha256": "3e57ba3789252f34c91f60dec521aa6540b18588e1c78dd7aeefa9651efa074b",
+    "readme_count": 4
+  },
+  "private_outputs": {
+    "provenance_evidence": "artifacts/phase2m_a/provenance_evidence.json",
+    "readiness_gate": "artifacts/phase2m_a/external_readiness_gate.json",
+    "split_manifest": "artifacts/phase2m_a/external_split_manifest.jsonl"
+  },
+  "provenance_type": "USER_SUPPLIED_OWNER_PROVENANCE",
+  "schema_version": "phase2m_a_external_data_authorization_v2",
+  "scope_guards": {
+    "consumed_618_validation_accessed": false,
+    "locked_377_audit_accessed": false,
+    "original_report_modified": false,
+    "production_modified": false,
+    "raw_or_card_level_data_committed": false,
+    "training_started": false
+  },
+  "split_proposal": {
+    "counts": {
+      "external_test": 321,
+      "external_train": 2892,
+      "external_validation": 699
+    },
+    "duplicate_cross_split_groups": 0,
+    "frozen": true,
+    "identity_cross_split_groups": 0,
+    "method": "identity and exact/perceptual duplicate components, deterministic 70/20/10 hash buckets",
+    "perceptual_hamming_threshold": 4,
+    "seed": "phase2m-a-owner-authorized-external-v1"
+  },
+  "structural_audit_preserved": {
+    "annotation_records": 4512,
+    "exact_14_annotation_records": 3916,
+    "exact_byte_duplicate_groups": 300,
+    "exact_dhash_duplicate_groups": 317,
+    "images_in_exact_byte_duplicate_groups": 600,
+    "images_in_exact_dhash_duplicate_groups": 637,
+    "images_in_repeated_label_identity_groups": 3427,
+    "label_identity_groups": 1644,
+    "repeated_label_identity_groups": 1155,
+    "valid_images": 4513
+  }
+}

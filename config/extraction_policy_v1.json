@@ -1,0 +1,42 @@
+{
+  "config_version": "extraction_policy_v1",
+  "confidence_threshold": 0.75,
+  "confidence_threshold_note": "Below this, a field with no cross-check available goes to needs_review rather than high_confidence. Not calibrated against Egyptian IDs; it is a starting point to tune once the contact sheet has been reviewed.",
+  "repaired_field_state": "needs_review",
+  "repaired_field_state_note": "State given to a field whose contradiction was resolved by an accepted repair. Default is needs_review: the repair is evidence-backed, but it is still a machine-authored change to a legal identifier. A repair cannot create externally_verified, which is reserved for comparison against independent application data.",
+  "governorate_check_blocking": false,
+  "governorate_check_blocking_note": "Default false: a governorate_encoded_vs_address disagreement is recorded as an 'observation' and never sends the card to a human. Two independent reasons, either sufficient. (1) It does not discriminate. Recomputed on the final 1823-card pipeline: it fires on 15.3% of correct reads (189/1237 where the comparison was possible) and 18.8% of wrong ones (44/234), a likelihood ratio of 1.231. Those intervals overlap heavily - [13.4%, 17.4%] against [14.3%, 24.3%] - so the ratio is not distinguishable from 1. At the observed base error rate of 409/1823 = 22.4%, a disagreement moves the posterior that the number is wrong from 22.4% to 26.3%, i.e. 3.8 points of belief in exchange for routing 189 correctly-read cards to manual review. Measured earlier on the 1027-card post-repair state the same quantities were 15.1% and 16.8% for a ratio of 1.11; both states agree that the ratio is near 1. A check with a likelihood ratio near 1 is not a weak check, it is not a check. (2) Its premise is false. Digits 8-9 encode the governorate of BIRTH REGISTRATION while the printed address is a CURRENT RESIDENCE; these were never required to agree. All 88 of the 88 governorate disagreements examined on correctly-read cards were correct reads, and 83% of them named Cairo, Giza or Qalyubia while the encoded governorates were spread across the governorates people leave - the signature of internal migration, not of OCR error. The decoder already treats digits 8-9 as a birth attribute: it records 'born_outside_egypt' for code 88. Reason (2) is why this is not merely a precision tune: routing a specific geographic and socioeconomic population to extra scrutiny inside a selection programme is a policy decision, and it must be taken deliberately rather than emerge implicitly from an OCR cross-check whose premise nobody checked. Measured cost of the demotion: 22 structurally valid but wrong reads were flagged by this check alone and are no longer flagged, so detection of that population falls from 38.6% to 29.2% while false flags on correct reads fall from 16.8% to 3.8% and the review queue falls from 18.8% to 6.8% of cards. The comparison is still computed and recorded, and remains useful in AGGREGATE as a per-batch drift signal - see cross_checks.governorate_drift. Set true to restore blocking behaviour; the tests of blocking-check behaviour do exactly that.",
+  "repair_enabled": false,
+  "repair_enabled_note": "Default false. Measured on the 1027-card official labelled set that reached OCR (reports/official_eval_baseline.md): 10 repairs were applied, and 7 of them turned a CORRECT read into a wrong one against 1 that fixed a wrong read (2 were wrong before and after). Exact national IDs: 652 before repair, 646 after - the rule cost 6 correct numbers net. Worse, 6 of the 7 damaged cards finished with their cross-checks reporting pass, because the rewritten number now agrees with the printed date or address it was rewritten to match. The reason is that every repair trigger compares the digits against other ink on the SAME image, and that evidence is itself an OCR read which can simply be wrong: when the printed date or the address governorate is misread, the search rewrites a correct ID to match it and the check then passes because both sides agree. A rule that manufactures consensus from evidence which is itself an OCR read is not a repair. The ID digits are read correctly on 62.9% of cards; the printed birth date parses at all on only 107 of 1027, so the trigger fields are far less reliable than the digits they would overwrite. Re-enable only with evidence that a trigger field is read MORE reliably than the ID digits, and never on national_id_front_vs_back, which compares two OCR reads of equal standing. The repair code and its tests are retained unchanged; tests that exercise the rule set this flag to true explicitly.",
+  "max_repair_edits": 2,
+  "max_repair_edits_note": "Maximum number of confusable-digit substitutions considered when repair_enabled is true. Two keeps the search exhaustive and small (a few hundred candidates) while covering the realistic double-misread case.",
+  "ocr": {
+    "lang_arabic": "ara",
+    "lang_digits": "ara",
+    "lang_digits_note": "Measured on this corpus: the numerals printed on these cards are Arabic-Indic, which the eng model cannot emit. lang=ara recovers roughly 15 digits per card against 2-8 for eng.",
+    "preprocessing": "none",
+    "preprocessing_note": "Phase 2C raw baseline passes the audited RGB field crop directly to each engine. Upscaling, grayscale conversion, CLAHE, thresholding, denoising, sharpening, padding, super-resolution and glare removal are excluded.",
+    "oem": 1,
+    "psm_candidates": [
+      6,
+      7,
+      8,
+      11,
+      13
+    ],
+    "psm_note": "The raw pilot evaluates these modes per Tesseract field crop and retains every attempt. Selection is deterministic and reported; PSM 7 is not assumed.",
+    "whitelist_note": "A numeric whitelist improves digit recall and is sent to the engine. An Arabic-letter whitelist makes Tesseract's LSTM return nothing at all, so it is withheld; the declared charset is still enforced after the engine returns, and the withholding is recorded per field."
+  },
+  "orientation": {
+    "mode": "auto",
+    "allowed_rotations": [
+      0,
+      180
+    ],
+    "note": "Phase 1 performs no 90/180 degree correction by design, so its rectified crops arrive in mixed orientations. Phase 2 picks the reading whose id_number region yields closest to 14 digits and records the chosen rotation on every record. 90 and 270 are excluded because they break the canonical 1000x630 aspect ratio the region config is expressed in."
+  },
+  "layout_detection": {
+    "mode": "auto",
+    "note": "auto scores the front and back anchor regions and picks the higher. It is a heuristic, never authoritative: the chosen layout is recorded in every document record so a wrong choice is visible rather than silent."
+  }
+}

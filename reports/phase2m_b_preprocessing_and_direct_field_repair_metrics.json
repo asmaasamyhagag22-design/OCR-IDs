@@ -1,0 +1,845 @@
+{
+  "challenges": {
+    "challenge_A": {
+      "band_state": "complete_band",
+      "fallback_band_contains_manual_line": 0.985625,
+      "fallback_band_vs_manual_band_iou": 0.761675,
+      "fallback_invoked": true,
+      "fallback_line_vs_manual_line_iou": 0.531578,
+      "fallback_result_source": "routed",
+      "fallback_status": "SHADOW_NEEDS_REVIEW",
+      "fallback_truncation_vs_manual_line": {
+        "bottom": true,
+        "left": false,
+        "right": true,
+        "top": false
+      },
+      "fixed14_fallback_vs_manual_band_differing_positions": 5,
+      "localized": true,
+      "manual_card_boundary_complete": false,
+      "primary_status": "document_not_found",
+      "reached_fixed14": true,
+      "reading_direction_evidence": "head_tail",
+      "reasons": [],
+      "route": "fallback_shadow"
+    },
+    "challenge_B": {
+      "band_state": "complete_band",
+      "fallback_band_contains_manual_line": 1.0,
+      "fallback_band_vs_manual_band_iou": 0.858933,
+      "fallback_invoked": false,
+      "fallback_line_vs_manual_line_iou": 0.784629,
+      "fallback_result_source": "diagnostic_only_not_routed",
+      "fallback_status": "SHADOW_NEEDS_REVIEW",
+      "fallback_truncation_vs_manual_line": {
+        "bottom": false,
+        "left": false,
+        "right": false,
+        "top": false
+      },
+      "fixed14_fallback_vs_manual_band_differing_positions": 0,
+      "localized": true,
+      "manual_card_boundary_complete": true,
+      "primary_band_contains_manual_line": 1.0,
+      "primary_band_vs_manual_band_iou": 0.963241,
+      "primary_status": "success",
+      "primary_tensor_recorded": true,
+      "reached_fixed14": true,
+      "reading_direction_evidence": "head_tail",
+      "reasons": [],
+      "route": "primary"
+    }
+  },
+  "development": {
+    "canonical_reference_cards": 673,
+    "canonical_reference_digit_extent_xyxy": [
+      431.0,
+      487.0,
+      976.0,
+      553.0
+    ],
+    "config_sha256_lf": "a039886722928b7591f6080c1d52b2fbe6ff1d2e5bc27b1a492642675a9f2d93",
+    "development_residuals": {
+      "all_fallback_status_shadow": true,
+      "auto_accepted": 0,
+      "band_state_counts": {
+        "complete_band": 54,
+        "line_truncated_or_completeness_unproven": 14,
+        "no_fallback": 1
+      },
+      "exact_fixed14_on_complete_band": 49,
+      "exact_fixed14_v2": 62,
+      "exact_paddle": 0,
+      "exact_paddle_on_complete_band": 0,
+      "fallback_latency_ms": {
+        "max": 70.138,
+        "median": 19.053,
+        "min": 14.342,
+        "p10": 15.376,
+        "p90": 36.879
+      },
+      "fixed14_paddle_disagreement": 68,
+      "localized": 68,
+      "not_localized": 0,
+      "primary_status_counts": {
+        "corrupt_image": 1,
+        "document_not_found": 68
+      },
+      "produced_complete_band": 54,
+      "reached_fallback": 68,
+      "reached_recognizer": 68,
+      "readable_complete_band": 54,
+      "readable_complete_band_rate": 0.794118,
+      "readable_human_line_visible": 68,
+      "route_counts": {
+        "fallback_shadow": 68,
+        "primary_terminal": 1
+      },
+      "runtime_failure_non_trigger_status": 1,
+      "sealed_predictions_sha256": "c16f9fc08b9a074207f2cb0dff648a17223490f2bc0fa96317e5f51e3ec63497",
+      "subset_counts": {
+        "calibration": 51,
+        "internal_validation_subset_residual": 18
+      },
+      "total": 69,
+      "truth_loaded_after_seal": true,
+      "unreadable_or_truncated": 14
+    },
+    "fixed14_v2_after": {
+      "config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+      "weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b"
+    },
+    "internal_access": {
+      "consumed_validation_opened": 0,
+      "locked_audit_opened": 0,
+      "opened": {
+        "authorised_residual_internal_validation_subset": 18,
+        "calibration": 207
+      },
+      "residual_consumed_overlap": 0
+    },
+    "internal_synthetic_off_frame": {
+      "by_mode": {
+        "card_boundary_far_x": {
+          "clipped_localized_rate": 1.0,
+          "complete_and_contained_rate": 0.812081,
+          "complete_band_rate_fully_visible": 0.892617,
+          "digit_clipped": 1,
+          "direction_agreement_rate_localized": 0.986395,
+          "false_complete_rate_clipped": 1.0,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": 0.892617,
+          "fully_visible": 149,
+          "localization_success_rate": 0.778523,
+          "median_iou_fully_visible_localized": 0.712104,
+          "negative": 0,
+          "scenes": 150,
+          "truncated_band_count_localized_fully_visible": 14,
+          "truncation_by_direction": {
+            "bottom": 1,
+            "left": 3,
+            "right": 6,
+            "top": 6
+          }
+        },
+        "card_boundary_far_xy": {
+          "clipped_localized_rate": null,
+          "complete_and_contained_rate": 0.793333,
+          "complete_band_rate_fully_visible": 0.86,
+          "digit_clipped": 0,
+          "direction_agreement_rate_localized": 0.96,
+          "false_complete_rate_clipped": null,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": 0.866667,
+          "fully_visible": 150,
+          "localization_success_rate": 0.773333,
+          "median_iou_fully_visible_localized": 0.726419,
+          "negative": 0,
+          "scenes": 150,
+          "truncated_band_count_localized_fully_visible": 20,
+          "truncation_by_direction": {
+            "bottom": 5,
+            "left": 8,
+            "right": 11,
+            "top": 5
+          }
+        },
+        "card_boundary_far_y": {
+          "clipped_localized_rate": null,
+          "complete_and_contained_rate": 0.78,
+          "complete_band_rate_fully_visible": 0.866667,
+          "digit_clipped": 0,
+          "direction_agreement_rate_localized": 0.973333,
+          "false_complete_rate_clipped": null,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": 0.826667,
+          "fully_visible": 150,
+          "localization_success_rate": 0.74,
+          "median_iou_fully_visible_localized": 0.686681,
+          "negative": 0,
+          "scenes": 150,
+          "truncated_band_count_localized_fully_visible": 26,
+          "truncation_by_direction": {
+            "bottom": 3,
+            "left": 12,
+            "right": 14,
+            "top": 10
+          }
+        },
+        "digits_clipped_line_half_height": {
+          "clipped_localized_rate": 1.0,
+          "complete_and_contained_rate": null,
+          "complete_band_rate_fully_visible": null,
+          "digit_clipped": 2,
+          "direction_agreement_rate_localized": null,
+          "false_complete_rate_clipped": 0.0,
+          "false_complete_rate_negative": 0.047297,
+          "false_localization_rate_negative": 0.418919,
+          "full_line_containment_rate": null,
+          "fully_visible": 0,
+          "localization_success_rate": null,
+          "median_iou_fully_visible_localized": null,
+          "negative": 148,
+          "scenes": 150,
+          "truncated_band_count_localized_fully_visible": 0,
+          "truncation_by_direction": {}
+        },
+        "digits_clipped_line_tail": {
+          "clipped_localized_rate": 0.986667,
+          "complete_and_contained_rate": null,
+          "complete_band_rate_fully_visible": null,
+          "digit_clipped": 150,
+          "direction_agreement_rate_localized": null,
+          "false_complete_rate_clipped": 0.04,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": null,
+          "fully_visible": 0,
+          "localization_success_rate": null,
+          "median_iou_fully_visible_localized": null,
+          "negative": 0,
+          "scenes": 150,
+          "truncated_band_count_localized_fully_visible": 0,
+          "truncation_by_direction": {}
+        },
+        "rotated12_card_boundary_far_x": {
+          "clipped_localized_rate": 1.0,
+          "complete_and_contained_rate": 0.832215,
+          "complete_band_rate_fully_visible": 0.899329,
+          "digit_clipped": 1,
+          "direction_agreement_rate_localized": 0.979452,
+          "false_complete_rate_clipped": 1.0,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": 0.872483,
+          "fully_visible": 149,
+          "localization_success_rate": 0.744966,
+          "median_iou_fully_visible_localized": 0.67042,
+          "negative": 0,
+          "scenes": 150,
+          "truncated_band_count_localized_fully_visible": 16,
+          "truncation_by_direction": {
+            "bottom": 2,
+            "left": 4,
+            "right": 7,
+            "top": 5
+          }
+        },
+        "rotated12_card_boundary_far_xy": {
+          "clipped_localized_rate": null,
+          "complete_and_contained_rate": 0.773333,
+          "complete_band_rate_fully_visible": 0.82,
+          "digit_clipped": 0,
+          "direction_agreement_rate_localized": 0.96,
+          "false_complete_rate_clipped": null,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": 0.846667,
+          "fully_visible": 150,
+          "localization_success_rate": 0.773333,
+          "median_iou_fully_visible_localized": 0.718447,
+          "negative": 0,
+          "scenes": 150,
+          "truncated_band_count_localized_fully_visible": 23,
+          "truncation_by_direction": {
+            "bottom": 6,
+            "left": 9,
+            "right": 13,
+            "top": 6
+          }
+        },
+        "rotated12_card_boundary_far_y": {
+          "clipped_localized_rate": 1.0,
+          "complete_and_contained_rate": 0.805369,
+          "complete_band_rate_fully_visible": 0.865772,
+          "digit_clipped": 1,
+          "direction_agreement_rate_localized": 0.973154,
+          "false_complete_rate_clipped": 1.0,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": 0.899329,
+          "fully_visible": 149,
+          "localization_success_rate": 0.758389,
+          "median_iou_fully_visible_localized": 0.656368,
+          "negative": 0,
+          "scenes": 150,
+          "truncated_band_count_localized_fully_visible": 15,
+          "truncation_by_direction": {
+            "bottom": 4,
+            "left": 5,
+            "right": 5,
+            "top": 8
+          }
+        }
+      },
+      "cards": 150,
+      "digits_clipped": {
+        "clipped_localized_rate": 0.986842,
+        "complete_and_contained_rate": null,
+        "complete_band_rate_fully_visible": null,
+        "digit_clipped": 152,
+        "direction_agreement_rate_localized": null,
+        "false_complete_rate_clipped": 0.039474,
+        "false_complete_rate_negative": 0.047297,
+        "false_localization_rate_negative": 0.418919,
+        "full_line_containment_rate": null,
+        "fully_visible": 0,
+        "localization_success_rate": null,
+        "median_iou_fully_visible_localized": null,
+        "negative": 148,
+        "scenes": 300,
+        "truncated_band_count_localized_fully_visible": 0,
+        "truncation_by_direction": {}
+      },
+      "eligible_primary_success_detector_cards": 515,
+      "frozen_detector_still_accepts_by_mode": {
+        "card_boundary_far_x": 116,
+        "card_boundary_far_xy": 75,
+        "card_boundary_far_y": 129,
+        "digits_clipped_line_half_height": 58,
+        "digits_clipped_line_tail": 112,
+        "rotated12_card_boundary_far_x": 92,
+        "rotated12_card_boundary_far_xy": 50,
+        "rotated12_card_boundary_far_y": 75
+      },
+      "line_visible_card_boundary_clipped": {
+        "clipped_localized_rate": 1.0,
+        "complete_and_contained_rate": 0.799331,
+        "complete_band_rate_fully_visible": 0.867336,
+        "digit_clipped": 3,
+        "direction_agreement_rate_localized": 0.971973,
+        "false_complete_rate_clipped": 1.0,
+        "false_complete_rate_negative": null,
+        "false_localization_rate_negative": null,
+        "full_line_containment_rate": 0.867336,
+        "fully_visible": 897,
+        "localization_success_rate": 0.761427,
+        "median_iou_fully_visible_localized": 0.692897,
+        "negative": 0,
+        "scenes": 900,
+        "truncated_band_count_localized_fully_visible": 114,
+        "truncation_by_direction": {
+          "bottom": 21,
+          "left": 41,
+          "right": 56,
+          "top": 40
+        }
+      },
+      "overall": {
+        "clipped_localized_rate": 0.987097,
+        "complete_and_contained_rate": 0.799331,
+        "complete_band_rate_fully_visible": 0.867336,
+        "digit_clipped": 155,
+        "direction_agreement_rate_localized": 0.971973,
+        "false_complete_rate_clipped": 0.058065,
+        "false_complete_rate_negative": 0.047297,
+        "false_localization_rate_negative": 0.418919,
+        "full_line_containment_rate": 0.867336,
+        "fully_visible": 897,
+        "localization_success_rate": 0.761427,
+        "median_iou_fully_visible_localized": 0.692897,
+        "negative": 148,
+        "scenes": 1200,
+        "truncated_band_count_localized_fully_visible": 114,
+        "truncation_by_direction": {
+          "bottom": 21,
+          "left": 41,
+          "right": 56,
+          "top": 40
+        }
+      },
+      "reference": "global median calibration projection-component digit extent mapped through each card's primary corners and turns; digits approximated as 14 equal cells"
+    },
+    "negative_controls": {
+      "non_card_local_image": {
+        "count": 37,
+        "errors": 0,
+        "fallback_invoked": 10,
+        "false_complete_band": 0,
+        "false_localization": 0,
+        "primary_success": 27
+      },
+      "not_an_id": {
+        "count": 5,
+        "errors": 0,
+        "fallback_invoked": 0,
+        "false_complete_band": 0,
+        "false_localization": 0,
+        "primary_success": 5
+      },
+      "wrong_side": {
+        "count": 1,
+        "errors": 0,
+        "fallback_invoked": 0,
+        "false_complete_band": 0,
+        "false_localization": 0,
+        "primary_success": 1
+      },
+      "wrong_side_calibration_note": "calibration-only reviewed cards; consumed-validation reviews are not opened"
+    }
+  },
+  "development_gate": {
+    "checks": {
+      "coverage_development_residuals": true,
+      "coverage_internal_synthetic_off_frame": true,
+      "fixed14_v2_preserved": true,
+      "primary_byte_identical": true,
+      "primary_zero_fallback_on_success": true,
+      "safety_internal_digit_clipped_false_complete_development_only": false,
+      "safety_non_card_false_complete": true,
+      "safety_non_card_false_localization": true,
+      "safety_shadow_only": true,
+      "safety_wrong_side_false_complete": false
+    },
+    "decision": "PREPROCESSING_REPAIR_NOT_VALIDATED",
+    "wrong_side_or_not_an_id_false_complete_bands": 2
+  },
+  "entry_state": {
+    "backup_ref": "7f0d281e52fb831af781c8c88f5d2091dd97a742",
+    "branch": "phase2m-b-preprocessing",
+    "checks": {
+      "backup_ref_is_start_commit": true,
+      "head_is_start_commit": true,
+      "main_unchanged": true,
+      "worktree_clean": true
+    },
+    "fixed14_v2": {
+      "config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+      "seed": 271828,
+      "weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b"
+    },
+    "head": "7f0d281e52fb831af781c8c88f5d2091dd97a742",
+    "main": "6bae4d8409b567ba6c6447dcadb431d0b8433dd3"
+  },
+  "external_access_totals": {
+    "external_train:annotation": 26028,
+    "external_train:image": 9290
+  },
+  "external_box_semantics_train_only": {
+    "angle_deg_abs": {
+      "max": 19.93,
+      "median": 1.672,
+      "min": 0.006,
+      "p10": 0.381,
+      "p90": 5.085
+    },
+    "angle_over_10_deg": 9,
+    "box_unit": "one axis-aligned box per printed national-ID digit (14 per record)",
+    "categories": {
+      "line_touches_image_border": 335,
+      "usable_line": 2557
+    },
+    "collinearity_rms_over_height": {
+      "max": 0.119,
+      "median": 0.06,
+      "min": 0.029,
+      "p10": 0.047,
+      "p90": 0.076
+    },
+    "coordinate_convention": "absolute pixel xyxy on the decoded image; x1<x2, y1<y2; all inside image bounds",
+    "height_cv": {
+      "max": 0.363,
+      "median": 0.257,
+      "min": 0.116,
+      "p10": 0.209,
+      "p90": 0.303
+    },
+    "image_dimensions": {
+      "640x640": 2892
+    },
+    "inner_holdout_records": 414,
+    "length_to_height": {
+      "max": 14.129,
+      "median": 8.371,
+      "min": 6.404,
+      "p10": 7.65,
+      "p90": 9.454
+    },
+    "line_length_fraction_of_width": {
+      "max": 0.727,
+      "median": 0.518,
+      "min": 0.389,
+      "p10": 0.504,
+      "p90": 0.548
+    },
+    "line_position": {
+      "lower_right_canonical_front_consistent": 2892
+    },
+    "pitch_cv": {
+      "max": 0.357,
+      "median": 0.195,
+      "min": 0.132,
+      "p10": 0.176,
+      "p90": 0.214
+    },
+    "reading_order": "left-to-right by x1 of boxes; label sequence follows that order",
+    "records_external_train": 2892,
+    "source_px_per_digit": {
+      "max": 33.231,
+      "median": 23.698,
+      "min": 17.797,
+      "p10": 23.056,
+      "p90": 25.057
+    },
+    "usable_line_boxes": 2557
+  },
+  "external_test": {
+    "access_total": 0,
+    "opened": false
+  },
+  "external_validation": {
+    "opened": false,
+    "records_accessed": 0
+  },
+  "frozen": {
+    "acceptance_rule_sha256_lf": "315fc576d6bafc55bee00f5558c34565cca8ad1d1619ae8e5993d19f90be8b30",
+    "locator_weights_sha256": "009e2e24acbbb60c40988fbb341378b273b4c5ed20046d90091ac3c69d0a7c00",
+    "predeclared_gates_sha256_lf": "04743d55c0b52ac4ff7e73c9df70d11d21f349057fefe191fc754a25c4d60e8a",
+    "preprocessing_config_sha256_lf": "a039886722928b7591f6080c1d52b2fbe6ff1d2e5bc27b1a492642675a9f2d93",
+    "source_sha256_lf": {
+      "scripts/phase2m_b.py": "1a337ecb8392afba884946ef57b50a8cd865b42a056d87bc62e99760ee86a30d",
+      "src/extraction/direct_field_fallback.py": "9bbba3185ed7548372475d5f52b406e7e8e483a27c7f55bb467407406af31cf1"
+    }
+  },
+  "locator_training": {
+    "locator_256_seed20260916": {
+      "data_scope": "external_train_inner_fit_only",
+      "epoch_selection": "final_epoch_no_holdout_monitoring",
+      "epochs": 22,
+      "final_loss": 0.19235871195212587,
+      "fit_records": 2478,
+      "inner_holdout_records_not_used": 414,
+      "seed": 20260916,
+      "size": 256,
+      "weights_sha256": "009e2e24acbbb60c40988fbb341378b273b4c5ed20046d90091ac3c69d0a7c00"
+    },
+    "locator_320_seed20260916": {
+      "data_scope": "external_train_inner_fit_only",
+      "epoch_selection": "final_epoch_no_holdout_monitoring",
+      "epochs": 22,
+      "final_loss": 0.1795183528069552,
+      "fit_records": 2478,
+      "inner_holdout_records_not_used": 414,
+      "seed": 20260916,
+      "size": 320,
+      "weights_sha256": "0b14e69260f6dcf2eb777d3e5df9201545d8b240266d69be3f65f6914758f4a4"
+    }
+  },
+  "negative_controls_direct_fallback_only": {
+    "internal_access": {
+      "consumed_validation_opened": 0,
+      "locked_audit_opened": 0,
+      "opened": {
+        "calibration": 6
+      },
+      "residual_consumed_overlap": 0
+    },
+    "non_card_local_image": {
+      "all_shadow": true,
+      "count": 37,
+      "false_complete_band": 0,
+      "false_localization": 0
+    },
+    "not_an_id": {
+      "all_shadow": true,
+      "count": 5,
+      "false_complete_band": 2,
+      "false_localization": 4
+    },
+    "wrong_side": {
+      "all_shadow": true,
+      "count": 1,
+      "false_complete_band": 0,
+      "false_localization": 1
+    }
+  },
+  "paddle_diagnostic_limitation": "Paddle was applied to the 650x180 broad band, outside its narrow-crop input contract; its exact counts are not a valid comparator",
+  "primary_preservation": {
+    "all_controls_public_identical": true,
+    "all_primary_success_byte_identical": true,
+    "controls_run": 939,
+    "fallback_calls_on_non_trigger_failures": 0,
+    "fallback_calls_on_primary_success": 0,
+    "fallback_calls_on_trigger_status": 50,
+    "fixed14_v2_hashes_after": {
+      "config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+      "weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b"
+    },
+    "fixed14_v2_hashes_before": {
+      "config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+      "weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b"
+    },
+    "identical_counts_on_primary_success": {
+      "detector": 888,
+      "logits_sha256": 888,
+      "orientation": 888,
+      "public": 888,
+      "tensor_sha256": 888
+    },
+    "internal_access": {
+      "consumed_validation_opened": 0,
+      "locked_audit_opened": 0,
+      "opened": {
+        "calibration": 935
+      },
+      "residual_consumed_overlap": 0
+    },
+    "primary_status_counts": {
+      "corrupt_image": 1,
+      "document_not_found": 50,
+      "success": 888
+    },
+    "primary_success_controls": 888,
+    "route_counts": {
+      "fallback_shadow": 50,
+      "primary": 888,
+      "primary_terminal": 1
+    }
+  },
+  "schema_version": "phase2m_b_metrics_v1",
+  "selection": {
+    "best_feasible_per_size_context": {
+      "256_C1_broad_band_parity": {
+        "complete_and_contained_rate": 0.657119,
+        "false_complete_rate_clipped": 0.008021,
+        "false_localization_rate_negative": 0.007883,
+        "full_line_containment_rate": 0.98527,
+        "localization_success_rate": 0.500818,
+        "thresholds": {
+          "end_probability": 0.5,
+          "in_frame_margin_fraction_of_line_height": 0.0,
+          "localization_score": 0.5,
+          "minimum_complete_length_to_height": 4.0
+        }
+      },
+      "256_C2_symmetric": {
+        "complete_and_contained_rate": 0.656301,
+        "false_complete_rate_clipped": 0.008021,
+        "false_localization_rate_negative": 0.007883,
+        "full_line_containment_rate": 0.98527,
+        "localization_success_rate": 0.500818,
+        "thresholds": {
+          "end_probability": 0.5,
+          "in_frame_margin_fraction_of_line_height": 0.0,
+          "localization_score": 0.5,
+          "minimum_complete_length_to_height": 4.0
+        }
+      },
+      "320_C1_broad_band_parity": {
+        "complete_and_contained_rate": 0.571195,
+        "false_complete_rate_clipped": 0.0,
+        "false_localization_rate_negative": 0.002252,
+        "full_line_containment_rate": 0.98036,
+        "localization_success_rate": 0.621931,
+        "thresholds": {
+          "end_probability": 0.3,
+          "in_frame_margin_fraction_of_line_height": 0.25,
+          "localization_score": 0.5,
+          "minimum_complete_length_to_height": 4.0
+        }
+      },
+      "320_C2_symmetric": {
+        "complete_and_contained_rate": 0.57365,
+        "false_complete_rate_clipped": 0.0,
+        "false_localization_rate_negative": 0.002252,
+        "full_line_containment_rate": 0.98527,
+        "localization_success_rate": 0.621931,
+        "thresholds": {
+          "end_probability": 0.3,
+          "in_frame_margin_fraction_of_line_height": 0.25,
+          "localization_score": 0.5,
+          "minimum_complete_length_to_height": 4.0
+        }
+      }
+    },
+    "chosen": {
+      "context": "C1_broad_band_parity",
+      "seed": 20260916,
+      "size": 256,
+      "thresholds": {
+        "end_probability": 0.5,
+        "in_frame_margin_fraction_of_line_height": 0.0,
+        "localization_score": 0.7,
+        "minimum_complete_length_to_height": 4.0
+      }
+    },
+    "chosen_holdout_metrics": {
+      "by_mode": {
+        "embedded": {
+          "clipped_localized_rate": 1.0,
+          "complete_and_contained_rate": 0.853521,
+          "complete_band_rate_fully_visible": 0.856338,
+          "digit_clipped": 59,
+          "direction_agreement_rate_localized": 0.988439,
+          "false_complete_rate_clipped": 0.0,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": 0.966197,
+          "fully_visible": 355,
+          "localization_success_rate": 0.107042,
+          "median_iou_fully_visible_localized": 0.390329,
+          "negative": 0,
+          "scenes": 414,
+          "truncated_band_count_localized_fully_visible": 3,
+          "truncation_by_direction": {
+            "bottom": 0,
+            "left": 2,
+            "right": 2,
+            "top": 0
+          }
+        },
+        "line_absent": {
+          "clipped_localized_rate": null,
+          "complete_and_contained_rate": null,
+          "complete_band_rate_fully_visible": null,
+          "digit_clipped": 0,
+          "direction_agreement_rate_localized": null,
+          "false_complete_rate_clipped": null,
+          "false_complete_rate_negative": 0.0,
+          "false_localization_rate_negative": 0.004831,
+          "full_line_containment_rate": null,
+          "fully_visible": 0,
+          "localization_success_rate": null,
+          "median_iou_fully_visible_localized": null,
+          "negative": 414,
+          "scenes": 414,
+          "truncated_band_count_localized_fully_visible": 0,
+          "truncation_by_direction": {}
+        },
+        "native": {
+          "clipped_localized_rate": 1.0,
+          "complete_and_contained_rate": 0.43832,
+          "complete_band_rate_fully_visible": 0.43832,
+          "digit_clipped": 33,
+          "direction_agreement_rate_localized": 1.0,
+          "false_complete_rate_clipped": 0.0,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": 0.994751,
+          "fully_visible": 381,
+          "localization_success_rate": 0.976378,
+          "median_iou_fully_visible_localized": 0.637453,
+          "negative": 0,
+          "scenes": 414,
+          "truncated_band_count_localized_fully_visible": 2,
+          "truncation_by_direction": {
+            "bottom": 0,
+            "left": 0,
+            "right": 2,
+            "top": 0
+          }
+        },
+        "no_card": {
+          "clipped_localized_rate": null,
+          "complete_and_contained_rate": null,
+          "complete_band_rate_fully_visible": null,
+          "digit_clipped": 0,
+          "direction_agreement_rate_localized": null,
+          "false_complete_rate_clipped": null,
+          "false_complete_rate_negative": 0.0,
+          "false_localization_rate_negative": 0.0,
+          "full_line_containment_rate": null,
+          "fully_visible": 0,
+          "localization_success_rate": null,
+          "median_iou_fully_visible_localized": null,
+          "negative": 414,
+          "scenes": 414,
+          "truncated_band_count_localized_fully_visible": 0,
+          "truncation_by_direction": {}
+        },
+        "off_frame": {
+          "clipped_localized_rate": 0.857868,
+          "complete_and_contained_rate": 0.847134,
+          "complete_band_rate_fully_visible": 0.859873,
+          "digit_clipped": 197,
+          "direction_agreement_rate_localized": 0.993631,
+          "false_complete_rate_clipped": 0.0,
+          "false_complete_rate_negative": 0.0,
+          "false_localization_rate_negative": 0.083333,
+          "full_line_containment_rate": 0.980892,
+          "fully_visible": 157,
+          "localization_success_rate": 0.248408,
+          "median_iou_fully_visible_localized": 0.435811,
+          "negative": 60,
+          "scenes": 414,
+          "truncated_band_count_localized_fully_visible": 3,
+          "truncation_by_direction": {
+            "bottom": 0,
+            "left": 0,
+            "right": 3,
+            "top": 0
+          }
+        },
+        "tight": {
+          "clipped_localized_rate": 1.0,
+          "complete_and_contained_rate": 0.607903,
+          "complete_band_rate_fully_visible": 0.610942,
+          "digit_clipped": 85,
+          "direction_agreement_rate_localized": 0.993921,
+          "false_complete_rate_clipped": 0.035294,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": 0.99696,
+          "fully_visible": 329,
+          "localization_success_rate": 0.495441,
+          "median_iou_fully_visible_localized": 0.498587,
+          "negative": 0,
+          "scenes": 414,
+          "truncated_band_count_localized_fully_visible": 1,
+          "truncation_by_direction": {
+            "bottom": 0,
+            "left": 0,
+            "right": 1,
+            "top": 0
+          }
+        }
+      },
+      "clipped_localized_rate": 0.925134,
+      "complete_and_contained_rate": 0.657119,
+      "complete_band_rate_fully_visible": 0.660393,
+      "digit_clipped": 374,
+      "direction_agreement_rate_localized": 0.994229,
+      "false_complete_rate_clipped": 0.008021,
+      "false_complete_rate_negative": 0.0,
+      "false_localization_rate_negative": 0.007883,
+      "full_line_containment_rate": 0.98527,
+      "fully_visible": 1222,
+      "localization_success_rate": 0.500818,
+      "median_iou_fully_visible_localized": 0.502716,
+      "negative": 888,
+      "scenes": 2484,
+      "truncated_band_count_localized_fully_visible": 9,
+      "truncation_by_direction": {
+        "bottom": 0,
+        "left": 2,
+        "right": 8,
+        "top": 0
+      }
+    },
+    "configurations_evaluated": 96,
+    "feasible_configurations": 66
+  }
+}

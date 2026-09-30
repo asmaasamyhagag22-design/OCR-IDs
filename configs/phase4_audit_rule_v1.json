@@ -1,0 +1,407 @@
+{
+  "schema_version": "phase4_audit_rule_v1",
+  "phase": "4 - locked 377 audit",
+  "amendment": 7,
+  "amends": "configs/phase2m_h_rule_v1.json (amendments 1-6)",
+  "utc_date": "2026-09-23",
+  "committed_before": [
+    "any audit image is opened",
+    "any audit label is read",
+    "the Phase 4 read code exists",
+    "the rehearsal on development photos runs"
+  ],
+  "why_a_separate_file": "configs/phase2m_h_rule_v1.json is sealed by LF sha256 in src/extraction/fixed14_bcfinal_shadow.py:40 and checked by verify_shadow_candidates(). Appending amendment 7 to it would change that hash, and the runtime would refuse to load (fail closed). This file pins it instead.",
+
+  "pinned": {
+    "phase2m_h_rule_v1_sha256_lf": "99a0a6142734ff932c906bdf71514b5cf957e4f852dc66ab063e54e557e48e03",
+    "phase2m_h_frozen_candidate_sha256_lf": "1ff1fcaeda5f7e8bb4899a373833b1c15db432a34c46aa38dded1317ce84f513",
+    "bc_final_weights_sha256": "00e23a14b3e9cf976864241f3e494ce383cdc52c8bbd2e52e54b53d03657d4df",
+    "bc_final_seed": 3101,
+    "primary_margin": 0.966875,
+    "typo_generator_seed": 20260922,
+    "inference": "single view, no TTA",
+    "split_manifest_sha256": "cc19d7d419a3e028cf8030e7557a656399d73ede300d4f127e3b90ccba578a1c",
+    "audit_membership": "artifacts/phase2f/split_manifest.jsonl rows with split == \"audit\""
+  },
+
+  "pass_criteria": {
+    "source": "configs/phase2m_h_rule_v1.json item_6_audit_acceptance_protocol.pass_criteria_declared_in_advance, unchanged in bound, unit, population and threshold",
+    "bounds_restated_for_reading_only": {
+      "false_mismatch_rate_honest_users": "<= 0.10, record level, admitted captures only",
+      "typo_detection_rate": ">= 0.995, structurally invalid typos excluded",
+      "share_of_non_accepted_honest_users_routed_to_retake": ">= 0.70, record level, at 0.966875",
+      "no_worse_than_v2_on_the_same_cards": "card-level net exact change >= 0, at most 3 regressed",
+      "admission_failure_rate": "reported against the full audit, not bounded"
+    },
+    "correction_A_vacuous_retake_criterion": {
+      "defect": "the frozen verdict() evaluates (share or 0.0) >= 0.70. When no admitted honest user is read wrong, the share is undefined (0/0) and becomes 0.0, so the criterion fails exactly when the model makes no admitted error.",
+      "correction": "when the denominator is zero the criterion is recorded as VACUOUS and does not fail. Nobody was left unrouted, so nothing is violated. The report states it as vacuous, not as a measured pass.",
+      "why_now": "found reading the protocol before the read. Declared before any audit number exists."
+    }
+  },
+
+  "label_source": {
+    "file": "artifacts/official_eval/lookup.json (per-worktree ignored tree; resolved from this worktree, else ../OCR_ID_working, as tests/test_official_eval_privacy.py does)",
+    "sha256": "fdf1a2717f2628764c07f4973ac32d0493f4ee80767811a66d17f88dc3e1dad8",
+    "shape": "card_id -> delivered 14-digit label (src/extraction/official_eval.py:311-314)",
+    "status": "the delivered labels, never reviewed for the audit cards. A label error counts against the model, which is conservative.",
+    "not_consulted": "artifacts/phase2c_manual_ground_truth.json. It covers development cards; using it for some audit cards and not others would be a choice made per card.",
+    "invalid_label": "an audit card whose label is not exactly 14 ASCII digits is excluded from every rate and counted as label_invalid",
+    "when_read": "only after the model outputs are sealed to disk and hashed"
+  },
+
+  "image_resolution": {
+    "path": "data/official_eval/images/<card_id>.jpg, else .png",
+    "guard": "every path goes through src.governance.guard.check_card_read before the read, so each audit read is refused without the override and recorded in the override ledger with it",
+    "missing_or_undecodable": "passed to the adapter unchanged. It returns a preprocessing-failure status, which is an admission failure (a retake), and it is counted"
+  },
+
+  "admission": "as in the frozen evaluate(): a capture is admitted when compare_image returns SHADOW_OK. The count of each status (SHADOW_OK, RETAKE_REQUIRED, MODEL_ERROR) is reported.",
+  "v2_comparison": "a v2 result that is not SUCCESS is an empty reading and counts as not exact, which is what the production v2 path would return",
+
+  "descriptive_quantities_not_criteria": {
+    "interval": "Clopper-Pearson 95 percent, scripts/phase2m_h.py exact_interval",
+    "unit": "card. The audit has one record per card (checked on the manifest before the read: row count == distinct card_id count; if not, AUDIT_BLOCKED:records_not_cards)",
+    "clustering_caveat": "the intervals assume independent cards. The number of distinct identity_components among audit cards is reported. Where a component holds more than one card, the true interval is wider.",
+    "quantities": {
+      "exact_card_accuracy_admitted": "BC-final exact 14-digit cards / admitted cards",
+      "exact_card_accuracy_all": "BC-final exact 14-digit cards / all audit cards with a valid label; an admission failure counts as not exact",
+      "admission_failure_rate": "non-admitted / all audit cards with a valid label",
+      "v2_exact_card_accuracy_all": "the same for v2, for the paired comparison",
+      "criterion_rates_with_intervals": "the three criterion rates above, each with its k/n and interval. The verdict is still decided on the point value against the bound, as declared in 2M-H."
+    },
+    "also_reported": [
+      "audit rows, distinct card_ids, identity_components",
+      "status counts",
+      "label_invalid count",
+      "honest_users_per_1000 and typo_users_per_1000 as the frozen evaluate() returns them",
+      "paired v2 vs BC-final counts as the frozen paired() returns them"
+    ],
+    "nothing_else": "no other quantity is computed on the 377. No error anatomy, no per-position analysis, no threshold sweep, no per-card listing."
+  },
+
+  "token_mapping": {
+    "PHASE2M_H_READY": "AUDIT_PASS",
+    "PHASE2M_H_NOT_READY:<criteria>": "AUDIT_FAIL:<criteria>",
+    "any crash, refusal or missing input": "AUDIT_BLOCKED:<reason>"
+  },
+
+  "single_read_and_crash_policy": {
+    "reads": "the audit images are read once, by one invocation, in one loop. They are never read again, for any reason.",
+    "sealing": "right after the loop, before any label is read: readings, margins, admitted flags and statuses are written to artifacts/phase4_audit/predictions.npz and its sha256 to predictions.sha256",
+    "crash_during_the_loop": "stop. Record AUDIT_BLOCKED:<reason>. Nothing is resumed or rerun.",
+    "crash_after_sealing": "stop and ask the owner. The only permitted continuation, and only with the owner's approval in chat, is to fix the evaluation code and run the declared, deterministic evaluation on the sealed predictions whose hash matches. Images are not re-read.",
+    "no_re_choice": "the threshold, criteria and quantities in this file and in 2M-H are not changed after the read (2M-H amendment 1)"
+  },
+
+  "execution": {
+    "who": "the owner, in her own PowerShell. The Claude Code session never holds the override.",
+    "authorisations": [
+      "OCRID_GOVERNANCE_OVERRIDE=OPEN-377-AUDIT-<local date>, checked against date.today() per read",
+      "PHASE2M_H_OPEN_THE_AUDIT=yes-open-the-locked-377-once"
+    ],
+    "also_set": "DISABLE_MODEL_SOURCE_CHECK=True, so PaddleOCR does not contact model hosters. The Paddle models load from local directories under artifacts/.",
+    "midnight": "the override is dated. The read starts only if twice the rehearsal's runtime estimate ends before 23:30 local time."
+  },
+
+  "approval_and_consequence": {
+    "approver": "the owner, project owner, 2026-09-23, recorded in docs/release/decision_log.md",
+    "on_fail": "v2 stays in production and nothing is re-tuned, re-thresholded or re-selected on the 377",
+    "ratification": "ministry ratification is pending. The verdict binds under these criteria only; there is no clean set left to test different ones."
+  },
+
+  "what_the_result_transfers_to_only_if": {
+    "parity_a": "the serving decision component reproduces scripts/phase2m_h.py route() decisions exactly on non-audit data",
+    "parity_b_bands": "the production machine reproduces this machine's predictions and decisions on the 168 controls",
+    "parity_b_full_pipeline": "the production machine reproduces this machine's sealed full-pipeline outputs on the rehearsal's development photos, because the 168 controls are pre-materialized bands and never exercise the detector, Paddle orientation or bidi, which are the components that differ by machine",
+    "if_either_fails": "the audit result does not transfer and go-live stops"
+  },
+
+  "amendment_7b": {
+    "utc_date": "2026-09-23",
+    "committed_before": "any audit image is opened or any audit label is read. The audit has not been opened.",
+    "why": "the stats-reviewer read amendment 7, the manifest and the code in a fresh context and returned FAIL with two blocking findings (B1, B2) and seven non-blocking ones. The owner decided B1 and N1, and approved the rest, in chat on 2026-09-23 (docs/release/decision_log.md D-002).",
+    "append_only": "the sections above are not edited. Where this block contradicts them, this block governs, and it names the line it supersedes.",
+
+    "B1_typo_criterion_is_decided_on_the_count": {
+      "defect": "2M-H grounds the typo bound as 'tolerates one silent acceptance in 377', but amendment 5 part D later restricted the rate to structurally valid typos from admitted captures (about 45 percent of typos were structurally invalid on the controls). The eligible n is then about 190, where a single silent acceptance gives 0.9947 < 0.995. The two statements disagree in exactly the case they were written for.",
+      "owner_decision": "the count governs, as the grounding intended: PASS when at most 1 structurally valid typo user from an admitted capture is silently accepted.",
+      "reported_alongside": "the rate, its eligible n, the silent count, and the Clopper-Pearson interval",
+      "unchanged": "the typo generator, its seed 20260922, the arm, the structural-validity exclusion"
+    },
+
+    "B2_a_missing_image_blocks_the_read_before_it_starts": {
+      "supersedes": "image_resolution.missing_or_undecodable for missing files",
+      "rule": "after the authorised resolution of paths and before read_started.json is written, if any audit path is not a file, the run stops with AUDIT_BLOCKED:audit_image_missing:<count>. This is a filesystem check; no image is opened, so the audit is not spent.",
+      "evidence_before_the_read": "the resolver data/official_eval/images/<card_id>.{jpg,png} agrees with the ingest manifest's image field on all 957 permitted (non-audit, non-consumed) cards"
+    },
+
+    "N2_admission_means_a_band_was_produced": {
+      "supersedes": "admission",
+      "rule": "a capture is admitted when compare_image produced a band (result.band is not None), which is the 2M-H definition: a capture that never produced a band never reached the comparison. A capture with a band on which BC-final produced no reading is admitted and counts as a BC-final error, routed to retake (margin 0). This is more conservative than status == SHADOW_OK.",
+      "sealed": "status, admission_status (the v2 adapter status) and band_produced are sealed per card",
+      "reported": "the count of each status and each admission_status, and the count of admitted captures where v2 did not return SUCCESS"
+    },
+
+    "N3_admission_failure_rate_is_over_every_audit_card": {
+      "supersedes": "descriptive_quantities_not_criteria.quantities.admission_failure_rate",
+      "rule": "non-admitted / all sealed audit rows, whatever their label. Admission does not depend on labels."
+    },
+
+    "N4_card_level_paired_sign_test": {
+      "rule": "exact two-sided sign test on the discordant cards, newly_exact against regressed_exact, BC-final against v2 (scripts/phase2m_e.py sign_test_two_sided). Descriptive, not a criterion. Its caveat: cards are treated as independent.",
+      "why": "CLAUDE.md declares card-level paired sign tests for model comparisons; without it any 'BC-final beats v2' statement would rest on counts alone"
+    },
+
+    "N5_the_ledger_is_checked_before_the_read": {
+      "rule": "the read refuses to start if the override ledger in this worktree holds more than 1 audit:card event, or the ledger in ../OCR_ID_working holds any",
+      "the_one_existing_event": "2026-09-21T22:01:29Z, tool Read, note: hook verification during the governance setup, driven with a crafted payload, no image opened and no audit content read"
+    },
+
+    "N6_the_crash_after_seal_path_is_committed_now": {
+      "rule": "python scripts/phase4_audit.py evaluate-sealed. It reads no image, checks the sealed hash, reads the declared lookup, and runs the same evaluate_sealed(). It requires both audit authorisations and PHASE4_OWNER_APPROVED_REEVALUATION=yes-owner-approved-in-chat, and refuses if a verdict already exists."
+    },
+
+    "N7_provenance_in_the_verdict": {
+      "rule": "the verdict carries git HEAD and the LF sha256 of the 2M-H rule, this rule file and the manifest"
+    },
+
+    "N1_false_fail_risk_is_on_the_record": {
+      "estimate": "if BC-final performs exactly as on the 168 controls: retake-share bound fails about 23 percent (0.70 against 7/9 = 0.778 over about 15 admitted errors); regression cap fails about 18 percent (at most 3, taken from the 168-card cap, against about 2.2 expected on 377); typo count about 1 percent after B1. Roughly 40 percent AUDIT_FAIL from sampling alone before B1, somewhat less after.",
+      "owner_decision": "the read waits until the team has seen this and approved the criteria at the meeting. The criteria are not changed here.",
+      "reporting_rule": "a fail is reported per criterion with k/n and its interval, and described as 'not demonstrated on this audit', never as 'BC-final is worse than v2' unless the paired sign test says so"
+    }
+  },
+
+  "amendment_7c": {
+    "utc_date": "2026-09-23",
+    "committed_before": "any audit image is opened or any audit label is read. The audit has not been opened.",
+    "why": "the stats-reviewer re-read amendment 7b and the code in a fresh context and returned PASS with no blocking finding. It listed non-blocking gaps that can only be closed before the read. They are closed here.",
+    "append_only": "the sections above are not edited",
+
+    "R1_what_the_sign_test_must_show": {
+      "status": "PROPOSED; the owner confirms before the read (the conventional reading, written down so it cannot be chosen after)",
+      "rule": "'the paired sign test says so' means the exact two-sided p < 0.05 AND regressed_exact > newly_exact. Only then may the report say BC-final is worse than v2 on this audit. Symmetrically, 'better than v2' needs p < 0.05 and newly_exact > regressed_exact. Otherwise the report says the audit does not distinguish them. Cards are treated as independent, as the caveat says.",
+      "supersedes": "the undeclared threshold in amendment_7b.N1_false_fail_risk_is_on_the_record.reporting_rule"
+    },
+
+    "R2_every_block_happens_before_the_ledger_is_written": {
+      "defect": "a B2 block fired after audit_image_paths had already written 377 audit:card ledger events, so N5 would refuse every retry and 'not spent' was not true in practice",
+      "rule": "the read runs its refusals in this order, and all of them come before any audit:card ledger event is written: already-read markers; ledger count; dirty worktree; pinned inputs; authorised membership; model load and self tests; path resolution and the missing-image check (a filesystem existence check under both authorisations, opening no image). Only then does each path pass the runtime guard, which writes the ledger, and read_started.json is written straight after. A block before the guard step leaves no ledger trace and may be retried once its cause is fixed."
+    },
+
+    "R3_evaluate_sealed_re_verifies_the_pinned_inputs": {
+      "rule": "evaluate-sealed refuses unless pinned_inputs_match() is all true and this rule file's LF sha256 equals the one recorded in configs/phase4_audit_manifest.json"
+    },
+
+    "R4_a_dirty_worktree_is_refused": {
+      "rule": "the read refuses to start if git status shows any change to a tracked file. Ignored artifacts/ are not tracked."
+    },
+
+    "R5_which_admission_failure_figure_the_report_cites": {
+      "rule": "the report cites descriptive.admission_failure_rate (every sealed audit row, 7b N3). The frozen evaluate()'s result.admission_failure_rate and honest_users_per_1000.admission_failure use cards with a valid label; the report states that they differ only when label_invalid > 0, and by how much."
+    }
+  },
+
+  "amendment_7d": {
+    "utc_date": "2026-09-23",
+    "why": "the stats-reviewer's check of 7c (PASS) noted that R4 ignored untracked files, so an untracked conftest.py or a module shadowing an import could change what the read runs",
+    "R4_tightened": "the read refuses if git status shows any tracked change OR any untracked file. Ignored paths (artifacts/, caches) do not appear and do not count.",
+    "naming_note": "7b N2 says band_produced is sealed; the seal stores it as `admitted`, which is exactly result.band is not None. Same value, one name."
+  },
+
+  "amendment_7e_part_A": {
+    "utc_date": "2026-09-23",
+    "status": "ADOPTED by the owner (the owner, project owner) in chat on 2026-09-23. Decision log D-003, D-004. Not a proposal.",
+    "committed_before": "any audit image is opened or any audit label is read, and before any false-fail or power number for the new criteria exists",
+    "owner_reason": "under the current criteria a BC-final that performs as it did on the 168 controls would fail by chance about 40 percent of the time, so a fail would carry no meaning",
+    "append_only": "the sections above are not edited; where this block contradicts them, it governs",
+
+    "criterion_1_false_mismatch": "UNCHANGED: at most 0.10, record level, admitted captures only, at 0.966875",
+    "criterion_2_typo": "UNCHANGED as decided in 7b B1: at most 1 silent acceptance among structurally valid typo users from admitted captures",
+    "criterion_3_retake_share": "DESCRIPTIVE ONLY from now on. Reported with k/n and its Clopper-Pearson interval, never used for pass or fail. Reason: it rests on about 15 errors and only decides which message a user sees.",
+    "criterion_4_against_v2": "REPLACED by the design chosen below. The old rule (net >= 0, at most 3 regressed) was set on 168 cards and is applied to 377.",
+    "D003_sign_test_cutoff": "7c R1 is CONFIRMED by the owner: 'worse than v2' or 'better than v2' only when the exact two-sided sign test p < 0.05 in that direction; otherwise the audit does not tell them apart",
+    "D004_timing": "supersedes D-002 item 2. The read does not wait for the meeting. The technical acceptance criteria are the owner's decision; the ministry receives the result and what it means.",
+
+    "genuinely_worse": {
+      "definition": "BC-final's exact 14-digit card accuracy on the same audit cards is at least 3 percentage points below v2's (delta_star = 0.03, about 11 more people of 377 given a wrong reading)",
+      "why_3_points": "it is smaller than BC-final's own measured advantage on the controls (+7 net of 168 = +4.2 points), so a model this far below v2 would erase more than the gain that justified choosing it",
+      "power_reported_at": [0.02, 0.03, 0.04, 0.05]
+    },
+
+    "criterion_4_candidates": {
+      "scaled_cap": "fail when regressed_exact > c, for c in 3..12",
+      "non_inferiority": "one-sided score test (constrained maximum likelihood, the Tango form) of H0: acc_BC - acc_v2 <= -delta_ni on the same cards, all audit cards with a valid label (an admission failure is both-wrong and therefore concordant), alpha one-sided 0.05; criterion 4 passes when H0 is rejected; delta_ni in {0.02, 0.03, 0.04, 0.05}",
+      "size_guard": "if the instrument-validator finds the score test's actual size at the H0 boundary above 0.055 at the audit's shape, the test's critical value is replaced by a simulation-calibrated one, declared here in advance"
+    },
+
+    "scenarios": {
+      "per_card_cells_source": "the 168 internal controls, published in 2M-H: both right 151, BC only right 8, v2 only right 1, both wrong 8. They have been read as a gate 13 times and BC-final was chosen on the spent external validation, so the controls advantage is if anything optimistic; this is stated wherever the numbers appear.",
+      "admission_failure": "0.10 (the rehearsal's 2 of 20 on development calibration cards), with 0.0 and 0.20 as sensitivity. An admission failure is both-wrong for criterion 4 and absent from criterion 1.",
+      "typo_coincidence": "the per-card probability that an admitted BC-final error is silently accepted with a structurally valid typo, estimated by applying the frozen typo generator (seed-varied, 20,000 draws per error) to the 9 control errors, in process, printing no identifier",
+      "S1_plug_in": "cells fixed at the control proportions",
+      "S2_predictive": "cells redrawn per simulated audit from Dirichlet(counts + 0.5), which carries the controls' own uncertainty",
+      "S3_equal": "BC-final exactly as accurate as v2: BC-only and v2-only cells 4.5/168 each, both wrong 8/168. Reported, not a selection constraint.",
+      "S4_worse": "v2 as on the controls; BC-final accuracy lower by delta. Two discordance variants, low churn (BC-only 1/168) and high churn (BC-only 8/168); power is the minimum of the two"
+    },
+
+    "computation": {
+      "simulation": "200,000 simulated audits of 377 cards per scenario and candidate, fixed seed 20260923, joint over criteria 1, 2 and 4, Monte Carlo standard error reported",
+      "overall_false_fail": "P(criterion 1 or 2 or 4 fails) under S1 (at each admission value) and S2",
+      "power": "P(criterion 4 fails) under S4 at each delta, minimum over the two variants",
+      "old_criteria_side_by_side": "the same simulation for the old four criteria (with 7b B1 and 7 correction A), so the old and new false-fail are shown next to each other",
+      "validation_before_use": "the instrument-validator checks the calculator on synthetic ground truth (analytic binomial and Poisson tails for single criteria, the score test's size at its boundary) and order preservation (false-fail non-increasing in c, power non-decreasing in delta) before any number decides"
+    },
+
+    "selection_rule": {
+      "eligible": "overall false-fail <= 0.05 under S1 at every admission value AND under S2, AND criterion-4 power >= 0.80 at delta_star = 0.03",
+      "choose": "the eligible candidate with the highest power at delta_star; ties go to the lower S2 false-fail, then to non-inferiority over a cap because it judges the net effect",
+      "if_none_eligible": "STOP. Nothing is chosen. The owner is shown the trade-off table and decides."
+    }
+  },
+
+  "amendment_7e_part_B": {
+    "utc_date": "2026-09-23",
+    "committed_before": "any audit image is opened or any audit label is read",
+    "procedure": "amendment_7e_part_A, unchanged, run by scripts/phase4_criteria_design.py at commit 9da8bbb",
+    "instrument_validation": "instrument-validator on synthetic ground truth. It checked: the constrained MLE (max |dZ| 2.2e-7); the score test's actual size at its boundary over the audit's shape (max 0.0506, so the size guard is not triggered and z = 1.6449 stands); the simulator against exact enumeration over 76 quantities (max |z| 2.37, noise on re-seed); typo q against analytic coincidence rates; order preservation; and the selection logic. One defect was found and fixed before any real number existed: the worse scenario had put delta on admitted cards only. Two minor fixes were also made: an undeclared tie now stops, and q is asserted to come from the 9 published errors.",
+    "results_file": "reports/phase4_criteria_design.json",
+    "results_sha256": "ce6216046f6a0a92607c942573838b0f7989508b47be9888aed480225ec5cf83",
+    "typo_q": "0.000917 per admitted BC-final error (2 of the 9 control errors can coincide with a structurally valid typo; max 0.00435)",
+
+    "criterion_4": {"kind": "ni", "value": 0.03,
+                    "statement": "BC-final passes criterion 4 when the one-sided score test rejects H0: acc_BC - acc_v2 <= -0.03 on the same audit cards (all with a valid label; admission failures are both-wrong), Z > 1.6449"},
+
+    "why_this_design": "it is the only candidate eligible under the declared selection rule",
+    "eligible": ["ni_0.03"],
+    "near_misses": {
+      "ni_0.04": "S2 false-fail 0.0463, but power at 3 points 0.797 < 0.80",
+      "ni_0.02": "power 0.987, but S2 false-fail 0.0604 > 0.05",
+      "cap_12": "S2 false-fail 0.0540 > 0.05, and power at 3 points only 0.576",
+      "cap_6": "power 0.980, but S2 false-fail 0.1472"
+    },
+
+    "false_fail_side_by_side": {
+      "unit": "probability that the audit fails when BC-final performs as on the controls; 200,000 simulated audits of 377 cards, seed 20260923, Monte Carlo SE about 0.0005 near 0.05",
+      "old_criteria_as_of_7d": {"S1_admission_0.10": 0.3243, "S1_admission_0.00": 0.3483, "S1_admission_0.20": 0.3029,
+                                "S2_predictive": 0.5714, "S3_equal_to_v2": 0.9846},
+      "new_criteria_7e": {"S1_admission_0.10": 0.0004, "S1_admission_0.00": 0.0002, "S1_admission_0.20": 0.0007,
+                          "S2_predictive": 0.0494, "S3_equal_to_v2": 0.2092},
+      "criterion_1_alone": {"S1_admission_0.10": 0.0003, "S2_predictive": 0.0453},
+      "criterion_2_alone": {"S1_admission_0.10": 0.0002, "S2_predictive": 0.0002}
+    },
+
+    "power_of_criterion_4_to_catch_a_worse_model": {
+      "definition": "P(criterion 4 fails) when BC-final's accuracy over all audit cards is lower than v2's by delta; minimum over low and high churn",
+      "at_0.02": 0.764, "at_0.03_delta_star": 0.952, "at_0.04": 0.986, "at_0.05": 0.997
+    },
+
+    "stated_plainly": [
+      "S2 at 0.0494 is about 1.2 Monte Carlo standard errors under 0.05. The choice holds at the declared seed and simulation count; nothing was re-run to move it.",
+      "Criterion 1 alone contributes about 0.045 under S2. S2 averages over true error rates the controls cannot exclude, including rates above 0.10 where failing is correct, so S2 overstates the chance of a false fail. No criterion-4 design can take S2 below about 0.045, because criterion 1 is unchanged by the owner's decision.",
+      "If BC-final is only as good as v2 (S3), the audit fails about 21 percent of the time. That is the price of catching a model 3 points worse 95 percent of the time. A fail on criterion 4 therefore means 'non-inferiority at 3 points not shown', not 'worse'; 'worse' is said only under D-003.",
+      "The scenario inputs are the 168 controls, read as a gate 13 times, with BC-final chosen on a spent set. If its real advantage over v2 is smaller than on the controls, the true false-fail lies between S1 and S3."
+    ]
+  },
+
+  "amendment_7f": {
+    "utc_date": "2026-09-23",
+    "committed_before": "any audit image is opened or any audit label is read",
+    "why": "a fresh stats-reviewer read 7e and every calculation (PASS, nothing blocking) and asked for these wording corrections and two pre-read hardenings. No number is recomputed; the design run is deterministic at its declared seed.",
+    "append_only": "the sections above are not edited",
+
+    "N1_how_close_S2_is": "S2 for ni_0.03 is 0.049375 with Monte Carlo SE 0.000484: 1.29 SE under 0.05, not 'about 1.2'. There is roughly a 1-in-10 chance that the exact (infinite-simulation) value lies above 0.05, in which case the declared rule would have stopped. The decision stands on the declared computation.",
+
+    "N2_what_a_result_means": {
+      "a_pass_on_criterion_4": "means 'not shown to be 3 or more points worse than v2, one-sided 5 percent'. It does NOT mean better than v2; 'better' is said only under D-003.",
+      "power_is_not_a_sample_size_statement": "0.95 power at exactly 3 points is fixed by the test's 5 percent level because the margin equals delta. The informative figures are the cost when BC-final equals v2 (fails about 21 percent) and the power at 2 points worse (0.764: a model 2 points worse passes criterion 4 about 1 time in 4; whether criterion 1 would catch it was not computed).",
+      "between_S1_and_S3_is_conditional": "the true false-fail lies between S1 and S3 only if BC-final's real advantage over v2 is between 0 and +4.2 points. If it is slightly worse than v2 but by less than 3 points, the chance of failing is above S3.",
+      "control_bands_are_not_the_live_pipeline": "S1 and S2 take their rates from the 168 pre-materialized control bands, which never exercise the detector, Paddle orientation or bidi. If the full pipeline reads admitted captures worse, criterion 1 fails more often, and that fail would be correct, not a false one."
+    },
+
+    "N3_criterion_4_is_resolved_before_the_ledger": "the read resolves criterion_4_design() and imports the calculator among its pre-read refusals, before any audit:card ledger event, so an absent part B blocks without a trace (as 7c R2 requires)",
+
+    "N4_the_read_runs_the_reviewed_code": "the read refuses unless the only tracked path changed between the manifest's git_commit and HEAD is configs/phase4_audit_manifest.json itself; any later change to rules, calculator or read code blocks it"
+  },
+
+  "amendment_7g": {
+    "utc_date": "2026-09-27",
+    "status": "ADOPTED by the owner (the owner, project owner) in chat on 2026-09-27. Decision log D-005, D-007, D-008. Not a proposal.",
+    "committed_before": "any audit image is opened or any audit label is read. The audit has not been opened. Two earlier read attempts failed before the guard step (docs/release/incident_2026-09-23_and_27.md).",
+    "append_only": "the sections above are not edited; where this block contradicts them, it governs, and it names what it supersedes",
+    "review": "a stats-reviewer read drafts of this block before commit: FAIL (B-1 process isolation, B-3 labels before the seal), then FAIL (the worker restart was unbounded), then FAIL (the worst-case bound, and the raw-score call could raise), then PASS with one hardening adopted (two_seals); all are resolved below",
+
+    "A_one_read_seals_two_systems": {
+      "rule": "the single audit read, in its one loop, seals per card the outputs of BC-final alone and v2 (as frozen in 7 to 7f) and, for the fused system, only: the contributed reading, its raw score, the fused reading of the selected fusion rule, the agreement flag and contributed_error",
+      "no_labels_before_the_seal": "the routing decision of either system depends on the typed ID, which is built from the label. It is never computed in the loop. Both systems' routing is computed after the seal, in the evaluation, as BC-final's already is (label_source.when_read unchanged)",
+      "frozen_first": "the fused system is sealed only once configs/phase4_integration_rule_v1.json has frozen its choices, and the regenerated manifest pins every one of them: the chosen crop (K1 or K2), the PP-OCRv5 detector file hashes if K2, the contributed model's three file hashes, the selected fusion rule, the R2 normalization table if R2 is selected, and the selected routing variant",
+      "if_the_integration_stops": "if the integration stops (INTEGRATION_NOT_WORTH_IT), nothing fused is sealed and the read is BC-final alone as frozen",
+      "two_seals": "after the loop, BC-final and v2 are sealed first, to artifacts/phase4_audit/predictions.npz and predictions.sha256 exactly as frozen. The fused fields are then written to a separate artifacts/phase4_audit/fused_predictions.npz with its own sha256, inside a wrapper that cannot raise. A failure there is recorded and cannot cost BC-final's seal or the verdict."
+    },
+    "B_the_gate_is_bc_final_alone": {
+      "rule": "the verdict and the audit token are computed from BC-final alone, exactly as amendments 7 to 7f declare. D-001 is unchanged. This is the clean official number.",
+      "supersedes": "D-007 item 1 (criterion 4 on the fused reading), which never reached this file",
+      "holds_only_while": "no fused quantity enters a criterion or the token (C). If one ever did, the 7e design would have to be re-grounded for it"
+    },
+    "C_the_fused_numbers_are_descriptive": {
+      "rule": "every fused-system quantity (configs/phase4_integration_rule_v1.json step_5_audit.fused_descriptive_quantities) is reported and never enters a criterion or the token",
+      "label": "POSSIBLY CONTAMINATED: the contributed model's training data are unverified, and a string in its bundle README matched a card in the official labelled set",
+      "go_live": "if the fused system ships, the go-live record states that its audit number cannot be certified"
+    },
+    "D_the_contributed_model_cannot_change_bc_final_or_stop_the_read": {
+      "process_isolation": "the contributed model, and the PP-OCRv5 detector if K2 is chosen, run only in a separate worker process. The reading process never imports Paddle code beyond what the frozen adapter already loads. On each card the reading process computes BC-final and v2 first, then passes the in-memory crop input (the band or canonical card it already holds, as bytes) to the worker. This is not a second read of the image: no file is opened by the worker.",
+      "per_card_timeout": "max(10 seconds, 10 x the contributed path's per-card p95 in the rehearsal in the read environment), fixed in the manifest",
+      "failure": "an exception, native crash, out-of-memory or timeout in the worker is sealed as contributed_error for that card. It cannot change a BC-final or v2 field, because those are computed in the reading process before the worker is called.",
+      "bounded_round_trip": "the per-card timeout covers the whole send-and-receive round trip. A restart of the worker, including its model load and self test, runs under the same timeout.",
+      "abandon_after_three": "after 3 consecutive worker failures (card failures or failed restarts), the worker is abandoned for the rest of the read and every remaining card is sealed as contributed_error without calling it. Every card costs at most one round trip plus one restart, each capped at the per-card timeout T, so the contributed path adds at most 2 x 377 x T; abandoning the worker can only lower that.",
+      "contributed_error_downstream": "a contributed_error counts as 'not 14 digits' in fusion (R1 and R2 then give BC-final's reading) and in routing. The count of cards with contributed_error is reported beside every fused quantity.",
+      "bc_final_raw_score_for_R2": "only if R2 is selected: BC-final's raw score (minimum per-slot softmax maximum) is obtained in the reading process by a second call to runtime.predict_bcfinal on result.band, after BC-final's fields are set; the shadow module is not edited. The call never raises into the loop: on an exception, an argmax that differs from the sealed BC-final reading, or an empty BC-final reading, the card is sealed with bc_raw_score_unavailable and its R2 comparison falls to BC-final's reading, as R1 would give. The flagged count is reported beside the fused quantities. If R2 is selected, the three-way parity rehearsal includes this call and must show no flag and no change to any BC-final or v2 field.",
+      "nothing_fused_raises_into_the_loop": "every fused-system step that runs in the reading process (the worker round trip, the raw-score call, fusion, sealing of fused fields) is wrapped so that it cannot raise into the loop; a failure is sealed as a per-card flag and falls back to BC-final's reading",
+      "load": "the worker is started, loads the contributed model and passes its self test among the pre-read refusals, before any audit:card ledger event (7c R2 order); a failure there blocks without a trace",
+      "if_the_self_test_fails_at_the_read": "stop and ask the owner, who chooses: fix it and retry (no trace was left), or read BC-final alone as frozen, which gives up the fused audit numbers for good",
+      "parity": "in the read environment, before the manifest is regenerated, the rehearsal runs on the development photos three ways: without the contributed path, with it, and with it plus an injected worker exception and an injected worker kill. The BC-final and v2 sealed fields are compared field by field and must be identical across all three.",
+      "midnight": "the read starts only if the larger of (a) twice the rehearsal estimate that includes the contributed path, in the read environment, and (b) BC-final's rehearsal time plus 2 x 377 x T ends before 23:30 local time (supersedes execution.midnight for a read that seals the fused system)"
+    },
+    "E_the_missing_card": {
+      "rule": "D-005 and D-007: the one audit card with no image is an admission failure. It is in the admission-failure rate, exact_card_accuracy_all and criterion 4 (both-wrong, concordant); it is not in criterion 1, which counts only captures that produced a band",
+      "pin": "the sha256 of its card_id, computed by the owner with `python scripts/phase4_audit.py missing-pin` (existence check only; no ledger event, no read marker), is recorded as allowed_missing_card_id_sha256 in a later amendment. Until then any missing image blocks the read (7b B2)"
+    },
+    "F_where_the_read_runs": {
+      "rule": "the read runs where Paddle loads. On 2026-09-27 the owner's Windows machine blocked it at model load, so the read environment is expected to be Linux. That design (paths, the override, the ledger, the guard, no copy of audit images, one invocation) is brought to the owner before any read code changes."
+    }
+  },
+
+  "amendment_7h": {
+    "utc_date": "2026-09-27",
+    "status": "ADOPTED by the owner (the owner, project owner) in chat on 2026-09-27. Decision log D-013, D-014. Not a proposal.",
+    "committed_before": "the manifest is regenerated and before any audit image is opened or any audit label is read. The audit has not been opened.",
+    "append_only": "the sections above are not edited; where this block contradicts them, it governs, and it names what it supersedes",
+    "the_integration_stopped": "D-013: INTEGRATION_NOT_WORTH_IT. As 7g A declared for that case, nothing fused is sealed. 7g A (fused sealing), C and D (the worker) do not apply. The read is BC-final alone and v2, as frozen in 7 to 7f, with 7g B (the gate is BC-final alone) and 7g E (the missing card) in force.",
+    "F_decided_where_the_read_runs": {
+      "environment": "WSL2 Ubuntu 26.04.1, the uv-built venv ~/venvs/ocrid-py3119 (Python 3.11.9, the project pins, paddlepaddle 3.3.0), run from the worktree mounted at the repository root, in the owner's own WSL terminal",
+      "why": "Windows Application Control blocks Paddle at model load on the owner's machine (2026-09-27). Amendment 2's parity justifies WSL: BC-final on the 168 control bands matched on 2352/2352 slots with max difference 0.0, and the full pipeline on the 20 rehearsal photos gave identical sealed fields on 20/20 with margin difference 0.0 (reports/phase4_integration_parity_linux.json)",
+      "supersedes": "7g F, which left the environment to be decided"
+    },
+    "wsl_adaptations_committed_before_the_manifest": {
+      "git": "the worktree's .git file points at a Windows path that Linux git cannot follow, so scripts/phase2m_h.py git() names the git directory explicitly under Linux. It still fails closed on any git error.",
+      "untracked_check": "under WSL, .venv, data and third_party are symlinks into OCR_ID_working, which the directory-only ignore patterns do not match. .gitignore adds root-anchored entries so the no-untracked-files refusal sees the same clean tree on both systems.",
+      "self_test_fonts": "the sealed v2 config names the self-test fonts C:/Windows/Fonts/*.ttf. During model load only, PIL gets /mnt/c/Windows/Fonts/*.ttf (phase4_audit.windows_font_paths); a no-op on Windows. The self-tests must still reproduce their sealed hashes.",
+      "detector_revision_check": "the vendored DocCornerNet checks its pinned git revision. Git's ownership check on that one repository is satisfied by a process-scope safe.directory (GIT_CONFIG_COUNT) in the owner's command. No global setting changes.",
+      "no_copy": "audit images are read in place through /mnt/c (data is a link into OCR_ID_working/data). Nothing is copied, and the ledger is this worktree's artifacts/governance/override_ledger.json."
+    },
+    "preflight": "python scripts/phase4_audit.py preflight runs every refusal that comes before the ledger, plus the model load and self-tests, without the authorisations. It opens no audit image, reads no label and writes nothing. It must print all_pass true in the read environment before the read starts.",
+    "authorisations": "the owner sets OCRID_GOVERNANCE_OVERRIDE=OPEN-377-AUDIT-<date> and PHASE2M_H_OPEN_THE_AUDIT in her own WSL terminal. The date is WSL's local date (date +%F), which is what Python's date.today() compares against in that shell. The Claude Code session never sets either.",
+    "midnight": "the WSL rehearsal measured 1.172 s per image and an 8.3 s bundle load, so 377 cards take about 450 s. Twice that is about 15 minutes, so the read starts before 23:15 local time.",
+    "pin": "the missing card's sha256 (7g E) is recorded by the next amendment, after the owner runs missing-pin. Until then, the missing-image refusal blocks the read."
+  },
+
+  "amendment_7i": {
+    "utc_date": "2026-09-27",
+    "status": "the owner ran `python scripts/phase4_audit.py missing-pin` in her own WSL terminal on 2026-09-27, under both authorisations, and pasted its output in chat (D-005, D-007, 7g E)",
+    "committed_before": "the manifest is regenerated and before any audit image is opened or any audit label is read. missing-pin checks file existence only: it opens no image, reads no label and writes no ledger event.",
+    "reported": {"audit_rows": 377, "missing": 1},
+    "allowed_missing_card_id_sha256": "28c1e9655d5328f2914688a45386eee3ba0423c9a0fcd67f14f6c047a0a141e7",
+    "rule": "refuse_if_images_missing allows exactly this card to have no image. Any other missing image still blocks the read before the ledger (7b B2). The pinned card goes through the read, where the adapter returns CORRUPT_IMAGE, so it is an admission failure (D-005, D-007): in the admission-failure rate, exact_card_accuracy_all and criterion 4 (both-wrong, concordant), and not in criterion 1."
+  }
+}

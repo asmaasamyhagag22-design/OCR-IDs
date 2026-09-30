@@ -1,0 +1,80 @@
+{
+  "acceptance_rule": {
+    "coverage_material_recovery": {
+      "external_validation_off_frame_complete_line_complete_and_contained_min": 0.6,
+      "internal_synthetic_off_frame_line_visible_complete_and_contained_min": 0.6,
+      "readable_development_residuals_complete_band_min": 0.5
+    },
+    "external_validation_native": {
+      "full_line_containment_rate_min_on_fully_visible": 0.95,
+      "localization_success_rate_min_on_fully_visible": 0.95
+    },
+    "external_validation_synthetic_scenes": {
+      "direction_agreement_rate_min_on_localized_fully_visible": 0.95,
+      "full_line_containment_rate_min_on_fully_visible": 0.85,
+      "negative_modes_per_record": [
+        "line_absent",
+        "no_card"
+      ],
+      "scene_modes_per_record": [
+        "tight",
+        "embedded",
+        "off_frame"
+      ]
+    },
+    "primary_preservation": {
+      "byte_identical_primary_fields_required": [
+        "detector",
+        "orientation",
+        "tensor_sha256",
+        "logits_sha256",
+        "public"
+      ],
+      "fallback_calls_on_primary_success": 0,
+      "production_routing_changes": 0
+    },
+    "safety": {
+      "fallback_auto_accept_count": 0,
+      "fallback_status_required": "SHADOW_NEEDS_REVIEW",
+      "false_complete_rate_on_digit_clipped_max": 0.02,
+      "false_complete_rate_on_negatives_max": 0.01,
+      "false_localization_rate_on_negatives_max": 0.05,
+      "wrong_side_false_complete_count_max": 0
+    }
+  },
+  "decision_mapping": {
+    "DIRECT_FIELD_FALLBACK_SHADOW_ONLY": "localization, containment, and safety pass but a coverage gate fails",
+    "FIXED14_V2_PRESERVATION_FAILURE": "frozen Fixed14-v2 config/weights/result not preserved",
+    "PREPROCESSING_REPAIR_NOT_VALIDATED": "any localization, containment, or safety gate fails",
+    "PREPROCESSING_V2_FROZEN": "all gates pass",
+    "PRIMARY_PATH_REGRESSION": "any primary-preservation difference"
+  },
+  "definitions": {
+    "complete_band": "band_state == complete_band (localized, head and tail evidence, line inside source frame, length/height and resolution minima)",
+    "false_complete_on_clipped": "complete_band on a scene where at least one digit quadrilateral is not fully inside the source frame",
+    "false_localization": "localized on a scene with no visible national-ID line",
+    "full_line_containment": "every corner of all 14 true digit quadrilaterals lies inside the final band quadrilateral with at most 1 source pixel tolerance",
+    "localization_success": "localized AND rotated IoU(predicted line rectangle, true 14-digit line rectangle) >= 0.5 AND reading-direction cosine >= 0.9"
+  },
+  "evaluator": "scripts/phase2m_b.py evaluate-external-validation",
+  "external_test_reads_before_freeze": 0,
+  "external_validation_reads_before_freeze": 0,
+  "external_validation_records_expected": 699,
+  "fixed14_v2": {
+    "config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+    "weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b"
+  },
+  "frozen_utc": "2026-09-15T15:10:35+00:00",
+  "git_head_at_freeze": "a7396e95c3014bad4c840da94e69d42e22e763b8",
+  "locator_weights_sha256": "009e2e24acbbb60c40988fbb341378b273b4c5ed20046d90091ac3c69d0a7c00",
+  "locator_weights_size_bytes": 1910040,
+  "one_time": true,
+  "predeclared_gates_sha256_lf": "04743d55c0b52ac4ff7e73c9df70d11d21f349057fefe191fc754a25c4d60e8a",
+  "preprocessing_config_sha256_lf": "a039886722928b7591f6080c1d52b2fbe6ff1d2e5bc27b1a492642675a9f2d93",
+  "schema_version": "phase2m_b_acceptance_rule_v1",
+  "source_sha256_lf": {
+    "scripts/phase2m_b.py": "1a337ecb8392afba884946ef57b50a8cd865b42a056d87bc62e99760ee86a30d",
+    "src/extraction/direct_field_fallback.py": "9bbba3185ed7548372475d5f52b406e7e8e483a27c7f55bb467407406af31cf1"
+  },
+  "validation_scene_seed": 6990321
+}

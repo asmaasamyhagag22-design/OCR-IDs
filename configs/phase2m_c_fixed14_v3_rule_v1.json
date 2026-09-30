@@ -1,0 +1,63 @@
+{
+  "schema_version": "phase2m_c_fixed14_v3_rule_v1",
+  "committed_before": ["any external-validation read", "any stage B or C training run", "any external-test read"],
+  "production_changed": false,
+  "base_checkpoint": {
+    "family": "phase2l_b.build_v2 conditioned 160x576 (unchanged architecture)",
+    "seed": 271828,
+    "config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+    "weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b",
+    "reproduced_inner_holdout_168_identical": 168,
+    "output_shape": [null, 14, 10]
+  },
+  "data": {
+    "external_train": {"records": 2892, "materialized": 2673, "excluded_digit_box_clipped_or_touching_border": 219},
+    "external_validation": {"records": 699, "use": "per-epoch checkpoint selection and bounded family selection only", "materialization": "same deterministic box checks as train"},
+    "external_test": {"records": 321, "use": "exactly once, after one candidate is frozen and committed"},
+    "materialization": "rotated line rectangle from the 14 ordered digit boxes; context 0.16/0.04 of line length; 650:180 perspective warp with padding 245; frozen phase2l_a.letterbox to 160x576",
+    "materialization_checks": ["exactly 14 single-digit labels and boxes", "boxes strictly ordered left-to-right", "no box clipped or within 1 px of the image border", "source line >= 8 px per digit and median digit height >= 10 px", "annotation labels equal the protected split target"],
+    "target_order": "left-to-right, verified against frozen v2 (forward digit agreement 0.922746 vs reversed 0.14446 on external train)",
+    "internal_replay_pool": "phase2l_a inner_train usable_for_real_training cards (664), the v2 original real training pool",
+    "eligible_115": "phase2m_a annotated eligible inner-train cards; zero identity or exact-image overlap with any external split; zero identity-component or target overlap with the 168 controls; 3 perceptual near-matches with external train (both training sources)",
+    "original_domain_controls": "phase2l_a inner_holdout 168 cards; evaluated once per run at its selected checkpoint, never per epoch",
+    "forbidden": ["consumed internal validation 618", "locked audit 377"]
+  },
+  "ablation": {
+    "A": "frozen Fixed14-v2, no training",
+    "B": "v2 fine-tuned on external train mixed with internal replay",
+    "C": "same-seed B selected checkpoint fine-tuned on the 115 eligible cards mixed with external train and internal replay"
+  },
+  "seeds": [3101, 3202],
+  "max_training_runs": 4,
+  "non_evaluated_smoke_runs": "one 20-step timing run on external train, weights discarded",
+  "stages": {
+    "B": {"epochs": 8, "steps_per_epoch": 111, "learning_rate": 0.0001, "optimizer": "adam, global_clipnorm 5.0, constant learning rate",
+          "batch_mix": {"external_train": 24, "internal_replay": 8}},
+    "C": {"epochs": 6, "steps_per_epoch": 60, "learning_rate": 0.00003, "optimizer": "adam, global_clipnorm 5.0, constant learning rate",
+          "batch_mix": {"eligible_115": 12, "external_train": 12, "internal_replay": 8}}
+  },
+  "augmentation": {
+    "geometric_probability": 0.8, "rotation_deg": 2.0, "scale": [0.94, 1.06], "translate_x_px": 12, "translate_y_px": 6, "perspective_px": 4,
+    "illumination_probability": 0.5, "contrast": [0.85, 1.15], "brightness": [0.8, 1.2],
+    "glare_probability": 0.15, "glare_radius_px": [20, 80], "glare_amplitude": [30, 70],
+    "blur_probability": 0.3, "blur_sigma": [0.3, 1.0],
+    "morphology_probability": 0.1,
+    "noise_probability": 0.3, "noise_sigma": [2, 8],
+    "jpeg_probability": 0.3, "jpeg_quality": [40, 90],
+    "partial_card_simulation": "not used: the fixed [B,14,10] contract has no reject output, and clipped inputs are never paired with an invisible full target"
+  },
+  "checkpoint_selection": "after every epoch, exact-sequence count on the materialized external validation; keep the maximum; ties keep the earlier epoch; the initial checkpoint is not a candidate",
+  "regression_cap_controls": {"max_regressed_exact": 3, "min_net_exact_change": -1, "reference": "frozen v2 on the same 168 controls"},
+  "stability": {"max_validation_exact_rate_difference": 0.02},
+  "family_eligibility": "both seeds: validation exact gain over A > 0, controls within the regression cap, zero short/empty/overlong outputs; and seed-stable",
+  "family_selection": "highest mean validation exact among eligible families; tie prefers B",
+  "seed_selection": "higher validation exact; tie prefers the lower seed",
+  "test_success": {"min_net_exact_gain": 1, "newly_exact_must_exceed_regressed_exact": true, "short_empty_or_overlong_max": 0},
+  "reporting": ["newly exact and regressed exact, not accuracy alone", "Egyptian-ID structure validity as diagnostics only, never to rewrite or select", "challenge_B as a recognition-domain diagnostic only, never to select", "challenge_A remains a capture/admission failure requiring a clearer complete image"],
+  "decisions": {
+    "FIXED14_V2_PRESERVATION_FAILURE": "v2 hashes, reconstruction, or validated result change",
+    "FIXED14_V3_NOT_IMPROVED": "no family is eligible on validation; the external test stays unopened",
+    "FIXED14_V3_TEST_NOT_CONFIRMED": "the frozen candidate fails test_success on the one-time external test",
+    "FIXED14_V3_IMPROVEMENT_CONFIRMED": "the frozen candidate passes test_success; research candidate only, no production change"
+  }
+}

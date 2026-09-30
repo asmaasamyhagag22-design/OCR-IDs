@@ -1,0 +1,42 @@
+{
+  "config_version": "field_regions_v1",
+  "canonical_size": [1000, 630],
+  "coordinate_space": "Relative to the Phase 1 rectified canonical card. rect is [x, y, w, h] with every component in [0, 1]; pixel bbox = [round(x*W), round(y*H), round((x+w)*W), round((y+h)*H)].",
+  "calibration_status": "uncalibrated_prior",
+  "calibration_note": "v1 rects are geometric priors for the standard Egyptian national ID layout. They were NOT fitted to the private evaluation images, which are deliberately never opened outside this machine. Use `python -m src.extraction.cli calibrate` to propose fitted rects from local Tesseract layout analysis, and the per-image debug overlay to confirm them by eye before trusting any state other than needs_review.",
+  "content_types": {
+    "digits": "Numeric only. OCR is whitelisted to ASCII digits; Arabic-Indic and Extended Arabic-Indic digits are folded to ASCII at read time and the fold is recorded as a note.",
+    "date_digits": "Numeric plus the separators / - . and space.",
+    "arabic_text": "Arabic script only. OCR runs with lang=ara and a whitelist of the Arabic letter block plus space.",
+    "none": "Not read. Drawn on the debug overlay so the layout can be checked, e.g. the portrait."
+  },
+  "layouts": {
+    "front": {
+      "description": "Portrait on the left, name and address block on the right, national ID number across the lower band.",
+      "regions": [
+        {"name": "portrait", "label_en": "Portrait", "label_ar": "الصورة", "rect": [0.045, 0.235, 0.235, 0.600], "content": "none", "role": "none", "psm": 7, "calibration": "prior"},
+        {"name": "card_serial_number", "label_en": "Card serial / factory number", "label_ar": "الرقم المسلسل", "rect": [0.620, 0.050, 0.340, 0.090], "content": "digits", "role": "serial", "psm": 7, "min_length": 6, "max_length": 20, "calibration": "prior"},
+        {"name": "first_name", "label_en": "First name", "label_ar": "الاسم", "rect": [0.330, 0.255, 0.620, 0.105], "content": "arabic_text", "role": "name", "psm": 7, "calibration": "prior"},
+        {"name": "full_name", "label_en": "Full name", "label_ar": "الاسم بالكامل", "rect": [0.330, 0.365, 0.620, 0.115], "content": "arabic_text", "role": "name", "psm": 7, "calibration": "prior"},
+        {"name": "address_line_1", "label_en": "Address line 1", "label_ar": "محل الإقامة", "rect": [0.330, 0.495, 0.620, 0.100], "content": "arabic_text", "role": "address", "psm": 7, "calibration": "prior"},
+        {"name": "address_line_2", "label_en": "Address line 2", "label_ar": "محل الإقامة (تابع)", "rect": [0.330, 0.595, 0.620, 0.100], "content": "arabic_text", "role": "address", "psm": 7, "calibration": "prior"},
+        {"name": "national_id_number", "label_en": "National ID number", "label_ar": "الرقم القومي", "rect": [0.300, 0.775, 0.600, 0.135], "content": "digits", "role": "id_number", "psm": 7, "expected_length": 14, "calibration": "prior"},
+        {"name": "birth_date_printed", "label_en": "Printed birth date", "label_ar": "تاريخ الميلاد", "rect": [0.045, 0.855, 0.240, 0.095], "content": "date_digits", "role": "printed_birth_date", "psm": 7, "calibration": "prior", "note": "Cross-verification depends entirely on this region. If it reads empty the ID number degrades to high_confidence at best, never verified."}
+      ]
+    },
+    "back": {
+      "description": "Detail block on the right, machine-readable band and serial across the lower half.",
+      "regions": [
+        {"name": "job_title", "label_en": "Occupation", "label_ar": "الوظيفة", "rect": [0.300, 0.150, 0.660, 0.100], "content": "arabic_text", "role": "other", "psm": 7, "calibration": "prior"},
+        {"name": "marital_status", "label_en": "Marital status", "label_ar": "الحالة الاجتماعية", "rect": [0.300, 0.275, 0.400, 0.090], "content": "arabic_text", "role": "other", "psm": 7, "calibration": "prior"},
+        {"name": "religion", "label_en": "Religion", "label_ar": "الديانة", "rect": [0.710, 0.275, 0.250, 0.090], "content": "arabic_text", "role": "other", "psm": 7, "calibration": "prior"},
+        {"name": "gender_printed", "label_en": "Printed gender", "label_ar": "النوع", "rect": [0.300, 0.380, 0.280, 0.090], "content": "arabic_text", "role": "printed_gender", "psm": 7, "calibration": "prior"},
+        {"name": "birth_date_printed", "label_en": "Printed birth date", "label_ar": "تاريخ الميلاد", "rect": [0.610, 0.380, 0.350, 0.090], "content": "date_digits", "role": "printed_birth_date", "psm": 7, "calibration": "prior", "note": "Cross-verification depends entirely on this region."},
+        {"name": "issue_date", "label_en": "Issue date", "label_ar": "تاريخ الإصدار", "rect": [0.300, 0.490, 0.350, 0.090], "content": "date_digits", "role": "other", "psm": 7, "calibration": "prior"},
+        {"name": "expiry_date", "label_en": "Expiry date", "label_ar": "تاريخ الانتهاء", "rect": [0.615, 0.490, 0.345, 0.090], "content": "date_digits", "role": "other", "psm": 7, "calibration": "prior"},
+        {"name": "national_id_number", "label_en": "National ID number", "label_ar": "الرقم القومي", "rect": [0.300, 0.600, 0.600, 0.120], "content": "digits", "role": "id_number", "psm": 7, "expected_length": 14, "calibration": "prior"},
+        {"name": "card_serial_number", "label_en": "Card serial / factory number", "label_ar": "الرقم المسلسل", "rect": [0.050, 0.830, 0.500, 0.120], "content": "digits", "role": "serial", "psm": 7, "min_length": 6, "max_length": 20, "calibration": "prior"}
+      ]
+    }
+  }
+}

@@ -1,0 +1,314 @@
+{
+  "acceptance": {
+    "conditions": {
+      "1_net_exact_gain_at_least_50": true,
+      "2_newly_gt_regressed_and_one_sided_sign_p_lt_0_01": true,
+      "3_regressed_within_cap": true,
+      "4_candidate_short_empty_overlong_zero": true,
+      "5_no_access_failure_denominator_label_privacy_or_truth_selection_violation": true,
+      "6_identical_population_normalization_and_contract": true
+    },
+    "decision": "FIXED14_V2_VALIDATED",
+    "one_sided_sign_test_p": 0.0,
+    "protocol_violation": false,
+    "regression_cap_cards": 24.85
+  },
+  "consumed_marker": "configs/phase2l_c_internal_validation_consumed.json",
+  "decision": "FIXED14_V2_VALIDATED",
+  "environment": {
+    "cpu_count": 8,
+    "git_branch": "parallel-session",
+    "git_head": "00ab16a43d65fc19430ad08802d28aa24080daab",
+    "keras": "3.13.0",
+    "machine": "AMD64",
+    "numpy": "1.26.4",
+    "opencv": "4.10.0",
+    "paddlepaddle": "3.3.0",
+    "pillow": "10.4.0",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 126 Stepping 5, GenuineIntel",
+    "python": "3.11.9",
+    "tensorflow": "2.16.1",
+    "tf_physical_devices": [
+      "CPU"
+    ]
+  },
+  "integrity": {
+    "access_failures": 0,
+    "denominator_ok": true,
+    "frozen_hashes_ok": true,
+    "identical_population": true,
+    "label_mismatches": 0,
+    "privacy_violations": 0,
+    "runtime_failures": 0,
+    "truth_dependent_selection": false
+  },
+  "paired": {
+    "absolute_percentage_point_change": 12.783172,
+    "baseline_exact": 497,
+    "baseline_exact_percent": 80.420712,
+    "both_exact": 482,
+    "both_wrong": 27,
+    "candidate_exact": 576,
+    "candidate_exact_percent": 93.203883,
+    "cards": 618,
+    "exact_ci95_net_exact_percentage_points_conditional_on_discordant_count": [
+      9.98994,
+      14.846737
+    ],
+    "exact_ci95_newly_share_of_discordant_clopper_pearson": [
+      0.783201,
+      0.920885
+    ],
+    "net_exact": 79,
+    "newly_exact": 94,
+    "one_sided_sign_test_p": 0.0,
+    "paddle_exact_fixed14_wrong": 15,
+    "paddle_wrong_fixed14_exact": 94,
+    "regressed_exact": 15,
+    "relative_exact_error_reduction": 0.652893
+  },
+  "phase2i_b_comparator_parity": {
+    "compared": {
+      "cards": {
+        "phase2i_b_tracked": 618,
+        "phase2l_c": 618
+      },
+      "complete_14_digit_wrong": {
+        "phase2i_b_tracked": 92,
+        "phase2l_c": 92
+      },
+      "empty": {
+        "phase2i_b_tracked": 3,
+        "phase2l_c": 3
+      },
+      "exact": {
+        "phase2i_b_tracked": 497,
+        "phase2l_c": 497
+      }
+    },
+    "matches": true
+  },
+  "population": {
+    "cards": 618,
+    "evaluated_once": true,
+    "locked_audit_opened": false,
+    "ordered_population_sha256": "4214666472a89fd655a17c633e04b64c757c64051d4b16cf91f5d510f295df44",
+    "production_changed": false,
+    "split": "internal_validation"
+  },
+  "provenance": {
+    "acceptance_rule_sha256": "f18db8648abe30cec1e3f62080b7a46aba285f2d36ae85fbf278f2c43e0b50b1",
+    "candidate_config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+    "candidate_source_commit": "1fb31da",
+    "candidate_weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b",
+    "comparator_source_sha256": "8834287e0259190bf4a21f3476fe450ac9077fe2c63c5be5185d3d0c1e1b373c",
+    "decoding": "argmax [14,10]",
+    "evaluator_sha256": "4b60af957c15f0642b2be3b400dcdc6885a779799e174d11df033fefaab811cc",
+    "git_head": "00ab16a43d65fc19430ad08802d28aa24080daab",
+    "latency_note": "candidate recognizer latency is batch-1 compiled TensorFlow CPU in this run; PP-OCRv5 latency is the frozen Phase 2I-B recorded value",
+    "paired_private_sha256": "a59dd18c4495271e172d871f553d369d8791f6f2419f72769d067e1886aaafa4",
+    "phase2l_b_script_sha256_at_training_freeze": "a5d229e59e92b42cbe507821b3df635381a783d1eb6991838181f5f66c98bbcf",
+    "sealed_before_truth_loaded": true,
+    "sealed_predictions_sha256": "100509b3775641621c6aa61b4e040a33caaac402ca8d379d2299a2b9be95b60d",
+    "tensor_hw": [
+      160,
+      576
+    ]
+  },
+  "reporting_addendum_from_aggregate_counts_only": {
+    "exact_ci95_newly_share_of_discordant": [
+      "0.7832",
+      "0.9209"
+    ],
+    "note": "Added after the single evaluation from the tracked aggregate counts; no card, label or prediction was re-read.",
+    "one_sided_sign_test_p_scientific": "1.853e-15",
+    "regression_cap_formula_value": "min(25, 0.05 x 497) = 24.85"
+  },
+  "schema_version": "phase2l_c_internal_validation_metrics_v1",
+  "subgroups": {
+    "by_current_crop_source": {
+      "projection_components": {
+        "cards": 69,
+        "current_exact": 67,
+        "exact": 65,
+        "net_exact": -2
+      },
+      "shipped_fixed": {
+        "cards": 549,
+        "current_exact": 430,
+        "exact": 511,
+        "net_exact": 81
+      }
+    },
+    "by_geometry_source": {
+      "doccornernet": {
+        "cards": 291,
+        "current_exact": 229,
+        "exact": 267,
+        "net_exact": 38
+      },
+      "full_image_fallback": {
+        "cards": 69,
+        "current_exact": 58,
+        "exact": 67,
+        "net_exact": 9
+      },
+      "pre_cropped_bypass": {
+        "cards": 258,
+        "current_exact": 210,
+        "exact": 242,
+        "net_exact": 32
+      }
+    },
+    "current_complete_wrong": {
+      "cards": 92,
+      "current_exact": 0,
+      "exact": 80,
+      "net_exact": 80
+    },
+    "current_malformed": {
+      "cards": 29,
+      "current_exact": 0,
+      "exact": 14,
+      "net_exact": 14
+    },
+    "phase2k_digits_cropped_auto_complete_broad_band": {
+      "cards": 11,
+      "current_exact": 0,
+      "exact": 10,
+      "net_exact": 10
+    },
+    "phase2k_digits_cropped_band_not_auto_complete": {
+      "cards": 16,
+      "current_exact": 0,
+      "exact": 11,
+      "net_exact": 11
+    },
+    "phase2k_label_DIGITS_CROPPED": {
+      "cards": 27,
+      "current_exact": 0,
+      "exact": 21,
+      "net_exact": 21
+    },
+    "phase2k_label_READABLE_CLEAR": {
+      "cards": 92,
+      "current_exact": 14,
+      "exact": 84,
+      "net_exact": 70
+    },
+    "phase2k_label_READABLE_EFFORT": {
+      "cards": 2,
+      "current_exact": 0,
+      "exact": 1,
+      "net_exact": 1
+    },
+    "phase2k_label_UNREVIEWED": {
+      "cards": 483,
+      "current_exact": 483,
+      "exact": 468,
+      "net_exact": -15
+    },
+    "phase2k_readable_clear": {
+      "cards": 92,
+      "current_exact": 14,
+      "exact": 84,
+      "net_exact": 70
+    }
+  },
+  "systems": {
+    "arabic_ppocrv5_frozen": {
+      "cards": 618,
+      "complete_14_digit_wrong": 92,
+      "digit_accuracy": 0.957235,
+      "empty": 3,
+      "exact": 497,
+      "exact_accuracy": 0.804207,
+      "inference_ms": {
+        "median": 75.081,
+        "p95": 229.941
+      },
+      "model_size_bytes": 8140551,
+      "name": "arabic_ppocrv5_frozen",
+      "net_exact_change": 0,
+      "newly_exact": 0,
+      "overlong": 0,
+      "paired_transition_matrix": {
+        "empty_to_empty": 3,
+        "exact_to_exact": 497,
+        "short_to_short": 26,
+        "wrong_14_to_wrong_14": 92
+      },
+      "parameter_count": null,
+      "position_error_counts": [
+        25,
+        16,
+        38,
+        14,
+        27,
+        19,
+        25,
+        17,
+        25,
+        16,
+        25,
+        27,
+        46,
+        50
+      ],
+      "regressed_exact": 0,
+      "run_errors": 0,
+      "short": 26
+    },
+    "fixed14_v2_seed271828": {
+      "cards": 618,
+      "complete_14_digit_wrong": 42,
+      "digit_accuracy": 0.97804,
+      "empty": 0,
+      "end_to_end_inference_ms_including_band_preparation": {
+        "median": 329.6319,
+        "p95": 752.54629
+      },
+      "exact": 576,
+      "exact_accuracy": 0.932039,
+      "inference_ms": {
+        "median": 69.091,
+        "p95": 76.599
+      },
+      "model_size_bytes": 538296,
+      "name": "fixed14_v2_seed271828",
+      "net_exact_change": 79,
+      "newly_exact": 94,
+      "overlong": 0,
+      "paired_transition_matrix": {
+        "empty_to_wrong_14": 3,
+        "exact_to_exact": 482,
+        "exact_to_wrong_14": 15,
+        "short_to_exact": 14,
+        "short_to_wrong_14": 12,
+        "wrong_14_to_exact": 80,
+        "wrong_14_to_wrong_14": 12
+      },
+      "parameter_count": 113439,
+      "position_error_counts": [
+        11,
+        10,
+        15,
+        13,
+        10,
+        14,
+        14,
+        10,
+        15,
+        13,
+        11,
+        14,
+        21,
+        19
+      ],
+      "regressed_exact": 15,
+      "run_errors": 0,
+      "short": 0
+    }
+  }
+}

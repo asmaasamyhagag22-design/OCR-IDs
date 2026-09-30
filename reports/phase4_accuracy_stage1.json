@@ -1,0 +1,1123 @@
+{
+  "F1": {
+    "controls_not_pristine": {
+      "admitted": 168,
+      "cards": 168,
+      "config": "s0.30_p0.10_nofull_valid",
+      "exact": 159,
+      "exact_interval": [
+        0.900743,
+        0.975214
+      ],
+      "label": "not pristine: the controls have been read as a gate 13+ times",
+      "reading_equals_step1_stored": 168,
+      "seconds_per_image_mean": 1.061,
+      "triggered": 0
+    },
+    "pool_production_form": {
+      "reproduction_check_amendment_1_A4": {
+        "agrees": true,
+        "config": "s0.30_p0.10_nofull_valid",
+        "failures": 51,
+        "in_run_comparison": {
+          "defect": "the in-run comparator looked up the gated label, which the ungated grid never recorded, so every expectation was empty: it matched only the unrecovered cards and no reading (the code at 44cbcd0; the grid's labels are the eight ungated ones)",
+          "recovered_reading_equals_cached_evaluation": 0,
+          "recovery_matches_cached_evaluation": 9
+        },
+        "latency_seconds": {
+          "triggered": {
+            "mean": 2.8124,
+            "median": 2.0606,
+            "n": 50,
+            "p90": 5.2014
+          },
+          "untriggered": {
+            "mean": 1.3253,
+            "median": 0.9491,
+            "n": 721,
+            "p90": 2.6975
+          }
+        },
+        "recomputed_from": "the sealed production-form rows, without re-running the pipeline",
+        "recovered": 42,
+        "recovered_reading_equals_cached_evaluation": 42,
+        "recovery_matches_cached_evaluation": 51
+      },
+      "run_summary": {
+        "admitted_band_identical": 720,
+        "admitted_first_pass": 720,
+        "admitted_triggered": 0,
+        "cards": 771,
+        "config": "s0.30_p0.10_nofull_valid",
+        "failures": 51,
+        "failures_recovered": 42,
+        "failures_triggered": 50,
+        "recovered_reading_equals_cached_evaluation": 0,
+        "recovery_matches_cached_evaluation": 9,
+        "seconds_per_image_mean": 1.4217,
+        "seconds_per_triggered_image_mean": 2.8124,
+        "seconds_per_untriggered_image_mean": 1.3253,
+        "wall_seconds": 1127.3
+      }
+    },
+    "selection": {
+      "chosen": "s0.30_p0.10_nofull",
+      "development_set": 46,
+      "failures_sealed": 51,
+      "held_back_by_exclusions": 5,
+      "label_source_agreement_with_phase2l_a": "720/720",
+      "labels_found_for_failures": 51,
+      "not_triggered_in_development_set": 0,
+      "note": "the chosen configuration's development numbers are selection numbers, in-sample to the choice",
+      "rule": "configs/phase4_accuracy_stage1_rule_v1.json first_fix.selection_rule and amendment 1",
+      "schema_version": "phase4_accuracy_second_pass_selection_v1",
+      "selected": false,
+      "table_all_triggered_failures_for_the_projection": [
+        {
+          "config": "s0.30_p0.10_nofull",
+          "exact": 37,
+          "exact_among_recovered_interval": [
+            0.611304,
+            0.866571
+          ],
+          "exact_interval": [
+            0.596552,
+            0.853699
+          ],
+          "index": 0,
+          "misread_not_wrong_region": 4,
+          "recovered": 49,
+          "recovered_labelled": 49,
+          "seconds_mean": 18.312,
+          "seconds_median": 17.726,
+          "seconds_p90": 31.27,
+          "triggered": 50,
+          "winning_steps": {
+            "pad_0.10": 45,
+            "relaxed_original": 2,
+            "turn_90": 2
+          },
+          "wrong_region": 8
+        },
+        {
+          "config": "s0.30_p0.10_full",
+          "exact": 37,
+          "exact_among_recovered_interval": [
+            0.596552,
+            0.853699
+          ],
+          "exact_interval": [
+            0.596552,
+            0.853699
+          ],
+          "index": 1,
+          "misread_not_wrong_region": 4,
+          "recovered": 50,
+          "recovered_labelled": 50,
+          "seconds_mean": 18.487,
+          "seconds_median": 17.726,
+          "seconds_p90": 31.27,
+          "triggered": 50,
+          "winning_steps": {
+            "full_image_quad": 1,
+            "pad_0.10": 45,
+            "relaxed_original": 2,
+            "turn_90": 2
+          },
+          "wrong_region": 9
+        },
+        {
+          "config": "s0.30_p0.25_nofull",
+          "exact": 35,
+          "exact_among_recovered_interval": [
+            0.553918,
+            0.821382
+          ],
+          "exact_interval": [
+            0.553918,
+            0.821382
+          ],
+          "index": 2,
+          "misread_not_wrong_region": 5,
+          "recovered": 50,
+          "recovered_labelled": 50,
+          "seconds_mean": 17.284,
+          "seconds_median": 15.18,
+          "seconds_p90": 33.137,
+          "triggered": 50,
+          "winning_steps": {
+            "pad_0.25": 48,
+            "relaxed_original": 2
+          },
+          "wrong_region": 10
+        },
+        {
+          "config": "s0.30_p0.25_full",
+          "exact": 35,
+          "exact_among_recovered_interval": [
+            0.553918,
+            0.821382
+          ],
+          "exact_interval": [
+            0.553918,
+            0.821382
+          ],
+          "index": 3,
+          "misread_not_wrong_region": 5,
+          "recovered": 50,
+          "recovered_labelled": 50,
+          "seconds_mean": 17.284,
+          "seconds_median": 15.18,
+          "seconds_p90": 33.137,
+          "triggered": 50,
+          "winning_steps": {
+            "pad_0.25": 48,
+            "relaxed_original": 2
+          },
+          "wrong_region": 10
+        },
+        {
+          "config": "s0.15_p0.10_nofull",
+          "exact": 35,
+          "exact_among_recovered_interval": [
+            0.553918,
+            0.821382
+          ],
+          "exact_interval": [
+            0.553918,
+            0.821382
+          ],
+          "index": 4,
+          "misread_not_wrong_region": 4,
+          "recovered": 50,
+          "recovered_labelled": 50,
+          "seconds_mean": 18.673,
+          "seconds_median": 17.726,
+          "seconds_p90": 31.27,
+          "triggered": 50,
+          "winning_steps": {
+            "pad_0.10": 43,
+            "relaxed_original": 7
+          },
+          "wrong_region": 11
+        },
+        {
+          "config": "s0.15_p0.10_full",
+          "exact": 35,
+          "exact_among_recovered_interval": [
+            0.553918,
+            0.821382
+          ],
+          "exact_interval": [
+            0.553918,
+            0.821382
+          ],
+          "index": 5,
+          "misread_not_wrong_region": 4,
+          "recovered": 50,
+          "recovered_labelled": 50,
+          "seconds_mean": 18.673,
+          "seconds_median": 17.726,
+          "seconds_p90": 31.27,
+          "triggered": 50,
+          "winning_steps": {
+            "pad_0.10": 43,
+            "relaxed_original": 7
+          },
+          "wrong_region": 11
+        },
+        {
+          "config": "s0.15_p0.25_nofull",
+          "exact": 35,
+          "exact_among_recovered_interval": [
+            0.553918,
+            0.821382
+          ],
+          "exact_interval": [
+            0.553918,
+            0.821382
+          ],
+          "index": 6,
+          "misread_not_wrong_region": 4,
+          "recovered": 50,
+          "recovered_labelled": 50,
+          "seconds_mean": 17.492,
+          "seconds_median": 15.419,
+          "seconds_p90": 33.137,
+          "triggered": 50,
+          "winning_steps": {
+            "pad_0.25": 43,
+            "relaxed_original": 7
+          },
+          "wrong_region": 11
+        },
+        {
+          "config": "s0.15_p0.25_full",
+          "exact": 35,
+          "exact_among_recovered_interval": [
+            0.553918,
+            0.821382
+          ],
+          "exact_interval": [
+            0.553918,
+            0.821382
+          ],
+          "index": 7,
+          "misread_not_wrong_region": 4,
+          "recovered": 50,
+          "recovered_labelled": 50,
+          "seconds_mean": 17.492,
+          "seconds_median": 15.419,
+          "seconds_p90": 33.137,
+          "triggered": 50,
+          "winning_steps": {
+            "pad_0.25": 43,
+            "relaxed_original": 7
+          },
+          "wrong_region": 11
+        }
+      ],
+      "token": "F1_NOT_SELECTED:no_configuration_passes_the_false_admission_bound",
+      "utc": "2026-09-28T04:44:53+00:00"
+    },
+    "table": [
+      {
+        "config": "s0.30_p0.10_nofull",
+        "exact": 36,
+        "exact_among_recovered_interval": [
+          0.654042,
+          0.904243
+        ],
+        "exact_interval": [
+          0.636376,
+          0.890518
+        ],
+        "excluded_cards_admitted": 4,
+        "false_admission_interval": [
+          0.175013,
+          0.381644
+        ],
+        "false_admission_rate": 0.2692,
+        "false_admissions": 21,
+        "index": 0,
+        "misread_not_wrong_region": 4,
+        "negatives": 78,
+        "recovered": 45,
+        "recovered_labelled": 45,
+        "seconds_mean": 18.139,
+        "seconds_median": 17.234,
+        "seconds_p90": 30.531,
+        "triggered": 46,
+        "winning_steps": {
+          "pad_0.10": 41,
+          "relaxed_original": 2,
+          "turn_90": 2
+        },
+        "wrong_region": 5
+      },
+      {
+        "config": "s0.30_p0.10_full",
+        "exact": 36,
+        "exact_among_recovered_interval": [
+          0.636376,
+          0.890518
+        ],
+        "exact_interval": [
+          0.636376,
+          0.890518
+        ],
+        "excluded_cards_admitted": 4,
+        "false_admission_interval": [
+          0.823797,
+          0.963153
+        ],
+        "false_admission_rate": 0.9103,
+        "false_admissions": 71,
+        "index": 1,
+        "misread_not_wrong_region": 4,
+        "negatives": 78,
+        "recovered": 46,
+        "recovered_labelled": 46,
+        "seconds_mean": 18.329,
+        "seconds_median": 17.234,
+        "seconds_p90": 30.531,
+        "triggered": 46,
+        "winning_steps": {
+          "full_image_quad": 1,
+          "pad_0.10": 41,
+          "relaxed_original": 2,
+          "turn_90": 2
+        },
+        "wrong_region": 6
+      },
+      {
+        "config": "s0.30_p0.25_nofull",
+        "exact": 34,
+        "exact_among_recovered_interval": [
+          0.588681,
+          0.857331
+        ],
+        "exact_interval": [
+          0.588681,
+          0.857331
+        ],
+        "excluded_cards_admitted": 4,
+        "false_admission_interval": [
+          0.511339,
+          0.735023
+        ],
+        "false_admission_rate": 0.6282,
+        "false_admissions": 49,
+        "index": 2,
+        "misread_not_wrong_region": 5,
+        "negatives": 78,
+        "recovered": 46,
+        "recovered_labelled": 46,
+        "seconds_mean": 16.689,
+        "seconds_median": 15.18,
+        "seconds_p90": 30.968,
+        "triggered": 46,
+        "winning_steps": {
+          "pad_0.25": 44,
+          "relaxed_original": 2
+        },
+        "wrong_region": 7
+      },
+      {
+        "config": "s0.30_p0.25_full",
+        "exact": 34,
+        "exact_among_recovered_interval": [
+          0.588681,
+          0.857331
+        ],
+        "exact_interval": [
+          0.588681,
+          0.857331
+        ],
+        "excluded_cards_admitted": 4,
+        "false_admission_interval": [
+          0.840054,
+          0.971247
+        ],
+        "false_admission_rate": 0.9231,
+        "false_admissions": 72,
+        "index": 3,
+        "misread_not_wrong_region": 5,
+        "negatives": 78,
+        "recovered": 46,
+        "recovered_labelled": 46,
+        "seconds_mean": 16.689,
+        "seconds_median": 15.18,
+        "seconds_p90": 30.968,
+        "triggered": 46,
+        "winning_steps": {
+          "pad_0.25": 44,
+          "relaxed_original": 2
+        },
+        "wrong_region": 7
+      },
+      {
+        "config": "s0.15_p0.10_nofull",
+        "exact": 34,
+        "exact_among_recovered_interval": [
+          0.588681,
+          0.857331
+        ],
+        "exact_interval": [
+          0.588681,
+          0.857331
+        ],
+        "excluded_cards_admitted": 4,
+        "false_admission_interval": [
+          0.175013,
+          0.381644
+        ],
+        "false_admission_rate": 0.2692,
+        "false_admissions": 21,
+        "index": 4,
+        "misread_not_wrong_region": 4,
+        "negatives": 78,
+        "recovered": 46,
+        "recovered_labelled": 46,
+        "seconds_mean": 18.531,
+        "seconds_median": 17.234,
+        "seconds_p90": 31.21,
+        "triggered": 46,
+        "winning_steps": {
+          "pad_0.10": 39,
+          "relaxed_original": 7
+        },
+        "wrong_region": 8
+      },
+      {
+        "config": "s0.15_p0.10_full",
+        "exact": 34,
+        "exact_among_recovered_interval": [
+          0.588681,
+          0.857331
+        ],
+        "exact_interval": [
+          0.588681,
+          0.857331
+        ],
+        "excluded_cards_admitted": 4,
+        "false_admission_interval": [
+          0.823797,
+          0.963153
+        ],
+        "false_admission_rate": 0.9103,
+        "false_admissions": 71,
+        "index": 5,
+        "misread_not_wrong_region": 4,
+        "negatives": 78,
+        "recovered": 46,
+        "recovered_labelled": 46,
+        "seconds_mean": 18.531,
+        "seconds_median": 17.234,
+        "seconds_p90": 31.21,
+        "triggered": 46,
+        "winning_steps": {
+          "pad_0.10": 39,
+          "relaxed_original": 7
+        },
+        "wrong_region": 8
+      },
+      {
+        "config": "s0.15_p0.25_nofull",
+        "exact": 34,
+        "exact_among_recovered_interval": [
+          0.588681,
+          0.857331
+        ],
+        "exact_interval": [
+          0.588681,
+          0.857331
+        ],
+        "excluded_cards_admitted": 4,
+        "false_admission_interval": [
+          0.511339,
+          0.735023
+        ],
+        "false_admission_rate": 0.6282,
+        "false_admissions": 49,
+        "index": 6,
+        "misread_not_wrong_region": 4,
+        "negatives": 78,
+        "recovered": 46,
+        "recovered_labelled": 46,
+        "seconds_mean": 16.915,
+        "seconds_median": 15.419,
+        "seconds_p90": 31.634,
+        "triggered": 46,
+        "winning_steps": {
+          "pad_0.25": 39,
+          "relaxed_original": 7
+        },
+        "wrong_region": 8
+      },
+      {
+        "config": "s0.15_p0.25_full",
+        "exact": 34,
+        "exact_among_recovered_interval": [
+          0.588681,
+          0.857331
+        ],
+        "exact_interval": [
+          0.588681,
+          0.857331
+        ],
+        "excluded_cards_admitted": 4,
+        "false_admission_interval": [
+          0.840054,
+          0.971247
+        ],
+        "false_admission_rate": 0.9231,
+        "false_admissions": 72,
+        "index": 7,
+        "misread_not_wrong_region": 4,
+        "negatives": 78,
+        "recovered": 46,
+        "recovered_labelled": 46,
+        "seconds_mean": 16.915,
+        "seconds_median": 15.419,
+        "seconds_p90": 31.634,
+        "triggered": 46,
+        "winning_steps": {
+          "pad_0.25": 39,
+          "relaxed_original": 7
+        },
+        "wrong_region": 8
+      }
+    ]
+  },
+  "F4": {
+    "admitted": 1,
+    "audit_upper_bound": 0,
+    "corrupt_failures": 1,
+    "decoded": 1,
+    "exact": 0,
+    "first_pass_status_after_decode": {
+      "success": 1
+    },
+    "why_zero": "the audit's corrupt_image is the pinned card with no image file"
+  },
+  "base": {
+    "audit_cards": 377,
+    "audit_document_not_found": 19,
+    "audit_exact": 342,
+    "audit_misreads": 15,
+    "audit_misreads_structurally_invalid": 8,
+    "note": "the audit's counts are the base of every projection; no claim is made on the audit (D-016)"
+  },
+  "cumulative_projection": [
+    {
+      "gain": 14.06,
+      "measured": true,
+      "projected_accuracy": 0.9445,
+      "projected_accuracy_range": [
+        0.9372,
+        0.9502
+      ],
+      "projected_exact_per_377": 356.06,
+      "step": "F1v"
+    },
+    {
+      "gain": 3.33,
+      "measured": true,
+      "projected_accuracy": 0.9533,
+      "projected_accuracy_range": [
+        0.9419,
+        0.9636
+      ],
+      "projected_exact_per_377": 359.39,
+      "step": "F8"
+    },
+    {
+      "gain": 2.68,
+      "measured": false,
+      "note": "projected, not measured; the candidates compete for the same remaining failures, so at most one is counted, and without a validated anchor the estimate is an overstatement",
+      "projected_accuracy": 0.9604,
+      "projected_exact_per_377": 362.07,
+      "step": "F2 or F3"
+    }
+  ],
+  "effort_units": {
+    "F1": 2,
+    "F1v": 2,
+    "F2": 2,
+    "F3": 3,
+    "F4": 1,
+    "F5": 1,
+    "F6": 2,
+    "F7": 1,
+    "F8": 2
+  },
+  "misread_fixes": {
+    "S1_controls_168_not_pristine": {
+      "F5": {
+        "cards": 168,
+        "fixed_exact": 159,
+        "frozen_exact": 159,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F6": {
+        "cards": 168,
+        "fixed_exact": 160,
+        "frozen_exact": 159,
+        "net": 1,
+        "newly_exact": 1,
+        "regressed": 0,
+        "sign_test_two_sided_p": 1.0
+      },
+      "F6+F5": {
+        "cards": 168,
+        "fixed_exact": 160,
+        "frozen_exact": 159,
+        "net": 1,
+        "newly_exact": 1,
+        "regressed": 0,
+        "sign_test_two_sided_p": 1.0
+      },
+      "F7": {
+        "cards": 168,
+        "fixed_exact": 159,
+        "frozen_exact": 159,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F7+F5": {
+        "cards": 168,
+        "fixed_exact": 159,
+        "frozen_exact": 159,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      }
+    },
+    "S1_plus_S2": {
+      "F5": {
+        "cards": 888,
+        "fixed_exact": 851,
+        "frozen_exact": 851,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F6": {
+        "cards": 888,
+        "fixed_exact": 851,
+        "frozen_exact": 851,
+        "net": 0,
+        "newly_exact": 1,
+        "regressed": 1,
+        "sign_test_two_sided_p": 1.0
+      },
+      "F6+F5": {
+        "cards": 888,
+        "fixed_exact": 852,
+        "frozen_exact": 851,
+        "net": 1,
+        "newly_exact": 1,
+        "regressed": 0,
+        "sign_test_two_sided_p": 1.0
+      },
+      "F7": {
+        "cards": 888,
+        "fixed_exact": 849,
+        "frozen_exact": 851,
+        "net": -2,
+        "newly_exact": 0,
+        "regressed": 2,
+        "sign_test_two_sided_p": 0.5
+      },
+      "F7+F5": {
+        "cards": 888,
+        "fixed_exact": 849,
+        "frozen_exact": 851,
+        "net": -2,
+        "newly_exact": 0,
+        "regressed": 2,
+        "sign_test_two_sided_p": 0.5
+      }
+    },
+    "S1_plus_S2_excluded_cards_only": {
+      "F5": {
+        "cards": 18,
+        "fixed_exact": 0,
+        "frozen_exact": 0,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F6": {
+        "cards": 18,
+        "fixed_exact": 0,
+        "frozen_exact": 0,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F6+F5": {
+        "cards": 18,
+        "fixed_exact": 0,
+        "frozen_exact": 0,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F7": {
+        "cards": 18,
+        "fixed_exact": 0,
+        "frozen_exact": 0,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F7+F5": {
+        "cards": 18,
+        "fixed_exact": 0,
+        "frozen_exact": 0,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      }
+    },
+    "S2_admitted_pool_720": {
+      "F5": {
+        "cards": 720,
+        "fixed_exact": 692,
+        "frozen_exact": 692,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F6": {
+        "cards": 720,
+        "fixed_exact": 691,
+        "frozen_exact": 692,
+        "net": -1,
+        "newly_exact": 0,
+        "regressed": 1,
+        "sign_test_two_sided_p": 1.0
+      },
+      "F6+F5": {
+        "cards": 720,
+        "fixed_exact": 692,
+        "frozen_exact": 692,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F7": {
+        "cards": 720,
+        "fixed_exact": 690,
+        "frozen_exact": 692,
+        "net": -2,
+        "newly_exact": 0,
+        "regressed": 2,
+        "sign_test_two_sided_p": 0.5
+      },
+      "F7+F5": {
+        "cards": 720,
+        "fixed_exact": 690,
+        "frozen_exact": 692,
+        "net": -2,
+        "newly_exact": 0,
+        "regressed": 2,
+        "sign_test_two_sided_p": 0.5
+      }
+    },
+    "S2_in_sample": {
+      "F5": {
+        "cards": 664,
+        "fixed_exact": 656,
+        "frozen_exact": 656,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F6": {
+        "cards": 664,
+        "fixed_exact": 655,
+        "frozen_exact": 656,
+        "net": -1,
+        "newly_exact": 0,
+        "regressed": 1,
+        "sign_test_two_sided_p": 1.0
+      },
+      "F6+F5": {
+        "cards": 664,
+        "fixed_exact": 656,
+        "frozen_exact": 656,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F7": {
+        "cards": 664,
+        "fixed_exact": 654,
+        "frozen_exact": 656,
+        "net": -2,
+        "newly_exact": 0,
+        "regressed": 2,
+        "sign_test_two_sided_p": 0.5
+      },
+      "F7+F5": {
+        "cards": 664,
+        "fixed_exact": 654,
+        "frozen_exact": 656,
+        "net": -2,
+        "newly_exact": 0,
+        "regressed": 2,
+        "sign_test_two_sided_p": 0.5
+      }
+    },
+    "S2_not_replay": {
+      "F5": {
+        "cards": 56,
+        "fixed_exact": 36,
+        "frozen_exact": 36,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F6": {
+        "cards": 56,
+        "fixed_exact": 36,
+        "frozen_exact": 36,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F6+F5": {
+        "cards": 56,
+        "fixed_exact": 36,
+        "frozen_exact": 36,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F7": {
+        "cards": 56,
+        "fixed_exact": 36,
+        "frozen_exact": 36,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      },
+      "F7+F5": {
+        "cards": 56,
+        "fixed_exact": 36,
+        "frozen_exact": 36,
+        "net": 0,
+        "newly_exact": 0,
+        "regressed": 0,
+        "sign_test_two_sided_p": null
+      }
+    },
+    "S3_external_validation_cards_descriptive": {
+      "F5": {
+        "cards": 293,
+        "fixed_exact": 279,
+        "frozen_exact": 278,
+        "net": 1,
+        "newly_exact": 1,
+        "regressed": 0,
+        "sign_test_two_sided_p": 1.0
+      },
+      "F7": {
+        "cards": 293,
+        "fixed_exact": 280,
+        "frozen_exact": 278,
+        "net": 2,
+        "newly_exact": 2,
+        "regressed": 0,
+        "sign_test_two_sided_p": 0.5
+      },
+      "F7+F5": {
+        "cards": 293,
+        "fixed_exact": 281,
+        "frozen_exact": 278,
+        "net": 3,
+        "newly_exact": 3,
+        "regressed": 0,
+        "sign_test_two_sided_p": 0.25
+      }
+    },
+    "S3_external_validation_records_descriptive": {
+      "F5": {
+        "cards": 647,
+        "fixed_exact": 629,
+        "frozen_exact": 628,
+        "net": 1,
+        "newly_exact": 1,
+        "regressed": 0,
+        "sign_test_two_sided_p": 1.0
+      },
+      "F7": {
+        "cards": 647,
+        "fixed_exact": 630,
+        "frozen_exact": 628,
+        "net": 2,
+        "newly_exact": 4,
+        "regressed": 2,
+        "sign_test_two_sided_p": 0.6875
+      },
+      "F7+F5": {
+        "cards": 647,
+        "fixed_exact": 631,
+        "frozen_exact": 628,
+        "net": 3,
+        "newly_exact": 5,
+        "regressed": 2,
+        "sign_test_two_sided_p": 0.453125
+      }
+    },
+    "added_seconds_per_card_mean": {
+      "F5": 0.00085,
+      "F6": 0.4802,
+      "F7": 0.17258,
+      "plain": 0.00016
+    },
+    "f6_centre_view_equals_the_frozen_band": {
+      "S1": 168,
+      "S2": 720
+    },
+    "rule": "configs/phase4_accuracy_stage1_rule_v1.json amendment 2",
+    "schema_version": "phase4_accuracy_misread_fixes_v1",
+    "utc": "2026-09-27T23:46:11+00:00"
+  },
+  "misread_fixes_adopted_into_the_projection": [],
+  "plan": {
+    "F1": {
+      "latency": {
+        "grid_mean_seconds_per_triggered_image": 18.139
+      },
+      "measured": true,
+      "measured_on": "all 50 triggered pool failures: 37 exact (development set after exclusions: 36 of 46)",
+      "realistic_per_377": 14.06,
+      "risk": {
+        "false_admission_interval": [
+          0.175013,
+          0.381644
+        ],
+        "false_admission_rate_on_negatives": 0.2692,
+        "touches_admitted_cards": false,
+        "wrong_region_or_unreadable_on_development": 5
+      },
+      "sealed_modules_touched": false,
+      "status": "F1_NOT_SELECTED:no_configuration_passes_the_false_admission_bound",
+      "targets": "document_not_found (score and shape gates)",
+      "upper_bound_per_377": 17.48
+    },
+    "F1v": {
+      "latency": {
+        "added_seconds_per_image_at_the_pool_trigger_rate": 0.0964,
+        "added_seconds_per_triggered_image": 1.4871,
+        "seconds_per_triggered_image": 2.8124,
+        "seconds_per_untriggered_image": 1.3253
+      },
+      "measured": true,
+      "measured_on": "all 50 triggered pool failures: 37 exact, 42 admitted (development set: 36 of 46)",
+      "realistic_per_377": 14.06,
+      "risk": {
+        "false_admissions_fresh_negatives": {
+          "built": 92,
+          "false_admissions": 1,
+          "frozen_admitted_of_all_built": 17,
+          "interval": [
+            0.000338,
+            0.072063
+          ],
+          "kept_negatives": 75,
+          "rate": 0.0133,
+          "ungated_false_admissions": 21
+        },
+        "touches_admitted_cards": false,
+        "wrong_region_or_unreadable_on_development": 1
+      },
+      "sealed_modules_touched": false,
+      "status": "PROVISIONAL_F1V_SELECTED",
+      "targets": "document_not_found (score and shape gates), keeping only structurally valid recoveries",
+      "upper_bound_per_377": 17.48
+    },
+    "F2": {
+      "flag": "projected, not measured (amendment 2 B9); I_face not validated (FAIL), so no anchor filter: the upper bound counts every still-unrecovered failure",
+      "latency": "not measured",
+      "measured": false,
+      "realistic_per_377": 2.68,
+      "risk": "untested; same trigger contract as F1",
+      "sealed_modules_touched": false,
+      "targets": "document_not_found left after F1, showing I_face",
+      "upper_bound_per_377": 3.04
+    },
+    "F3": {
+      "flag": "projected, not measured (amendment 2 B9); I_line not validated (FAIL), so no anchor filter: the upper bound counts every still-unrecovered failure",
+      "latency": "not measured",
+      "measured": false,
+      "realistic_per_377": 2.68,
+      "risk": "untested; same trigger contract as F1",
+      "sealed_modules_touched": false,
+      "targets": "document_not_found left after F1, showing I_line",
+      "upper_bound_per_377": 3.04
+    },
+    "F4": {
+      "latency": "only on corrupt files",
+      "measured": true,
+      "pool": {
+        "admitted": 1,
+        "audit_upper_bound": 0,
+        "corrupt_failures": 1,
+        "decoded": 1,
+        "exact": 0,
+        "first_pass_status_after_decode": {
+          "success": 1
+        },
+        "why_zero": "the audit's corrupt_image is the pinned card with no image file"
+      },
+      "realistic_per_377": 0,
+      "risk": "a truncated image may be read wrong; margin routing applies",
+      "sealed_modules_touched": false,
+      "targets": "corrupt_image",
+      "upper_bound_per_377": 0,
+      "why": "the audit's corrupt_image is the pinned card with no file"
+    },
+    "F5": {
+      "latency": 0.00085,
+      "measured": true,
+      "measured_on": "S1+S2: 0 of 24 invalid misreads made exact; regressed 0",
+      "realistic_per_377": 0.0,
+      "risk": "cannot regress a card whose label is valid; counted",
+      "sealed_modules_touched": false,
+      "targets": "admitted misreads whose reading is structurally invalid",
+      "upper_bound_method": "rule stage_2_plan: 15 misreads x the bank's struct_invalid_and_rank2 share (0.000); the mechanism's outer limit is the audit's 8 impossible readings",
+      "upper_bound_per_377": 0.0
+    },
+    "F6": {
+      "latency": 0.4802,
+      "measured": true,
+      "measured_on": "S1+S2: newly 1, regressed 1, net 0 of 37 misreads",
+      "realistic_per_377": 0.0,
+      "risk": "regressed 1 cards on S1+S2",
+      "sealed_modules_touched": false,
+      "targets": "all admitted misreads",
+      "upper_bound_per_377": 15
+    },
+    "F7": {
+      "latency": 0.17258,
+      "measured": true,
+      "measured_on": "S1+S2: newly 0, regressed 2, net -2 of 37 misreads",
+      "realistic_per_377": -0.81,
+      "risk": "regressed 2 cards on S1+S2",
+      "sealed_modules_touched": false,
+      "targets": "all admitted misreads",
+      "upper_bound_per_377": 15
+    },
+    "F8": {
+      "latency": {
+        "seconds_per_triggered_card": 4.3827
+      },
+      "measured": true,
+      "measured_on": "S1+S2: 10 exact of 24 triggered; after exclusions 5 of 7",
+      "realistic_per_377": 3.33,
+      "risk": "cannot replace a correct reading; changed but still wrong: 6",
+      "sealed_modules_touched": false,
+      "targets": "admitted misreads whose reading is structurally invalid",
+      "upper_bound_per_377": 8
+    }
+  },
+  "ranked_by_realistic_per_effort": [
+    "F1v",
+    "F1",
+    "F8",
+    "F2",
+    "F3",
+    "F6",
+    "F4",
+    "F5",
+    "F7"
+  ],
+  "rule": "configs/phase4_accuracy_stage1_rule_v1.json (amendments 1-5)",
+  "schema_version": "phase4_accuracy_stage1_v1",
+  "utc": "2026-09-28T06:17:58+00:00"
+}

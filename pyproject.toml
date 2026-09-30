@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "egyptian-id-ocr-pipeline"
+version = "2.2.0"
+description = "Local Egyptian ID geometry and extraction pipeline"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "tensorflow==2.16.1",
+  "keras==3.13.0",
+  "numpy==1.26.4",
+  "pillow==10.4.0",
+  "pillow-heif==0.18.0",
+  "pypdfium2==5.13.0",
+  "opencv-python-headless==4.10.0.84",
+  "h5py==3.15.1",
+]
+
+[project.optional-dependencies]
+test = ["pytest==8.3.5"]
+ocr = [
+  "pytesseract==0.3.13",
+  "paddlepaddle==3.3.0",
+  "paddleocr==3.3.2",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src", "src.*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+  "service: tests of the shipped code only (the fast target: scripts/test_service.sh)",
+]
+
+# Stage 7: static analysis of the shipped code (scripts/lint_shipped.sh runs it on the files
+# docker/app_code_files.txt lists, minus the sealed modules, which are never edited).
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# report generators whose long lines are Markdown table rows and shell commands, kept verbatim
+"src/extraction/baseline.py" = ["E501"]
+"src/extraction/hybrid.py" = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+follow_imports = "silent"
+
+[[tool.mypy.overrides]]
+# these two call into the sealed frozen modules (src/extraction/fixed14_*, src/geometry/doccornernet,
+# scripts/phase2l_b), which carry no annotations and are never edited; every other strict check applies
+module = ["src.service.runtime", "src.service.golden"]
+disallow_untyped_calls = false

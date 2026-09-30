@@ -1,0 +1,60 @@
+{
+  "bands": {
+    "cards": 168,
+    "cards_on_the_same_side_of_the_margin": 168,
+    "max_abs_delta_margin": 0.0,
+    "max_abs_delta_probability": 0.0,
+    "pass": true,
+    "slots": 2352,
+    "slots_with_identical_argmax": 2352
+  },
+  "code_sha256": "3b84ec97b47dae76dc058132e8bfdd7c8f271d73094791114e1e91b0527c12d4",
+  "environment": {
+    "cpu_count": 8,
+    "excluded_from_the_windows_freeze": {
+      "-e git+...#egg=egyptian_id_ocr_pipeline": "the project itself; the code runs from the mounted worktree, so no build metadata is written into it",
+      "tensorflow-intel==2.16.1": "Windows-only build of tensorflow; tensorflow==2.16.1 itself is installed"
+    },
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "libc": "glibc-2.43",
+    "machine": "x86_64",
+    "os": "Ubuntu 26.04.1 LTS",
+    "python": "3.11.9",
+    "python_executable_is_the_system_python": false,
+    "schema_version": "phase4_integration_env_v1",
+    "system_libraries_installed_by_the_owner": {
+      "libgomp1": "OpenMP runtime Paddle links against",
+      "libice6": "OpenCV Qt plugin",
+      "libsm6": "OpenCV Qt plugin"
+    },
+    "utc": "2026-09-27T14:35:37+00:00",
+    "uv": "uv 0.12.19 (x86_64-unknown-linux-gnu)"
+  },
+  "pass": true,
+  "rehearsal": {
+    "bundle_load_seconds": 8.3,
+    "cards": 20,
+    "cards_on_the_same_side_of_the_margin": 20,
+    "font_paths_translated": 1,
+    "identical_fields": {
+      "admission_status": true,
+      "admitted": true,
+      "bc_final": true,
+      "card_id": true,
+      "status": true,
+      "v2": true
+    },
+    "linux_seal_sha256": "d892ff1fe3623e1d3632dbf864a59873049b650419176b799a5ef28b956ef23c",
+    "max_abs_delta_margin": 0.0,
+    "pass": true,
+    "seal_byte_identical_to_windows": false,
+    "seconds_per_image": 1.172,
+    "self_test": {
+      "bc_final_known_prediction_reproduced": true,
+      "v2_known_prediction_reproduced": true
+    }
+  },
+  "rule": "configs/phase4_integration_rule_v1.json amendment_2",
+  "schema_version": "phase4_integration_parity_v1",
+  "utc": "2026-09-27T14:35:36+00:00"
+}

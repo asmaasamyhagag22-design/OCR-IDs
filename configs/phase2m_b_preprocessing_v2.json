@@ -1,0 +1,229 @@
+{
+  "completeness": {
+    "in_frame_margin_fraction_of_line_height": 0.0,
+    "minimum_complete_length_to_height": 4.0,
+    "minimum_source_pixels_per_digit": 8.0
+  },
+  "context": {
+    "left_fraction_of_line_length": 0.16,
+    "name": "C1_broad_band_parity",
+    "right_fraction_of_line_length": 0.04
+  },
+  "fixed14_input_contract": {
+    "aspect_ratio_handling": "perspective warp of the expanded rotated rectangle to 650x180, then frozen phase2l_a.letterbox (INTER_AREA, centred) to 160x576",
+    "colour_space": "RGB uint8 from EXIF-normalized decode; float32 0..255 into the model, which rescales internally",
+    "context_margins": "see context; band height = band width * 180/650",
+    "digit_reading_order": "left-to-right along the band x-axis",
+    "enhancement": "none (no CLAHE, thresholding, sharpening, denoising, morphology, or super-resolution)",
+    "field_orientation": "band x-axis follows the detected reading direction (first digit left); head/tail evidence required for completeness",
+    "minimum_effective_horizontal_footprint": "line spans 576/1.2 = 480 tensor px (34.3 px per digit); source line >= 8 px per digit",
+    "minimum_visible_line_completeness": "all 14 digits: head and tail digit evidence plus the whole line rectangle inside the source frame",
+    "native_band_hw": [
+      180,
+      650
+    ],
+    "normalization": "none at runtime beyond the model's internal Rescaling(1/127.5, -1)",
+    "padding_policy": "out-of-source context and letterbox padding use value 245",
+    "padding_value": 245,
+    "source_orientation_handling": "PIL ImageOps.exif_transpose; no other source rotation",
+    "tensor_hw": [
+      160,
+      576
+    ]
+  },
+  "locator": {
+    "architecture": "src/extraction/direct_field_fallback.build_locator",
+    "input_pad_value": 0,
+    "input_size": 256,
+    "seed": 20260916,
+    "stride": 4,
+    "thresholds": {
+      "end_probability": 0.5,
+      "localization_score": 0.7,
+      "mask_probability": 0.5,
+      "maximum_length_to_height": 20.0,
+      "minimum_component_cells": 4,
+      "minimum_length_to_height": 3.0
+    },
+    "training_epochs": 22,
+    "training_fit_records": 2478,
+    "training_scope": "external_train_inner_fit_only",
+    "weights_path": "artifacts/phase2m_b/models/locator_256_seed20260916/final.weights.h5",
+    "weights_sha256": "009e2e24acbbb60c40988fbb341378b273b4c5ed20046d90091ac3c69d0a7c00",
+    "weights_size_bytes": 1910040
+  },
+  "production_changed": false,
+  "routing": {
+    "fallback_auto_accept": false,
+    "fallback_status": "SHADOW_NEEDS_REVIEW",
+    "fallback_trigger_statuses": [
+      "broad_band_extraction_failure",
+      "document_not_found",
+      "invalid_corners",
+      "orientation_failure",
+      "perspective_correction_failure"
+    ],
+    "primary": "unchanged src/extraction/fixed14_demo_adapter.extract_national_id_from_image",
+    "rule": "strictly_primary_first"
+  },
+  "schema_version": "phase2m_b_preprocessing_v2",
+  "selection": {
+    "feasible_configurations": 66,
+    "holdout_metrics": {
+      "by_mode": {
+        "embedded": {
+          "clipped_localized_rate": 1.0,
+          "complete_and_contained_rate": 0.853521,
+          "complete_band_rate_fully_visible": 0.856338,
+          "digit_clipped": 59,
+          "direction_agreement_rate_localized": 0.988439,
+          "false_complete_rate_clipped": 0.0,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": 0.966197,
+          "fully_visible": 355,
+          "localization_success_rate": 0.107042,
+          "median_iou_fully_visible_localized": 0.390329,
+          "negative": 0,
+          "scenes": 414,
+          "truncated_band_count_localized_fully_visible": 3,
+          "truncation_by_direction": {
+            "bottom": 0,
+            "left": 2,
+            "right": 2,
+            "top": 0
+          }
+        },
+        "line_absent": {
+          "clipped_localized_rate": null,
+          "complete_and_contained_rate": null,
+          "complete_band_rate_fully_visible": null,
+          "digit_clipped": 0,
+          "direction_agreement_rate_localized": null,
+          "false_complete_rate_clipped": null,
+          "false_complete_rate_negative": 0.0,
+          "false_localization_rate_negative": 0.004831,
+          "full_line_containment_rate": null,
+          "fully_visible": 0,
+          "localization_success_rate": null,
+          "median_iou_fully_visible_localized": null,
+          "negative": 414,
+          "scenes": 414,
+          "truncated_band_count_localized_fully_visible": 0,
+          "truncation_by_direction": {}
+        },
+        "native": {
+          "clipped_localized_rate": 1.0,
+          "complete_and_contained_rate": 0.43832,
+          "complete_band_rate_fully_visible": 0.43832,
+          "digit_clipped": 33,
+          "direction_agreement_rate_localized": 1.0,
+          "false_complete_rate_clipped": 0.0,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": 0.994751,
+          "fully_visible": 381,
+          "localization_success_rate": 0.976378,
+          "median_iou_fully_visible_localized": 0.637453,
+          "negative": 0,
+          "scenes": 414,
+          "truncated_band_count_localized_fully_visible": 2,
+          "truncation_by_direction": {
+            "bottom": 0,
+            "left": 0,
+            "right": 2,
+            "top": 0
+          }
+        },
+        "no_card": {
+          "clipped_localized_rate": null,
+          "complete_and_contained_rate": null,
+          "complete_band_rate_fully_visible": null,
+          "digit_clipped": 0,
+          "direction_agreement_rate_localized": null,
+          "false_complete_rate_clipped": null,
+          "false_complete_rate_negative": 0.0,
+          "false_localization_rate_negative": 0.0,
+          "full_line_containment_rate": null,
+          "fully_visible": 0,
+          "localization_success_rate": null,
+          "median_iou_fully_visible_localized": null,
+          "negative": 414,
+          "scenes": 414,
+          "truncated_band_count_localized_fully_visible": 0,
+          "truncation_by_direction": {}
+        },
+        "off_frame": {
+          "clipped_localized_rate": 0.857868,
+          "complete_and_contained_rate": 0.847134,
+          "complete_band_rate_fully_visible": 0.859873,
+          "digit_clipped": 197,
+          "direction_agreement_rate_localized": 0.993631,
+          "false_complete_rate_clipped": 0.0,
+          "false_complete_rate_negative": 0.0,
+          "false_localization_rate_negative": 0.083333,
+          "full_line_containment_rate": 0.980892,
+          "fully_visible": 157,
+          "localization_success_rate": 0.248408,
+          "median_iou_fully_visible_localized": 0.435811,
+          "negative": 60,
+          "scenes": 414,
+          "truncated_band_count_localized_fully_visible": 3,
+          "truncation_by_direction": {
+            "bottom": 0,
+            "left": 0,
+            "right": 3,
+            "top": 0
+          }
+        },
+        "tight": {
+          "clipped_localized_rate": 1.0,
+          "complete_and_contained_rate": 0.607903,
+          "complete_band_rate_fully_visible": 0.610942,
+          "digit_clipped": 85,
+          "direction_agreement_rate_localized": 0.993921,
+          "false_complete_rate_clipped": 0.035294,
+          "false_complete_rate_negative": null,
+          "false_localization_rate_negative": null,
+          "full_line_containment_rate": 0.99696,
+          "fully_visible": 329,
+          "localization_success_rate": 0.495441,
+          "median_iou_fully_visible_localized": 0.498587,
+          "negative": 0,
+          "scenes": 414,
+          "truncated_band_count_localized_fully_visible": 1,
+          "truncation_by_direction": {
+            "bottom": 0,
+            "left": 0,
+            "right": 1,
+            "top": 0
+          }
+        }
+      },
+      "clipped_localized_rate": 0.925134,
+      "complete_and_contained_rate": 0.657119,
+      "complete_band_rate_fully_visible": 0.660393,
+      "digit_clipped": 374,
+      "direction_agreement_rate_localized": 0.994229,
+      "false_complete_rate_clipped": 0.008021,
+      "false_complete_rate_negative": 0.0,
+      "false_localization_rate_negative": 0.007883,
+      "full_line_containment_rate": 0.98527,
+      "fully_visible": 1222,
+      "localization_success_rate": 0.500818,
+      "median_iou_fully_visible_localized": 0.502716,
+      "negative": 888,
+      "scenes": 2484,
+      "truncated_band_count_localized_fully_visible": 9,
+      "truncation_by_direction": {
+        "bottom": 0,
+        "left": 2,
+        "right": 8,
+        "top": 0
+      }
+    },
+    "predeclared_gates_sha256_lf": "04743d55c0b52ac4ff7e73c9df70d11d21f349057fefe191fc754a25c4d60e8a"
+  },
+  "status": "CANDIDATE_SELECTED_ON_EXTERNAL_TRAIN_INNER_HOLDOUT",
+  "truth_or_ocr_dependent_runtime_selection": false
+}

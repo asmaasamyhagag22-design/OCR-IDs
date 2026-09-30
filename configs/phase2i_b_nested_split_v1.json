@@ -1,0 +1,26 @@
+{
+  "algorithm": "sha256(tag + ':' + identity_component), first 32 bits modulo 5",
+  "bucket_cards": {
+    "0": 327,
+    "1": 309,
+    "2": 296,
+    "3": 328,
+    "4": 315
+  },
+  "development_cards": 1575,
+  "development_identity_components": 1574,
+  "identity_components_persisted": false,
+  "internal_validation_is_external": false,
+  "logical_manifest_sha256": "7dc84da8a20e522b72832599b9ecd9384f622dc1113fe86c3310d7d2313a3971",
+  "schema_version": "phase2i_b_nested_split_summary_v1",
+  "source_sha256": "cc19d7d419a3e028cf8030e7557a656399d73ede300d4f127e3b90ccba578a1c",
+  "subset_cards": {
+    "calibration": 939,
+    "internal_validation": 636
+  },
+  "subset_identity_components": {
+    "calibration": 938,
+    "internal_validation": 636
+  },
+  "tag": "phase2i-b-nested-development-v1"
+}

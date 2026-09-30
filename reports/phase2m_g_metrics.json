@@ -1,0 +1,515 @@
+{
+  "access": {
+    "external_train:annotation": 14460,
+    "external_train:image": 94,
+    "external_train:materialized_bands": 11,
+    "external_train:materialized_labels": 1,
+    "external_validation:materialized_bands": 2
+  },
+  "frozen_candidate": {
+    "architecture": "phase2l_b.build_v2 conditioned 160x576, unchanged",
+    "candidate": "BC-final seed 3101",
+    "control_gate_168": {
+      "vs_control_model": {
+        "candidate": 159,
+        "net": -1,
+        "ref": 160,
+        "regressed": 1
+      },
+      "vs_v2": {
+        "candidate": 159,
+        "net": 7,
+        "ref": 152,
+        "regressed": 1,
+        "within_cap": true
+      },
+      "vs_v3": {
+        "candidate": 159,
+        "net": 1,
+        "ref": 158,
+        "regressed": 1
+      }
+    },
+    "declared_before_the_read": true,
+    "external_validation_single_read": {
+      "cards": 278,
+      "of": 647,
+      "of_cards": 293,
+      "records": 628,
+      "status": "EXPLORATORY: spent selection set, used for selection in 2M-C and analysed in 2M-E"
+    },
+    "output_shape": [
+      null,
+      14,
+      10
+    ],
+    "phase": "2M-G",
+    "production_changed": false,
+    "recipe": {
+      "cosine_decay_to_zero": true,
+      "init": "the Phase 2M-E control model",
+      "labels": "8 owner-verified corrections applied",
+      "pool": "full external train minus 13 excluded unreadable records, plus internal replay",
+      "shear_deg": [
+        -5,
+        5
+      ],
+      "steps": 2664,
+      "weight_ema": 0.999
+    },
+    "research_candidate_only": true,
+    "schema_version": "phase2m_g_frozen_candidate_v1",
+    "vs_control_model_paired_cards": {
+      "established": false,
+      "losses": 2,
+      "p": 0.6875,
+      "wins": 4
+    },
+    "weights_path": "artifacts/phase2m_g/runs/BCFINAL_seed3101/final.weights.h5",
+    "weights_sha256": "00e23a14b3e9cf976864241f3e494ce383cdc52c8bbd2e52e54b53d03657d4df"
+  },
+  "item_0_rebaseline": {
+    "control_regression_check": {
+      "cap": {
+        "max_regressed_exact": 3,
+        "min_net_exact_change": -1,
+        "reference": "frozen v2, as in the Phase 2M-C rule"
+      },
+      "cards": 168,
+      "control_model_exact": 160,
+      "net_exact_change": 8,
+      "newly_exact": 8,
+      "regressed_exact": 0,
+      "v2_exact": 152,
+      "within_cap": true
+    },
+    "control_weights_sha256": "2b3dabdf5504bfbc5ef49f08127bb46d0b8000ec2fdf9edfb5772290eb3532ae",
+    "family_anatomy": {
+      "external_train": {
+        "exact": 2631,
+        "families": {
+          "alignment_only": 11,
+          "glyph_only": 30,
+          "mixed": 1
+        },
+        "records": 2673,
+        "wrong_positions": 67,
+        "wrong_records": 42
+      },
+      "external_validation": {
+        "exact": 626,
+        "families": {
+          "alignment_only": 4,
+          "glyph_only": 17,
+          "mixed": 0
+        },
+        "records": 647,
+        "wrong_positions": 24,
+        "wrong_records": 21
+      }
+    },
+    "gate": "PASS",
+    "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT",
+    "zero_attraction": {
+      "external_train": {
+        "attractor_ratio_per_digit": {
+          "0": 1.6,
+          "1": 1.642857,
+          "2": 0.714286,
+          "3": 2.0,
+          "4": 1.25,
+          "5": 1.2,
+          "6": 0.0,
+          "7": 0.833333,
+          "8": 1.25,
+          "9": 0.142857
+        },
+        "errors_on_true_zero": 5,
+        "errors_predicting_zero": 8,
+        "share_of_wrong_positions_predicting_zero": 0.119403,
+        "v3_reference_share": 0.271,
+        "wrong_positions": 67
+      },
+      "external_validation": {
+        "attractor_ratio_per_digit": {
+          "0": 0.333333,
+          "1": 1.6,
+          "2": 1.2,
+          "3": 0.5,
+          "4": null,
+          "5": null,
+          "6": 0.5,
+          "7": 3.0,
+          "8": 0.0,
+          "9": 0.0
+        },
+        "errors_on_true_zero": 6,
+        "errors_predicting_zero": 2,
+        "share_of_wrong_positions_predicting_zero": 0.083333,
+        "v3_reference_share": 0.271,
+        "wrong_positions": 24
+      }
+    }
+  },
+  "item_1_probes": {
+    "cross_fit": {
+      "A": 146,
+      "B": 147
+    },
+    "probe_a_phase_tta": {
+      "choose_A_read_B": {
+        "gain_on_the_choosing_half": 3,
+        "losses": 0,
+        "read_half_base_cards": 138,
+        "read_half_delta": 1,
+        "read_half_tta_cards": 139,
+        "sign_test_two_sided_p": 1.0,
+        "wins": 1,
+        "would_adopt": true
+      },
+      "choose_B_read_A": {
+        "gain_on_the_choosing_half": 1,
+        "losses": 0,
+        "read_half_base_cards": 138,
+        "read_half_delta": 3,
+        "read_half_tta_cards": 141,
+        "sign_test_two_sided_p": 0.25,
+        "wins": 3,
+        "would_adopt": true
+      }
+    },
+    "probe_b_caveat": "logit adjustment targets balanced error, while the metric here is plain exact match on the same distribution the priors come from, so it may well hurt. This probe decides the question; a gain is not presumed.",
+    "probe_b_logit_adjustment": {
+      "choose_A_read_B": {
+        "cards_by_tau_on_the_choosing_half": {
+          "0.0": 138,
+          "0.125": 138,
+          "0.25": 138,
+          "0.5": 136,
+          "0.75": 135,
+          "1.0": 126
+        },
+        "chosen_tau": 0.0,
+        "losses": 0,
+        "read_half_chosen_tau_cards": 138,
+        "read_half_delta": 0,
+        "read_half_tau0_cards": 138,
+        "sign_test_two_sided_p": 1.0,
+        "wins": 0
+      },
+      "choose_B_read_A": {
+        "cards_by_tau_on_the_choosing_half": {
+          "0.0": 138,
+          "0.125": 138,
+          "0.25": 138,
+          "0.5": 136,
+          "0.75": 134,
+          "1.0": 125
+        },
+        "chosen_tau": 0.0,
+        "losses": 0,
+        "read_half_chosen_tau_cards": 138,
+        "read_half_delta": 0,
+        "read_half_tau0_cards": 138,
+        "sign_test_two_sided_p": 1.0,
+        "wins": 0
+      }
+    },
+    "records_reference": {
+      "base": 626,
+      "of": 647,
+      "tta": 629
+    },
+    "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT"
+  },
+  "item_1_visibility_proxy": {
+    "item_1_proxy": {
+      "border_distance_pitch": {
+        "median": 0.524731,
+        "min": 0.0
+      },
+      "calibration_records": 56,
+      "floor_records": 13,
+      "out_of_fold": {
+        "balanced_accuracy": 0.5,
+        "fn": 0,
+        "fp": 43,
+        "sensitivity": 1.0,
+        "sensitivity_wilson": [
+          0.771905,
+          1.0
+        ],
+        "specificity": 0.0,
+        "specificity_wilson": [
+          0.0,
+          0.08201
+        ],
+        "tn": 0,
+        "tp": 13
+      },
+      "passes": false,
+      "readable_records": 43,
+      "required": {
+        "balanced_accuracy_at_least": 0.7,
+        "rationale": "a proxy used to estimate a ceiling must not over-flag, so specificity carries the higher bar; all three are reported with Wilson intervals",
+        "sensitivity_at_least": 0.6,
+        "specificity_at_least": 0.7
+      },
+      "score_distribution": {
+        "max_over_boxes_max": 0.288889,
+        "max_over_boxes_min": 0.0,
+        "nonzero_records": 24,
+        "of": 56
+      },
+      "selection": "leave-one-out; theta is refitted without the record it is scored on",
+      "theta_grid": [
+        0.0,
+        0.01,
+        0.02,
+        0.05,
+        0.1,
+        0.2,
+        0.3,
+        0.5,
+        0.75,
+        1.0
+      ]
+    },
+    "item_2_source_versus_band_clipping": {
+      "external_train_records": 2673,
+      "materialization_defect_count": 0,
+      "proposed_fix_still_worth_making": "the right band context is 0.04 of the line length against 0.16 on the left, which leaves the last digit about 0.8 pitches from the band edge against 2.6 for the first. Symmetrising it costs nothing and gives the last digit the same surround as the first, but it does not recover a digit that is not visible.",
+      "reading": "the materialization already rejects any record with a digit box clipped or within one pixel of the source border, so no digit is partly outside the source and no digit is cut by the band edge. The cropped last digit the reviewer saw is not a clipping defect of ours: the digit is inside the image and inside the band, and it is unreadable for photometric reasons, being at the dark edge of the card.",
+      "records_where_the_band_edge_cuts_a_digit_cell": 0,
+      "records_where_the_band_samples_outside_the_source_over_a_digit_cell": 275,
+      "records_with_any_box_partly_outside_the_source_image": 0,
+      "worst_padding_fraction_over_any_digit_cell": 0.333333
+    },
+    "rule_amendment": 4,
+    "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT"
+  },
+  "item_2_label_corrections": {
+    "correction_source": "the model output the reviewer actually saw on that sheet: frozen v3 for the 20-sheet batch, the control model for the 37-sheet batch. Using the control model's current output for the 20-sheet batch would have written the wrong label back in, because the control model has since memorised it.",
+    "corrections": [
+      {
+        "record_index": 38,
+        "source": "20_sheet_batch"
+      },
+      {
+        "record_index": 383,
+        "source": "20_sheet_batch"
+      },
+      {
+        "record_index": 2038,
+        "source": "20_sheet_batch"
+      },
+      {
+        "record_index": 2039,
+        "source": "20_sheet_batch"
+      },
+      {
+        "record_index": 2058,
+        "source": "37_sheet_batch_v2"
+      },
+      {
+        "record_index": 2059,
+        "source": "37_sheet_batch_v2"
+      },
+      {
+        "record_index": 2642,
+        "source": "37_sheet_batch_v2"
+      },
+      {
+        "record_index": 2656,
+        "source": "37_sheet_batch_v2"
+      }
+    ],
+    "counts": {
+      "corrections": 8,
+      "corrections_that_undo_a_memorised_label": 1,
+      "exclusions": 13
+    },
+    "exclusions": [
+      {
+        "record_index": 124,
+        "source": "37_sheet_batch_v2",
+        "verdict": "unreadable_or_cannot_tell"
+      },
+      {
+        "record_index": 308,
+        "source": "37_sheet_batch_v2",
+        "verdict": "unreadable_or_cannot_tell"
+      },
+      {
+        "record_index": 382,
+        "source": "37_sheet_batch_v2",
+        "verdict": "neither"
+      },
+      {
+        "record_index": 394,
+        "source": "37_sheet_batch_v2",
+        "verdict": "unreadable_or_cannot_tell"
+      },
+      {
+        "record_index": 407,
+        "source": "37_sheet_batch_v2",
+        "verdict": "unreadable_or_cannot_tell"
+      },
+      {
+        "record_index": 849,
+        "source": "37_sheet_batch_v2",
+        "verdict": "neither"
+      },
+      {
+        "record_index": 850,
+        "source": "37_sheet_batch_v2",
+        "verdict": "neither"
+      },
+      {
+        "record_index": 1336,
+        "source": "37_sheet_batch_v2",
+        "verdict": "neither"
+      },
+      {
+        "record_index": 1489,
+        "source": "37_sheet_batch_v2",
+        "verdict": "unreadable_or_cannot_tell"
+      },
+      {
+        "record_index": 2037,
+        "source": "37_sheet_batch_v2",
+        "verdict": "neither"
+      },
+      {
+        "record_index": 2099,
+        "source": "37_sheet_batch_v2",
+        "verdict": "unreadable_or_cannot_tell"
+      },
+      {
+        "record_index": 2249,
+        "source": "37_sheet_batch_v2",
+        "verdict": "unreadable_or_cannot_tell"
+      },
+      {
+        "record_index": 2467,
+        "source": "37_sheet_batch_v2",
+        "verdict": "neither"
+      }
+    ],
+    "original_label_files_are_never_edited": true,
+    "records_reviewed": 56,
+    "schema_version": "phase2m_g_label_corrections_v3"
+  },
+  "item_2_owner_verdicts": {
+    "answered": 37,
+    "by_disputed_position": {
+      "other_slots": {
+        "label": 4,
+        "neither": 4,
+        "prediction": 3
+      },
+      "slot_14_only": {
+        "label": 16,
+        "neither": 2,
+        "prediction": 1,
+        "unreadable_or_cannot_tell": 7
+      }
+    },
+    "label_error_among_legible": 0.166667,
+    "resolved": {
+      "label": 20,
+      "neither": 6,
+      "prediction": 4,
+      "unreadable_or_cannot_tell": 7
+    },
+    "unlabelable_floor": 13
+  },
+  "item_3_weight_distance_confound": {
+    "A_over_BC": 1.844719,
+    "final_A_mean": 0.041045,
+    "final_BC_mean": 0.02225,
+    "relative_distance_from_initialization": {
+      "A_seed3101": [
+        0.0,
+        0.00949,
+        0.01442,
+        0.01734,
+        0.02042,
+        0.0235,
+        0.02607,
+        0.02893,
+        0.03148,
+        0.03374,
+        0.03637,
+        0.03877,
+        0.04082
+      ],
+      "A_seed3202": [
+        0.0,
+        0.00985,
+        0.015,
+        0.01812,
+        0.02102,
+        0.02443,
+        0.02681,
+        0.02942,
+        0.03186,
+        0.034,
+        0.03689,
+        0.0389,
+        0.04127
+      ],
+      "BC_seed3101": [
+        0.0,
+        0.00129,
+        0.00318,
+        0.00542,
+        0.00784,
+        0.0103,
+        0.01266,
+        0.01486,
+        0.01686,
+        0.01861,
+        0.02008,
+        0.0213,
+        0.02229
+      ],
+      "BC_seed3202": [
+        0.0,
+        0.00133,
+        0.00336,
+        0.00571,
+        0.00823,
+        0.01069,
+        0.01298,
+        0.01509,
+        0.017,
+        0.01866,
+        0.02008,
+        0.02125,
+        0.02221
+      ]
+    },
+    "steps": [
+      0,
+      222,
+      444,
+      666,
+      888,
+      1110,
+      1332,
+      1554,
+      1776,
+      1998,
+      2220,
+      2442,
+      2664
+    ]
+  },
+  "phase": "2M-G",
+  "production_changed": false,
+  "rule_amendments": 6,
+  "rule_sha256_lf": "ec281bfc087228255f7ffdc04c129c0cc3b141fd3f39ef5b8db71fa8d8c2ac75",
+  "schema_version": "phase2m_g_metrics_v1",
+  "validation_status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT"
+}

@@ -1,0 +1,15 @@
+{
+  "acceptance_rule_sha256": "f18db8648abe30cec1e3f62080b7a46aba285f2d36ae85fbf278f2c43e0b50b1",
+  "cards": 618,
+  "decision": "FIXED14_V2_VALIDATED",
+  "git_head": "00ab16a43d65fc19430ad08802d28aa24080daab",
+  "locked_audit_opened": false,
+  "opened_utc": "2026-09-15T07:52:44+00:00",
+  "ordered_population_sha256": "4214666472a89fd655a17c633e04b64c757c64051d4b16cf91f5d510f295df44",
+  "paired_private_sha256": "a59dd18c4495271e172d871f553d369d8791f6f2419f72769d067e1886aaafa4",
+  "schema_version": "phase2l_c_internal_validation_consumed_v1",
+  "sealed_predictions_sha256": "100509b3775641621c6aa61b4e040a33caaac402ca8d379d2299a2b9be95b60d",
+  "split": "internal_validation",
+  "status": "CONSUMED",
+  "use_for_model_selection_or_tuning_forbidden": true
+}

@@ -1,0 +1,98 @@
+{
+  "schema_version": "phase2l_a_fixed14_config_v1",
+  "phase": "2L-A",
+  "production_changed": false,
+  "source_scope": "frozen_888_card_calibration_only",
+  "excluded_scopes": [
+    "618_card_internal_validation",
+    "377_card_locked_audit",
+    "all_audit_artifacts"
+  ],
+  "broad_band": {
+    "canonical_size": [1000, 630],
+    "bbox_xyxy": [350, 430, 1000, 610],
+    "owner_bbox_xyxy": [420, 479, 980, 558],
+    "context_ltrb_px": [70, 49, 20, 52],
+    "selection": "single_global_calibration_evidence_based_band",
+    "runtime_truth_dependent": false
+  },
+  "inner_split": {
+    "tag": "phase2l-a-inner-calibration-v1",
+    "algorithm": "sha256(tag + ':' + private_identity_component), first 32 bits modulo 5",
+    "holdout_buckets": [0],
+    "identity_components_persisted": false
+  },
+  "prototype": {
+    "family": "lightweight_cnn_trainable_gaussian_slot_pool_shared_digit_head",
+    "ordered_slots": 14,
+    "digit_classes": 10,
+    "output_shape": [null, 14, 10],
+    "resolutions": [[64, 448], [80, 560]],
+    "preserve_aspect_ratio": true,
+    "padding_value": 245,
+    "primary_resolution": [80, 560],
+    "training_seeds": [271828, 314159]
+  },
+  "overfit_gate": {
+    "tag": "phase2l-a-overfit-32-v1",
+    "examples": 32,
+    "minimum_digit_accuracy": 0.99,
+    "minimum_sequence_accuracy": 0.95,
+    "maximum_repairs": 3
+  },
+  "synthetic": {
+    "seed": 161803,
+    "clean_samples": 6000,
+    "degraded_samples": 12000,
+    "fonts": [
+      "C:/Windows/Fonts/arial.ttf",
+      "C:/Windows/Fonts/arialbd.ttf",
+      "C:/Windows/Fonts/tahoma.ttf",
+      "C:/Windows/Fonts/tahomabd.ttf",
+      "C:/Windows/Fonts/trado.ttf"
+    ],
+    "native_canvas": [180, 650],
+    "clean_epochs": 1,
+    "degraded_epochs": 1,
+    "parameter_ranges": {
+      "background_rgb_each": [225, 255],
+      "ink_rgb_each": [15, 74],
+      "font_size_px": [54, 76],
+      "rendered_line_width_px": [500, 585],
+      "rotation_degrees": [-2.0, 2.0],
+      "horizontal_scale": [0.94, 1.06],
+      "perspective_width_fraction": [-0.012, 0.012],
+      "gaussian_blur_sigma": [0.25, 1.25],
+      "gaussian_blur_probability": 0.65,
+      "noise_sigma": [0.0, 7.0],
+      "morphology_kernel": [2, 2],
+      "morphology_probability": 0.5,
+      "glare_probability": 0.45,
+      "glare_opacity": [0.12, 0.32],
+      "jpeg_quality": [45, 95]
+    }
+  },
+  "real_training": {
+    "epochs": 40,
+    "batch_size": 32,
+    "early_stopping_patience": 8,
+    "hard_example_epochs": 5
+  },
+  "fusion": {
+    "views": [
+      "broad_band",
+      "translate_x_plus_3_y_plus_2_reflect",
+      "clahe_clip_1_5_grid_8x8"
+    ],
+    "policy": "unweighted_position_level_logit_average",
+    "truth_or_confidence_selected": false
+  },
+  "bounded_decoder": {
+    "name": "digit_only_fixed_length_ctc_prefix_beam",
+    "beam_width": 128,
+    "required_output_length": 14,
+    "uses_expected_digits": false,
+    "uses_confidence_to_select_between_outputs": false,
+    "evaluation_scope": "inner_holdout_only"
+  }
+}

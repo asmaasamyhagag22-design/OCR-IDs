@@ -1,0 +1,122 @@
+{
+  "schema_version": "phase2k_crop_truncation_metrics_v1",
+  "outcome": "SCATTERED_STOP",
+  "shipment": {
+    "configuration_shipped": false,
+    "reason": "No dominant truncating edge was established on the frozen calibration split.",
+    "margin_grid_run": false,
+    "configuration_sha256": null,
+    "internal_validation_candidate_runs": 0,
+    "internal_validation_contaminated": false
+  },
+  "split_isolation": {
+    "development_cards": 1575,
+    "development_ocr_reaching": 1506,
+    "calibration_ocr_reaching": 888,
+    "internal_validation_ocr_reaching_held_out": 618,
+    "audit_cards_opened_rendered_or_scored": 0
+  },
+  "adjudication": {
+    "review_units": 417,
+    "exact_controls": 40,
+    "complete_verdicts": 417,
+    "verdict_distribution": {
+      "DIGITS_CROPPED": 75,
+      "NOT_AN_ID": 7,
+      "PARTIALLY_READABLE": 1,
+      "READABLE_CLEAR": 291,
+      "READABLE_EFFORT": 10,
+      "UNREADABLE_GLARE": 5,
+      "UNSURE": 24,
+      "WRONG_SIDE": 4
+    },
+    "control_verdict_distribution": {
+      "READABLE_CLEAR": 39,
+      "UNREADABLE_GLARE": 1
+    },
+    "control_false_alarm_count": 1,
+    "control_false_alarm_rate": 0.025,
+    "controls_marked_digits_cropped": 0,
+    "eligible_digits_cropped_failures": 75,
+    "broad_false_alarm_discounted_digits_cropped_estimate": 73.125,
+    "physically_impossible_confirmed": 16,
+    "physically_impossible_worst_case": 41,
+    "unreadable_blur": 0,
+    "unreadable_resolution": 0,
+    "occluded": 0,
+    "orientation_failures": 10,
+    "front_and_back_in_one_image": 12
+  },
+  "calibration_characterization": {
+    "digits_cropped_cards": 48,
+    "currently_exact_cards": 701,
+    "fixed_semantic_owner_bbox_canonical_1000x630": [420, 479, 980, 558],
+    "digits_cropped_fixed_owner_bbox": 48,
+    "digits_cropped_offset_from_owner_px": [0, 0, 0, 0],
+    "digits_cropped_crop_width_px": 560,
+    "digits_cropped_crop_height_px": 79,
+    "currently_exact_median_width_px": 560,
+    "currently_exact_median_height_px": 79,
+    "geometry_source": {
+      "doccornernet": 26,
+      "full_image_fallback": 3,
+      "pre_cropped_bypass": 19
+    },
+    "localization_status": {
+      "abstained_disagreement": 3,
+      "fallback_uncertain": 45
+    },
+    "localizer_promotions": 0,
+    "minimum_cached_clearance_edge": {
+      "bottom": 8,
+      "left": 4,
+      "right": 12,
+      "top": 15,
+      "undetermined_no_components": 1,
+      "undetermined_tie": 8
+    },
+    "determinate_edge_cards": 39,
+    "dominant_edge": "top",
+    "dominant_edge_count": 15,
+    "dominant_edge_share_of_determinate": 0.384615,
+    "assessment": "SCATTERED"
+  },
+  "signal_validation": {
+    "status": "NOT_RUN_AFTER_STEP1_STOP",
+    "precision": null,
+    "recall": null,
+    "threshold": null
+  },
+  "denominators": {
+    "development_ocr_reaching": {
+      "before_exact": 1198,
+      "after_exact": 1198,
+      "population": 1506,
+      "before_accuracy": 0.7955,
+      "after_accuracy": 0.7955
+    },
+    "development_whole": {
+      "before_exact": 1198,
+      "after_exact": 1198,
+      "population": 1575,
+      "before_accuracy": 0.7606,
+      "after_accuracy": 0.7606
+    },
+    "whole_population": {
+      "before_exact": 1487,
+      "after_exact": 1487,
+      "population": 1952,
+      "before_accuracy": 0.7618,
+      "after_accuracy": 0.7618,
+      "audit_exact_frozen_unchanged": 289,
+      "audit_population_unchanged_not_rerun": 377
+    }
+  },
+  "attainable_development_ceiling": {
+    "confirmed_exact_ceiling": 1559,
+    "population": 1575,
+    "confirmed_accuracy": 0.9899,
+    "worst_case_exact_ceiling": 1534,
+    "worst_case_accuracy": 0.974
+  }
+}

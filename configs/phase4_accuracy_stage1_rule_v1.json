@@ -1,0 +1,262 @@
+{
+  "schema_version": "phase4_accuracy_stage1_rule_v1",
+  "phase": "Phase 4 accuracy push, stage 1: the error bank and the first fix",
+  "branch": "phase4-accuracy, from phase4-integration d462d74; backup ref backup/phase4-accuracy-entry-20260927; not pushed",
+  "declared_before_any_number": "This file is committed before any number that bears on a category, a ranking or a fix choice is computed. Amendments are appended below `amendments`, never edited in place, and each states its reason.",
+  "owner_instruction": "run fully autonomously; every choice is recorded in docs/release/decision_log.md as taken autonomously under owner instruction",
+
+  "why": {
+    "target": "the supervisor scores teams on about 8000 images, all 14 digits exact on every image. The previous cohort scored 90%. The target is 95% end to end, at most about 18 losses per 377.",
+    "starting_point": "the locked 377 audit read once: BC-final 342/377 = 90.7% end to end, 342/357 = 95.8% admitted. 35 losses: 20 admission failures (19 document_not_found, 1 corrupt_image, the pinned card with no image file) and 15 misreads.",
+    "principle": "the failure types recur at scale, so the work fixes types, not cards"
+  },
+
+  "hard_lines": {
+    "audit": "no audit image or label read of any kind. The runtime guard and the hooks require the owner's manual override; it is never set, simulated or bypassed. Only the sealed outputs of the one read (artifacts/phase4_audit/predictions.npz, without its card_id key, and verdict.json) are read. The Phase 2I-A sealed audit inventory is derived from audit images and is not read.",
+    "sealed_modules": "no edit to a sealed or hash-pinned module: src/extraction/fixed14_demo_adapter.py, fixed14_v3_shadow.py, fixed14_bcfinal_shadow.py, official_eval.py, demo_national_id.py, pipeline.py, registration.py, canonicalize.py, src/geometry/*, scripts/phase2l_a.py, scripts/phase2l_b.py, every configs/ file of an earlier phase, and config/. New code wraps them.",
+    "training": "no training or fine-tuning of any model",
+    "product": "the frozen product decision logic is unchanged: bcfinal_only, margin threshold 0.966875. This stage is research for the competition package.",
+    "privacy": "no national ID printed or committed. Per-card material stays under the ignored artifacts/phase4_accuracy/. Tracked outputs are aggregate only and pass the privacy scan.",
+    "paddle": "every Paddle-dependent step runs in WSL (distribution Ubuntu), ~/venvs/ocrid-py3119, with DISABLE_MODEL_SOURCE_CHECK=True and a process-scope safe.directory for the vendored DocCornerNet repository only, as amendment 7h established",
+    "forbidden_sets": "the consumed external test (321), the consumed internal validation (618, blocked as its 636-row superset) and the audit (377) are never opened. External validation (647) is spent: nothing is tuned, selected or thresholded on it; it is a separate descriptive bucket."
+  },
+
+  "d_016_owner_decision": "the locked 377 audit is retired as a test. Its official result stands unchanged (90.7% end to end, 95.8% admitted). It may be used for diagnosis only, and no future accuracy claim may be made on it. Reading its images or labels still requires the owner's manual override; that is not waived. (The owner's instruction numbered this D-015; that number was taken by the audit result, so it is recorded as D-016.)",
+
+  "error_bank": {
+    "scope": "BC-final's errors only, at the frozen pipeline (single view, bcfinal_only, no second pass)",
+    "unit": "card. Every source is deduplicated by card_id; the internal sources are disjoint by construction (the pool is InternalAccess calibration minus controls, audit and consumed). External validation is reported at record and at card (identity_group) level.",
+    "loss_definition": "a card is a loss when it is not admitted (no band) or when BC-final's 14-digit reading differs from its label",
+    "sources": {
+      "S1_controls_168": {
+        "definition": "scripts/phase2m_c.py internal_pools()[2], the 168 inner-holdout internal cards",
+        "domain": "internal real photographs, end to end",
+        "errors": "BC-final's end-to-end misreads (published: 159 exact, so 9 errors, 0 admission failures). The reading is recomputed from the step-1 canonical cards (band = canonical[430:610, 350:1000], letterbox to 160x576, pad 245) and must equal the stored step-1 reading on 168/168 before it is used; otherwise the stored readings are used and the logits-based measurements are marked unavailable.",
+        "labels": "the Phase 2L-A manifest targets",
+        "tag": "not pristine: read as a gate 13+ times. BC-final did not train on them."
+      },
+      "S2_development_pool_771": {
+        "definition": "scripts/phase4_integration.py development_pool(): InternalAccess calibration minus controls, audit and consumed, 771 cards",
+        "domain": "internal real photographs",
+        "admission_failures": "every pool card the frozen pipeline did not admit in the step-0 capture (artifacts/phase4_integration/step0). Clean evidence: the detector never trained on these images.",
+        "misreads": "every admitted pool card whose BC-final reading, recomputed on the captured band, differs from its Phase 2L-A target. Tagged in_sample when the card is a BC-final replay-training card (internal_pools()[0]), and not_replay otherwise.",
+        "labels": "Phase 2L-A targets for admitted cards. The admission failures have no Phase 2L-A target; their labels come from artifacts/phase2h/baseline/lookup.json by the permitted-id extraction (label_extraction below), and only after every second-pass reading of them is sealed."
+      },
+      "S3_external_validation_647": {
+        "definition": "the 647 usable external-validation records (52 border-clipped excluded from 699), BC-final's sealed predictions artifacts/phase2m_g/bcfinal_validation_prob.npy",
+        "domain": "external, synthetically distorted",
+        "errors": "BC-final's wrong records (published: 19 records in 15 cards)",
+        "access": "labels, metadata and bands through scripts/phase2m_c.py Access(allow_validation=True), recorded in its ledger",
+        "rule": "a separate secondary bucket, never pooled with S1, S2 or S4. Descriptive only; nothing is chosen on it."
+      },
+      "S4_audit_377": {
+        "definition": "the 35 losses of the one audit read",
+        "readable_without_override": "the aggregate verdict, and from the sealed predictions only the keys admission_status, admitted, margin and bc_final (the card_id key is never loaded). From these, label-free aggregates only: admission status counts, the number of admitted readings that are structurally invalid (a lower bound on structurally invalid misreads), and the margin distribution of admitted cards.",
+        "behind_the_guard": "per-card categorisation needs audit images and labels. It is written as a ready-to-run owner command (scripts/phase4_accuracy.py audit-diagnostic), refuses to run without the owner's override, and its result is labelled diagnostic, not held out."
+      }
+    },
+    "exclusions": {
+      "E1_label_correction_ledger": "artifacts/phase2m_g/label_corrections.json: every record whose label is known to be wrong (8 corrections) or judged unreadable or neither (13 exclusions). They index external-train records; any that fall in a bank source are excluded.",
+      "E2_phase2m_e_blinded_reviews": "artifacts/phase2m_e review batches cards_24 (external validation), substitution_cells_30 (external validation) and wrong_training_records_20 (external train): a record is excluded when the reviewer endorsed the model over the label (a known label error) or answered neither, unreadable or cannot tell",
+      "E3_phase2j_b_internal_review": "artifacts/phase2j_b verdicts.xlsx with .keys/review_map.csv, the blinded internal development review: a card is excluded when its verdict is UNREADABLE_GLARE, NOT_AN_ID, WRONG_SIDE, PARTIALLY_READABLE or UNSURE (the internal equivalents of unreadable, neither and cannot tell). READABLE_CLEAR, READABLE_EFFORT and DIGITS_CROPPED (a crop defect of ours, not unreadable data) are kept.",
+      "reported": "the number excluded, per exclusion source and per bank source; a sensitivity line with UNSURE kept"
+    },
+    "label_extraction": {
+      "what": "labels for the development-pool admission failures, which have no Phase 2L-A target",
+      "how": "the file text is read once; for each requested card_id, which must be a development-pool card and is re-checked against InternalAccess (audit and consumed refused), one regular expression anchored on that card_id extracts its 14-digit value. The file is never parsed as a whole, so no other card's value is ever decoded or bound to an identifier. The extracted labels are written to the ignored artifacts/phase4_accuracy/ and hashed.",
+      "consistency_check": "before use, the same extraction on the 720 admitted pool cards must agree with their Phase 2L-A targets; the agreement count is reported",
+      "when": "only after every candidate reading of the failures is sealed with its hash"
+    }
+  },
+
+  "instruments": {
+    "rule": "every derived instrument is validated by the instrument-validator subagent before any category uses it: synthetic ground truth with known answers, and order preservation on real content (permitted development-pool content only). An instrument that fails is not used, and the categories that need it are reported as unavailable.",
+    "admission": {
+      "I_gate": "which frozen detector gate failed: score (valid quad, score < 0.5), bounds (out_of_bounds at tolerance 0.02), area (area_too_small at 0.02), shape (self_intersection, non_convex_or_degenerate, degenerate_quadrilateral, invalid_corner_order), no_output (exception or non-finite output). Taken from the frozen DocCornerNet.predict and validate_quadrilateral, with a counterfactual flag for each single relaxation that would pass.",
+      "I_resolution": "short side, long side and megapixels of the decoded (EXIF-normalised) image",
+      "I_brightness": "mean Rec.601 luma of the decoded image, 0-255",
+      "I_clipped": "share of pixels with luma >= 250 or <= 5",
+      "I_blur": "variance of the Laplacian of the grayscale image resized so its long side is 1000 px (higher is sharper)",
+      "I_exif": "the EXIF orientation tag of the file (absent, 1, or 2-8)",
+      "I_face": "OpenCV's bundled Haar frontal-face cascade on the image at the four quarter turns: found (bool), the turn, and the face box side relative to the image short side",
+      "I_line": "Paddle PP-OCRv5 mobile text detection on the whole image at the four quarter turns, each box read by the frozen engine's Arabic PP-OCRv5 recognizer; a 14-digit-like line is a box whose reading folds to 12-16 digits",
+      "I_card_fill": "the frozen detector's quad area as a share of the image (when a quad is output), and whether any corner lies outside the image"
+    },
+    "misread": {
+      "I_kind": "the Phase 2M-E per-slot classifier scripts/phase2m_e.py classify_positions (precedence shift > collision > neighbour > substitution); a record's kind is its highest-precedence slot kind",
+      "I_slot_and_pair": "each wrong slot (1-14) and its confusion pair true -> read",
+      "I_margin": "the frozen weakest_margin (softmax, per-slot top-1 minus top-2, minimum over the 14) and the per-slot margin at each wrong slot",
+      "I_struct": "src/extraction/national_id.decode with today fixed at 2026-09-27: century, birth date and governorate problems only. The check digit is never used.",
+      "I_rank2": "the rank of the true digit in the per-slot probabilities at each wrong slot; a record is second-choice-recoverable when the true digit is rank 2 at every wrong slot",
+      "I_band_photometry": "on the 160x576 band: mean luma, clipped share (luma >= 250 or <= 5), glare share (luma >= 240 and HSV saturation <= 30), and Laplacian variance"
+    },
+    "fix_evaluation": {
+      "I_wrong_region": "a recovered admission is flagged as a quad that is not the card's ID region when BC-final's reading matches the label on 6 or fewer of the 14 slots"
+    }
+  },
+
+  "categories": {
+    "admission": "each failure gets one primary category from I_gate (score, bounds, area, shape, no_output, decode) and trait flags from the photometric and framing instruments (tight_crop: quad area >= 0.80 of the image or a corner outside it; small_card: quad area < 0.10; dark: luma < 60; bright: luma > 200 or clipped > 0.20; blurred: Laplacian variance < 50; exif_rotated; face_found; line_found). The trait thresholds are declared here and never tuned.",
+    "misread": "each misread gets one kind from I_kind and one recoverability class, in this order: struct_invalid_and_rank2 (the read is structurally invalid and every wrong slot has the true digit at rank 2), rank2_only (rank 2 at every wrong slot, read structurally valid), other",
+    "statistics": "per-category counts by source with Clopper-Pearson 95% intervals, cards treated as independent (external validation also at card level). The largest recoverable categories are ranked by count within the real-photo sources (S1 + S2 misreads kept separate from S2 admission failures)."
+  },
+
+  "fix_candidates": {
+    "F1_detector_second_pass": "triggered only when the frozen pipeline returns admission_status document_not_found. A declared cascade of frozen-detector re-runs on transformed images and relaxed gates, each accepted quad passed through the unchanged frozen downstream (compare_image with a proxy runtime). Detailed in first_fix.",
+    "F2_face_anchored_roi": "on failures: Haar face detection at four turns; the card quad is estimated from the face box through the canonical portrait rectangle (field_regions_v5 portrait [0.025, 0.055, 0.25, 0.55]) and passed to the frozen downstream",
+    "F3_line_first_fallback": "on failures: Paddle text detection on the whole image; the 14-digit-like line's rotated box is mapped onto the canonical owner box [420, 479, 980, 558], the image is warped to the 1000x630 canonical by that similarity transform, and the band canonical[430:610, 350:1000] is materialised exactly as BC-final's",
+    "F4_robust_decoding": "on corrupt_image with an existing file: tolerant decode (PIL LOAD_TRUNCATED_IMAGES, then cv2.imdecode). A missing file cannot be recovered.",
+    "F5_structure_constrained_decoding": "on admitted cards whose argmax reading is structurally invalid: the most probable structurally valid 14-digit string under the per-slot probabilities (product of per-slot probabilities, exhaustive over the constrained slots 1-9, argmax elsewhere). Parameter-free. Never uses the check digit.",
+    "F6_multi_crop_voting": "on admitted cards: the band bbox jittered by dx, dy in {-8, 0, +8} canonical pixels (9 views), mean softmax. Parameters fixed here, not tuned.",
+    "F7_four_phase_tta": "on admitted cards: the Phase 2M-G probe, horizontal shifts of 0, 1, 2, 3 px (cv2.warpAffine, BORDER_REPLICATE), mean softmax. Parameter-free."
+  },
+
+  "stage_2_plan": {
+    "per_candidate": "the categories it targets; an upper bound and a realistic estimate of the losses it recovers per 377; its latency cost; its risk; whether it can be built without touching sealed modules",
+    "upper_bound": "the audit's loss count in the targeted type (19 document_not_found for F1-F3, 1 corrupt for F4, 15 misreads for F5-F7) times the share of that type in the bank that the fix's mechanism could reach (for F5 the struct_invalid_and_rank2 share; for F1-F3 the share of real-photo admission failures whose image contains a readable card)",
+    "realistic": "the audit's loss count in the targeted type times the fix's measured exact-recovery rate on the development bank (F1-F4 on the pool's admission failures; F5-F7 net of regressions on S1 and S2, reported separately)",
+    "effort_units": "S = 1, M = 2, L = 3: F1 M, F2 M, F3 L, F4 S, F5 S, F6 M, F7 S",
+    "ranking": "by realistic recovered losses per 377 divided by effort; ties by upper bound, then by lower risk",
+    "projection": "cumulative end-to-end accuracy per 377 after each step: (342 + cumulative realistic recoveries) / 377, with the audit counts as the base and no claim made on the audit (D-016)"
+  },
+
+  "first_fix": {
+    "which": "F1, the detector second pass, is built first whatever its rank (owner instruction: at least the detector second pass). Stage 3 then continues down the ranked list, each fix with its own amendment committed before its numbers.",
+    "trigger": "only when the frozen compare_image returns admission_status document_not_found. Any other result is returned unchanged, object for object. Proven by a unit test (a stubbed runtime shows the second pass is never called on an admitted card and the result is the same object) and on real data (the 720 admitted pool cards and the 168 controls: zero triggers, identical band tensors by sha256).",
+    "mechanism": "each cascade step produces an image (possibly transformed) and a detector (the frozen DocCornerNet instance, or a gate-relaxing wrapper around its unchanged predict). A proxy runtime carrying that detector is given to the unchanged compare_image, so validation at 0.02, canonicalisation, orientation, band extraction, v2 and BC-final all run as frozen. The first step whose result has a band wins.",
+    "cascade_order": [
+      "1 relaxed gates on the original image: a quad the frozen detector rejected only for score is accepted if its score >= s_min; a quad rejected only for out_of_bounds within 0.10 has its corners clipped to the image and is accepted if it then validates at 0.02 and scores >= s_min",
+      "2 pad: the image placed in a canvas larger by fraction p on each side, fill constant 0; frozen gates, then the step-1 relaxation",
+      "3 quarter turns 90, 180, 270 of the original: frozen gates, then the step-1 relaxation",
+      "4 crops: four overlapping quadrant crops of 0.65 of each side and one centre crop of 0.70; frozen gates only",
+      "5 full-image quad, only if enabled: the whole image border as the card, when the image aspect is within 0.30 of ID-1"
+    ],
+    "parameter_grid": {
+      "s_min": [0.30, 0.15],
+      "p": [0.10, 0.25],
+      "full_image_quad": [false, true],
+      "configurations": "the 8 combinations, indexed in the order s_min descending, p ascending, full_image_quad false first (index 0 = s_min 0.30, p 0.10, no full-image quad, the most conservative)"
+    },
+    "development_set": "the development pool's admission failures only (S2). Never the 168, the audit or external validation.",
+    "readings_sealed_before_labels": "every configuration's per-card result (admitted, status, reading, margin, winning step, seconds) is written with its sha256 before the labels of the failures are extracted",
+    "false_admission": {
+      "negatives": "synthetic card-free images: 100 admitted development-pool images (deterministic sample by sha256 of 'phase4_accuracy:negatives:' + card_id) with the frozen detector's accepted quad, dilated by 5%, filled by OpenCV Telea inpainting at a working size of 640 px on the long side; kept only when the frozen pipeline no longer admits them. Any second-pass admission of a kept negative is a false admission.",
+      "on_development_failures": "I_wrong_region on each recovered failure"
+    },
+    "selection_rule": "among configurations whose false-admission rate on the kept negatives is at most 0.10, the most exact reads on the development failures wins. Ties: fewer false admissions on the negatives, then fewer wrong-region admissions on the failures, then lower mean added seconds per triggered image, then the lower configuration index. If no configuration passes the false-admission bound, the lowest-rate one is reported and marked NOT_SELECTED, and F1 is recorded as not ready.",
+    "reported": "admissions recovered, exact reads among the recovered cards (Clopper-Pearson), false admissions (negatives and wrong-region), added latency (median and p90 seconds per triggered image, and the added seconds per image at the observed trigger rate), and the winning-step histogram. The chosen configuration's development numbers are selection numbers, labelled in-sample to the choice.",
+    "controls": "then measured once on the 168 controls with the chosen configuration, labelled not pristine: triggers, identical outputs, exact count",
+    "audit_diagnostic": "a ready-to-run owner command applies the chosen configuration to the audit's 20 admission failures. It refuses to run without the owner's override and writes a result labelled diagnostic, not held out, never an accuracy claim (D-016)."
+  },
+
+  "subsequent_fixes": "each later fix is declared in an amendment committed before its numbers: its parameters (fixed here for F5-F7, which are parameter-free or fixed), the sets it is measured on (S1 not pristine, S2 in-sample tagged, external validation descriptive only), and the card-level paired sign test against the frozen reading. A misread fix changes admitted cards and so can regress them; regressions are reported card by card in count.",
+
+  "verification": {
+    "per_stage": "every claim carries its command and output; the stats-reviewer subagent reviews each report; the full suite, the privacy scan (no skips) and the frozen-hash checks pass at every commit",
+    "frozen_hashes": "checked at entry and at exit: the 18 BC-final shadow checks (scripts/phase2m_h_verify.py hash_checks), BC-final's known prediction on the synthetic band, the DocCornerNet checkpoint sha256, the Paddle model files pinned in configs/phase4_audit_manifest.json, and the sha256 of every sealed module listed under hard_lines",
+    "progress_file": "reports/phase4_accuracy_progress.md is updated before every commit with what is done, what is next and what waits for the owner"
+  },
+
+  "outputs": {
+    "tracked_aggregate": [
+      "reports/phase4_error_bank.md",
+      "reports/phase4_error_bank.json",
+      "reports/phase4_accuracy_stage1.md",
+      "reports/phase4_accuracy_stage1.json",
+      "reports/phase4_accuracy_progress.md"
+    ],
+    "ignored_per_card": "artifacts/phase4_accuracy/",
+    "decision_token": "STAGE1_COMPLETE, or STAGE1_PARTIAL:<last completed step>"
+  },
+
+  "amendments": [
+    {
+      "amendment": 1,
+      "utc": "2026-09-28",
+      "why": "The rule left five execution details open that bear on F1's numbers. They are fixed here, after the bank's measurements and exclusions were computed and before any second-pass reading exists.",
+      "A1_development_set": "F1's development set is the pool's admission failures whose frozen admission status is document_not_found (the trigger), minus the cards the bank excludes (E1-E3). Excluded failures are still run and sealed; how many of them each configuration admits is reported beside the table, and nothing is chosen on them.",
+      "A2_corrupt_image": "a corrupt_image failure never triggers F1. It is F4's, and is counted there.",
+      "A3_negatives": "the 100 negatives are the first 100 admitted pool cards, in the order of sha256('phase4_accuracy:negatives:' + card_id), whose frozen DocCornerNet prediction is accepted with a quad covering at most 0.60 of the image. A pre-cropped bypass card, or a quad filling the frame, leaves no background to inpaint the card from. Skipped cards are counted by reason.",
+      "A4_evaluation": "for the grid, the frozen detector runs once per transformed image and the frozen downstream once per (step, quad); each configuration's outcome is the first success in its own cascade order, and its latency is the sum of the measured detector and downstream seconds of the steps it would have tried. The production form (read_with_second_pass) is then run with the chosen configuration on all 771 pool cards: the 720 admitted cards must not trigger and must give bands identical by sha256 to the step-0 capture, and on the failures its recoveries and readings must equal the cached evaluation's. A disagreement stops F1 and is reported.",
+      "A5_label_source_check": "the D-019 extraction must reproduce every admitted pool card's Phase 2L-A target (720 of 720) or scoring stops"
+    },
+    {
+      "amendment": 2,
+      "utc": "2026-09-28",
+      "why": "Stage 3 continues down the list. The misread fixes and F4 need a measurement protocol, fixed before any of their numbers. F1's grid run had started, but no F1 score, and no F4-F7 number, existed when this was written.",
+      "B1_sets": "F5, F6 and F7 are measured on S1 (168 controls, not pristine, from the step-1 canonical cards), on S2 (the 720 admitted pool cards, from the step-0 bands and canonical cards; replay-training cards tagged in-sample and reported apart from the 107 non-replay cards) and on S3 (external validation, descriptive only, by record and by card; F6 needs a canonical card, which S3 lacks, so F6 is not measured there). Every card counts, including the ones the bank excludes; a fix's effect on the excluded cards is reported beside the main line.",
+      "B2_comparison": "against the frozen single-view argmax reading of the same card: newly exact, regressed, net, and the exact two-sided sign test on the discordant cards (descriptive). A card of S3 is exact when all its records are.",
+      "B3_F5": "constrained_decode on softmax(logits); it changes only structurally invalid readings, and a correct reading of a card with a valid label is always valid, so it cannot regress such a card. That is checked, not assumed: regressions are counted.",
+      "B4_F7": "BC-final on the band shifted by 0, 1, 2, 3 px (scripts/phase2m_e.py shift_bands: cv2.warpAffine, BORDER_REPLICATE), mean of the four softmaxes, argmax",
+      "B5_F6": "the canonical card padded by 8 px with edge replication, the band box [350, 430, 1000, 610] moved by dx, dy in {-8, 0, 8} (9 views, 0 offsets included), each letterboxed to 160 x 576 with pad 245, BC-final on each, mean of the nine softmaxes, argmax",
+      "B6_combinations": "F5 is also measured on top of F6 and on top of F7 (constrained decoding of the averaged probabilities), because F5 composes with either",
+      "B7_adoption_into_the_projection": "a misread fix enters the cumulative projection only if, on S1 + S2 together, net > 0 and neither S1 nor S2 shows more regressed than newly exact cards. S3 never decides. Between F6 and F7, which both average views, only the one with the larger S1 + S2 net enters (ties to F7, the cheaper); F5 then enters on top of it, measured in combination.",
+      "B8_F4": "robust decoding measured on the pool's corrupt_image failure(s): the file is decoded with PIL ImageFile.LOAD_TRUNCATED_IMAGES set for that call only, else cv2.imdecode; if pixels result, the frozen compare_image runs on the decoded array and then F1 if it returns document_not_found. The audit's corrupt_image is the pinned card with no file, which no decoder can recover, so F4's audit upper bound is 0.",
+      "B9_projection_for_unbuilt_fixes": "a fix that is not built (F2, F3 if the budget ends) gets an upper bound from the bank (the audit's remaining document_not_found count times the share of the pool's still-unrecovered failures showing the fix's anchor: I_face for F2, I_line for F3) and a projected realistic estimate equal to that upper bound times F1's measured exact-per-recovered ratio, flagged projected, not measured"
+    },
+    {
+      "amendment": 3,
+      "utc": "2026-09-28",
+      "why": "The instrument-validator failed three instruments and found a defect in a fourth, and the misread-fix measurement showed that the internal structurally invalid misreads are gross (8-14 of 14 slots wrong), which no per-slot decoder can repair. This amendment fixes the instruments, re-validates them, and declares a new geometric candidate, F8. It is written after the F1 grid and the F5-F7 numbers existed, and before any F1 label was read, any F1 configuration chosen, or any F8 reading made.",
+      "C1_I_wrong_region": "redefined: a reading is flagged when at most 6 of 14 slots match the label at the best whole-string shift of up to 2 slots (the validator's proposal). It is reported as 'wrong region or unreadable', never as wrong region alone, because a present but unreadable line can still be flagged. The redefined instrument is re-validated before F1 is scored; the F1 tie-break that uses it applies only if it passes, and is dropped from the tie-break order otherwise.",
+      "C2_I_traits": "exif_rotated counts only the tags exif_transpose acts on (2-8); the first version flagged the invalid tag 0, which 36 pool files carry. Re-validated before use.",
+      "C3_I_card_fill": "FAIL, and not used: on rejected quads the share tracks the card poorly (median IoU 0.105 on the validator's shrink test), so the traits tight_crop and small_card are reported as unavailable. The self-intersection area defect is fixed anyway.",
+      "C4_I_gate": "PASS. Its counterfactual flags now also require the frozen score floor, so each relaxes one gate only (the validator's note). bank-admission is re-run so that the stored rows carry the corrected flags and the frozen quad.",
+      "C5_I_margin": "returns 0.0 for a non-finite or misshapen array, as the frozen weakest_margin does",
+      "C6_projection_base_for_F1": "the realistic F1 estimate uses every triggered pool failure, excluded cards included, as stage_2_plan says ('on the pool's admission failures'): the audit's 19 were filtered by no review. The development-set rate (after exclusions) that chooses the configuration is reported beside it.",
+      "C7_F8_validity_reread": {
+        "what": "src/extraction/validity_reread.py: triggered only when the frozen pipeline admitted a card and BC-final's reading is structurally invalid (decode, check digit never used). It tries the other three quarter turns of the frozen geometry (180 first), then the chosen F1 configuration's cascade steps through the unchanged compare_image, and keeps the first structurally valid reading; otherwise the frozen result stands. A correct reading of a valid number is never invalid, so it cannot replace a correct reading.",
+        "measured_on": "every S1 and S2 card whose frozen reading is structurally invalid (the trigger is label-free); readings sealed before the labels are compared. S1 is labelled not pristine and S2 in-sample.",
+        "reported": "triggered, recovered (a valid reading found), exact (Clopper-Pearson over triggered), changed but still wrong, the winning steps, latency per triggered card; all cards, and after exclusions",
+        "projection": "upper bound: the audit's structurally invalid misreads (8, from the sealed outputs). Realistic: 8 x exact / triggered over all S1 + S2 triggered cards; the after-exclusion rate beside it.",
+        "effort": "M = 2",
+        "product": "not adopted into the product; the frozen decision logic is unchanged"
+      },
+      "C8_F5_result_stands": "F5 was measured as amendment 2 declared. Its stage-2 realistic estimate is the audit's 8 structurally invalid misreads times F5's exact-recovery rate on the S1 + S2 structurally invalid misreads."
+    },
+    {
+      "amendment": 4,
+      "utc": "2026-09-28",
+      "why": "F1 was scored as declared and failed its false-admission bound: every configuration admits at least 21 of the 78 kept negatives (27%), against 10%. Under the rule F1 is NOT_SELECTED and recorded as not ready. The frozen pipeline itself admits 22 of the same 100 card-erased images, so the negatives are not card-free to the detector, but the rule's bound stands. This amendment declares one gated variant and a fresh test for it, before any number of the variant is computed.",
+      "D1_F1_verdict": "F1_NOT_SELECTED. The reported configuration is index 0 (s_min 0.30, pad 0.10, no full-image quad): the lowest false-admission rate, 21/78, tied with index 4 and ahead of it on exact reads under the declared order. Its development numbers are reported as measured.",
+      "D2_F1v": "configuration 0 plus a validity gate: the second pass's result is kept only if BC-final's reading is structurally valid (decode with today 2026-09-27; the check digit is never used); otherwise the image stays not admitted, as the frozen pipeline left it, and the cascade does not continue. A correct reading of a valid number is always structurally valid, so the gate cannot remove an exact read; it removes only admissions whose reading is certainly wrong. Configuration 0 is fixed now because it has the most exact reads on the development set (36, unique), so no configuration is re-chosen.",
+      "D3_fresh_negatives": "F1v's false-admission rate is decided on a fresh, disjoint negative set: the next 100 qualifying admitted pool cards in the same order (sha256('phase4_accuracy:negatives:' + card_id)) after the first 100 qualifying ones, built identically (frozen quad accepted, area at most 0.60, 5% dilation, Telea inpainting at 640 px), kept when the frozen pipeline returns document_not_found. F1v passes if at most 0.10 of the kept fresh negatives are admitted. The frozen pipeline's own admission count on the fresh set is reported.",
+      "D4_second_look": "F1v's rate on the original 78 negatives, and its development numbers, are computed from the sealed readings and reported as a second look, descriptive only. Its exact count equals configuration 0's by construction; that is checked, not assumed.",
+      "D5_downstream_measurements": "if F1v passes, it is PROVISIONAL_F1V_SELECTED and the production-form pool run, the controls run, F8's cascade and the owner's audit diagnostic use it. If it fails, they use configuration 0 ungated, labelled NOT_SELECTED. Either way the result stays research for the competition package and the owner decides whether it is used there.",
+      "D6_projection": "the stage-2 plan reports F1 (configuration 0, ungated) and F1v side by side; the cumulative projection uses F1v if it passes, otherwise it shows F1 as a projection conditional on the owner accepting its false-admission rate."
+    },
+    {
+      "amendment": 5,
+      "utc": "2026-09-28",
+      "why": "Errata from the stats review of the stage-1 report. Nothing here changes a choice already made. Each item corrects a statement or a computation, and says so.",
+      "E1_A4_in_run_comparison": "the production-form run stored 9 of 51 matching recovery decisions and 0 of 42 matching readings against the cached evaluation. The cause is a defect in the comparison code, not in F1v: the code the run imported (commit 44cbcd0) looked up the gated label s0.30_p0.10_nofull_valid, and the sealed grid records only the eight ungated labels, so every expectation was empty and matched only the 9 unrecovered cards. Recomputed from the sealed production-form rows without re-running anything, with the gate applied to configuration 0's cached result as amendment 4 D2 defines F1v: 51 of 51 and 42 of 42. A4's stop clause is therefore not applied (D-028); both pairs are reported.",
+      "E2_amendment_4_D2": "'(36, unique)' is wrong: configuration 1 also reads 36 of 46 (37 of 50). Configuration 0 is the winner under the declared order, with fewer false admissions on the first negatives (21 against 71). F1v's development numbers are in-sample to that choice.",
+      "E3_amendment_3_C8_timing": "C8, which sets F5's realistic base, was committed after the F5-F7 numbers existed. F5 recovers 0 of 24 under either base, so nothing depends on it.",
+      "E4_stage_2_corrections": {
+        "F2_F3_bound": "the bound counts every failure F1v leaves unadmitted, 8 of 50, with no filter. The first computation counted only the review-kept 5.",
+        "F5_upper_bound": "by the base rule, 15 misreads times the bank's struct_invalid_and_rank2 share, which is 0 internally, so 0. The audit's 8 impossible readings are reported as the mechanism's outer limit.",
+        "tie_break": "F1 and F1v tie on realistic per effort and upper bound. The declared next key is lower risk, which puts F1v first. The first computation broke the tie by name."
+      },
+      "E5_controls_trigger_check": "the controls run compares readings, not band hashes: 0 of 168 triggered, all 168 readings identical. Together with the unit test that an untriggered result is the same object, that establishes the contract on the controls. The band-hash comparison was made on the 720 admitted pool cards."
+    },
+    {
+      "amendment": 6,
+      "utc": "2026-09-28",
+      "why": "The owner asked for PDF handling in the competition package, and for a comparison with the frozen pipeline on the permitted PDF cards. This fixes the page rule, the extraction rule and the measurement before any PDF number is computed. The census of delivered data had already counted 21 permitted PDFs by magic bytes; nothing else about them had been looked at.",
+      "P1_scope": "the permitted delivered cards (pool and controls; the audit and the consumed internal validation are skipped by membership before any byte is read) whose delivered original starts with %PDF",
+      "P2_what_the_frozen_path_did": "from records already on disk: the ingest manifest's decode record for each such card (how it was decoded, the page note), and the bank's frozen outcome (admitted, exact) for it. Aggregate counts only.",
+      "P3_page_rule": "the first page that is not blank. A page is blank when it has no image object and its render at 72 DPI has a luma standard deviation below 2. If every page is blank, page 1.",
+      "P4_extraction_rule": "on the chosen page: if it holds exactly one image object (at any depth), placed upright (its matrix has no rotation or flip, and the page has no /Rotate), that image's bitmap at its native pixel size; otherwise the page rendered at 300 DPI (pypdfium2 5.13.0, pinned), as ingest does",
+      "P5_measurement": "each permitted PDF card through the new decoder, then the unchanged frozen compare_image (WSL); also through F1v (provisional, amendment 4). Readings sealed before labels. Labels: Phase 2L-A targets where they exist, else the D-019 anchored extraction; controls from their manifest. Reported: admitted and exact for the frozen path, the new decoder alone, and the new decoder with F1v; per-card discordance counts and the exact sign test (descriptive; about 21 cards). The controls among them are not pristine; the pool's replay-training cards are in-sample for BC-final.",
+      "P6_no_selection": "nothing is chosen on these cards: the rules above are fixed here"
+    },
+    {
+      "amendment": 7,
+      "utc": "2026-09-28",
+      "decided_by": "the owner, project owner",
+      "why": "Train/serve consistency. Every PDF card BC-final was trained, validated and audited on reached it as ingest's 300-DPI render of page 1 (official_eval.transcode). Native extraction would feed it images of a different scale. The 21-card result (amendment 6: native extraction lost 2 exact reads, gained 0) is consistent with this choice but was not the basis for it.",
+      "Q1_pdf_rule": "the competition decoder renders page 1 of every PDF at 300 DPI with pypdfium2 5.13.0, exactly as ingest does. This supersedes amendment 6 P3 (first non-blank page) and P4 (native extraction). A test asserts pixel identity with official_eval.transcode on synthetic PDFs, and pdf-read checks it on the 21 permitted PDF cards against the ingest images.",
+      "Q2_video_uploads": "an upload whose magic bytes are an ISO BMFF video (for example an MP4 named Nid_Front.jpg, D-031) routes to decision UNREADABLE with reason_code UPLOAD_IS_VIDEO, so the backend can ask for an image instead. Other undecodable uploads keep the contract's HTTP errors. The product's decision logic for images (bcfinal_only, 0.966875) is unchanged."
+    }
+  ]
+}

@@ -1,0 +1,207 @@
+{
+  "schema_version": "phase4_service_rule_v1",
+  "phase": "Phase 4 OCR service: the production service, the competition CLI and the Docker image, one codebase",
+  "branch": "phase4-ocr-service, from phase4-accuracy 561ab45; backup ref backup/phase4-ocr-service-entry-20260928; not pushed, to git or to any registry",
+  "declared_before_any_number": "This file is committed before any parity, fix-effect, latency or timing number is computed. Amendments are appended under `amendments`, never edited in place, and each states its reason.",
+  "owner_instruction": "run fully autonomously; every choice is recorded in docs/release/decision_log.md as taken autonomously under owner instruction; a hard line skips the item, records it, and the run continues",
+
+  "hard_lines": {
+    "audit": "no audit read of any kind: no audit image, label, card id or sealed per-card output is opened",
+    "sealed_modules": "no edit to a sealed or hash-pinned module (scripts/phase4_accuracy.py SEALED_MODULES, src/geometry/*, every earlier configs/ file, config/); new code wraps them",
+    "training": "no training or fine-tuning",
+    "contract": "no breaking change to docs/release/ocr_api_contract_v1.md; additive optional fields only, each recorded as a decision",
+    "privacy": "no national ID printed, logged or committed; per-card material only under the ignored artifacts/phase4_service/",
+    "fonts": "no Microsoft font in the image or the repository",
+    "image_contents": "the Docker image holds code, configs and the model weights it needs, and nothing else: no images, labels, manifests, lookups, ledgers or reports"
+  },
+
+  "pipeline": {
+    "shared": "src/service/recognizer.py is the one pipeline; the service and the CLI both call Recognizer.recognize(image: bytes)",
+    "P1_decode": "src/extraction/image_decode.decode_bytes as it stands: format from magic bytes; JPEG, PNG, WebP, GIF, BMP, TIFF; HEIF/HEIC/AVIF through pillow-heif 0.18.0; PDF page 1 rendered at 300 DPI (pypdfium2 5.13.0, amendment 7 of the stage-1 rule); an ISO BMFF video returns video_not_an_image, which routes to UNREADABLE with reason_code UPLOAD_IS_VIDEO. Any other failure is HTTP 400 in the service.",
+    "P2_first_pass": "the frozen fixed14_bcfinal_shadow.compare_image on the decoded RGB array (frozen DocCornerNet, frozen Paddle orientation, frozen band, v2 and BC-final on the identical tensor)",
+    "P3_F1v": "only when the first pass returns admission status document_not_found: admission_second_pass.read_with_second_pass with configuration 0 (s_min 0.30, pad 0.10, no full-image quad) run ungated, then the validity gate of stage-1 amendment 4 D2 applied to its result: kept only if BC-final's reading is structurally valid (national_id.decode with today 2026-09-27, the check digit never used). A gated reading does not admit the card. Running ungated and gating the result is F1v by definition (the ungated cascade stops at the same first band), and the stage-1 D-028 recomputation used the same construction; a unit test pins the equivalence.",
+    "P4_BC_final": "frozen, weights sha256 00e23a14... checked when it loads (fixed14_bcfinal_shadow.verify_shadow_candidates, the sealed 18 checks)",
+    "P5_F8": "only when the card is admitted and BC-final's reading is structurally invalid: validity_reread.reread_if_invalid with configuration 0's cascade, given the first-pass result. The first structurally valid re-read replaces the reading; otherwise the first-pass reading stands.",
+    "P6_isolation": "the recognizer takes image bytes only. The typed ID can never reach it: enforced by the type signature (one parameter, `image: bytes`, a TypeError on anything else) and by tests (a spy recognizer, and a static check of the call site).",
+    "portable_wrappers": {
+      "detector": "src/service/runtime.PortableDocCornerNet: the frozen DocCornerNet's load checks without git. The upstream-revision check (git rev-parse, git show) is replaced by the LF sha256 of model.py at the pinned revision (9be2646d...), verified against git show on the development machine by a test. The config.json architecture check, the weights sha256 check, strict loading and the finite dummy forward pass are unchanged.",
+      "self_test": "src/service/runtime.ServiceRuntime: the sealed BCFinalRuntime self-test renders its probe band with Windows fonts. The service loads the same probe from a stored fixture (its tensor sha256 pinned), and the sealed known-prediction hashes of v2 and BC-final must reproduce from it, unchanged. A Windows test asserts the stored probe equals the sealed self_test_tensor() byte for byte.",
+      "paddle_paths": "the frozen orientation engine (paddle-v5: arabic PP-OCRv5 mobile rec, latin PP-OCRv3 mobile rec, cpu) built by src/extraction/cli.build_engine with project-root-anchored model paths and a writable cache directory; the model files are the ones the audit manifest pins"
+    }
+  },
+
+  "decider": {
+    "name": "bcfinal_only, decision_rule_version phase4-routing-v1",
+    "threshold": "configs/phase2m_h_frozen_candidate.json operating_point.primary.margin (0.966875), read at startup, never restated",
+    "statistic": "BC-final's weakest-position margin (fixed14_bcfinal_shadow.weakest_margin) of the final reading",
+    "rule": "not admitted (after F1v) -> UNREADABLE with a reason_code; reading == typed ID -> MATCH with suggested_validation Valid; mismatch with margin >= threshold -> MISMATCH_CONFIDENT; otherwise NEEDS_REVIEW. It never suggests Invalid.",
+    "parity_to_route": "for admitted cards the decision equals scripts/phase2m_h.route() mapped accept -> MATCH, check_the_number_you_typed -> MISMATCH_CONFIDENT, retake_the_photo -> NEEDS_REVIEW; a unit test checks the mapping on synthetic readings, typed IDs and margins, including margins exactly at the threshold"
+  },
+
+  "golden_self_test": {
+    "what": "stored fixtures, no fonts at run time: the sealed self-test probe band, and synthetic bands rendered once by the sealed scripts/phase2l_b.synthetic_batch from seeds whose synthetic label is structurally invalid (so it can never be a real ID), with the frozen models' expected outputs",
+    "expected_outputs": "v2 and BC-final argmax sequences (stored as digit lists, never as a 14-character string), BC-final margins (tolerance 1e-5), the frozen detector's corners and score on a synthetic card canvas, the frozen Paddle engine's reading on synthetic crops (hash and confidence), and the full pipeline's outcome on the synthetic canvas where it is deterministic",
+    "where_generated": "bands on Windows (the sealed renderer's fonts exist there; no font is copied); expected model outputs in WSL (the target platform) through the sealed code paths",
+    "hashes": "the fixture file's sha256 is pinned in the expected-output file and in a test",
+    "ready": "/ready returns 200 only after the models loaded, the sealed checks and known predictions passed, and every golden expectation reproduced"
+  },
+
+  "parity": {
+    "P_sets": {
+      "S_dev": "the permitted development pool, scripts/phase4_integration.development_pool(): InternalAccess calibration minus the 168 controls, the audit and the consumed validation (771 cards), images via InternalAccess.image_path (the ingest images)",
+      "S_ctl": "the 168 controls, scripts/phase2m_c.internal_pools()[2], same image source",
+      "S_orig": "the permitted delivered originals that are PDF or ISO BMFF HEIF (the audit and the consumed validation skipped by membership before any byte is read, as scripts/phase4_accuracy.permitted_pdf_originals does); the service reads the original bytes, the reference is the frozen reading of the same card's ingest image"
+    },
+    "reference": "the frozen logic: fixed14_bcfinal_shadow.compare_image in the stage-1 WSL venv (~/venvs/ocrid-py3119) with the sealed self-test (WindowsFontPaths), and scripts/phase2m_h.route() at the frozen threshold. Computed fresh, and cross-checked against the stage-1 sealed readings.",
+    "typed_ids": "per card with a label, two typed IDs: T_honest = the label (Phase 2L-A target; the controls' manifest target), and T_typo = the label with its 12th digit replaced by (d + 1) mod 10. Labels are read in-process only and never written out.",
+    "scope": "cards where the frozen pipeline admits the card and BC-final's reading is structurally valid. Neither fix can trigger there, so the service must reproduce the frozen reading exactly and the frozen decision for both typed IDs.",
+    "compared": "admitted, reading (exact string equality), margin (absolute difference, max reported; equality of the decision is what counts), decision for T_honest and T_typo",
+    "gate": "zero mismatches in scope, in each environment. Every mismatch is reported with its card count and cause; nothing is re-tuned.",
+    "environments": {
+      "E_wsl": "WSL, a fresh venv built from requirements-linux.txt (~/venvs/ocrid-service-py3119), the service in-process through HTTP (FastAPI TestClient)",
+      "E_container": "the built image, the service over HTTP on localhost; images sent by a client outside the container; no data inside the image"
+    },
+    "S_orig_note": "PDF renders can differ at pixel level between platforms (D-033: 2 of 21 on Linux). Pixel differences are reported; readings and decisions must still match in scope."
+  },
+
+  "fixes_effect": {
+    "set": "S_dev (the 771 permitted development pool cards), reported separately from S_ctl",
+    "measured": "from E_wsl service rows against the fresh frozen reference: extra admissions (frozen not admitted, service admitted), extra exact reads (service exact, frozen not exact; labels as in stage 1: Phase 2L-A targets, else the D-019 anchored extraction for the pool's admission failures), lost exact reads, and changes on already-admitted structurally valid reads (must be 0). F1v and F8 triggers and recoveries are counted separately.",
+    "statistics": "card-level counts; newly exact against lost with the exact two-sided sign test; Clopper-Pearson intervals on rates. Descriptive: F1v's configuration was chosen on these development failures and 664 pool cards are BC-final replay-training cards, so the numbers are in-sample and not a clean estimate.",
+    "product_safety": "recorded as a decision: F1v acts only on cards the frozen pipeline left UNREADABLE; F8 acts only on structurally impossible readings, which went to review unless the typed ID was itself impossible and identical; a MATCH can be added only when the reading equals the typed ID"
+  },
+
+  "cli": {
+    "command": "python -m src.service.cli INPUT_DIR --output CSV [--workers N]",
+    "columns": ["image_name", "reading", "margin", "admitted", "fixes_triggered", "reason_code"],
+    "reading": "BC-final's final reading whenever one exists; a reading that F1v's gate refused is still written, with admitted false. Never abstains for low confidence.",
+    "order": "files sorted by their relative path; output in that order whatever the worker count",
+    "workers": "a process pool, one model bundle per process; with N > 1, TensorFlow intra-op threads, Paddle cpu_threads, OpenCV and OpenMP threads are each max(1, cpu_count // N); with N = 1 the library defaults are kept, as in the frozen measurements",
+    "parity": "CLI rows equal the service's on the same images: reading where the service returns one, admitted, margin (6 decimals), reason_code; CLI-only gated readings are counted separately. Checked in WSL at 1 and 4 workers.",
+    "timing": "inside the container: 8000 images made by cycling the 939 permitted S_dev + S_ctl images in a fixed order, at 1, 2 and 4 workers; wall time, images per second, and peak memory (the container's cgroup memory.peak). If a run cannot finish, the images completed and the elapsed time are reported and the 8000 figure is extrapolated and labelled as such."
+  },
+
+  "latency": "100 S_dev images (the first 100 of development_pool() order), single worker, inside the container, sequential HTTP requests after /ready; p50 and p95 of the server's processing_ms and of the client round trip",
+
+  "tests": {
+    "T1_contract": "every endpoint and status code (200, 400, 401, 413, 422, 503, 500), reason_code included, and /openapi.json compared field by field against the contract",
+    "T2_golden_parity": "parity above, E_wsl and E_container",
+    "T3_fixes_effect": "fixes_effect above",
+    "T4_cli_parity": "cli.parity above",
+    "T5_isolation": "pipeline.P6_isolation",
+    "T6_log_privacy": "an allowlist of log fields; a test that fails on any run of 14 ASCII or Arabic-Indic digits in the captured logs; the container's logs after the parity run are scanned the same way",
+    "T7_latency": "latency above"
+  },
+
+  "image_scan": "after the build: the image's full file list (docker export), every file scanned for image magic bytes (JPEG, PNG, GIF, WebP, BMP, TIFF, HEIF/AVIF, PDF) and for runs of 14 ASCII or Arabic-Indic digits. Findings inside /app must be zero, except the golden fixture file, which is named and hash-checked. Findings in third-party and system paths are listed by path and type, and every 14-digit run found is checked against the real-ID lookups (tier 1) and for structural validity.",
+
+  "verification": {
+    "stats_review": "the stats-reviewer subagent checks the parity methodology and the report",
+    "security_review": "a fresh-context subagent reviews security and privacy, including the image-contents scan",
+    "every_commit": "the full suite, the privacy scan (no skips) and scripts/phase4_service.py check pass"
+  },
+
+  "decision_token": "SERVICE_READY when every stage is complete and every gate above passes; otherwise SERVICE_PARTIAL:<last completed stage>",
+
+  "amendments": [
+    {
+      "amendment": 1,
+      "utc": "2026-09-28",
+      "why": "Written before the image exists and before any scan result. Two parts of `image_scan` needed a method that can be checked mechanically, and one part would have read the label lookup, which holds the locked audit's labels.",
+      "S1_third_party_provenance": "the tier-1 comparison of third-party 14-digit runs against the real-ID lookup is replaced: every file under the image's site-packages is checked against its distribution's RECORD sha256, so a third-party file is shown to be byte-identical to the published wheel it came from, and none can carry project data. Files that no RECORD hashes (bytecode, RECORD itself, INSTALLER) and every mismatch are listed; the only expected mismatches are the cv2/ files that the headless OpenCV reinstall overwrote (D-046), and those must match the headless RECORD. The lookup is not read.",
+      "S2_app_findings": "a 14-digit run inside /app is allowed only when it lies inside a 40- or 64-character hex hash, or inside a decimal literal of a model file whose sha256 is in docker/model_files.sha256. Measured on the files before the build: the two Paddle recognition graphs (inference.json) hold 29 and 81 runs, all inside decimal literals; docker/model_files.sha256 holds 2 and src/geometry/doccornernet.py 1, all inside hex hashes; the golden fixture holds none. Any other run in /app, and any image-format or PDF file in /app, fails the scan.",
+      "S3_image_formats_elsewhere": "image-format and PDF files outside /app are listed by path; each must be RECORD-verified third-party content (S1) or part of the base image's system files",
+      "S4_fonts": "every font file in the image (TrueType, OpenType, WOFF) is listed, and one whose name table names Microsoft fails the scan",
+      "S5_build_context": "the image is built from `git archive HEAD` plus the model files named in docker/model_files.sha256, copied with symlinks and junctions resolved and hash-verified before the build (scripts/phase4_service_docker.sh). The lock carries exact pins without hashes (D-047)."
+    },
+    {
+      "amendment": 2,
+      "utc": "2026-09-28",
+      "why": "Written after the WSL service rows existed and before any parity or fix-effect number was computed from them. The only thing looked at was each response's HTTP status: 961 of 966 staged uploads answered 200, 4 answered 413 and 1 answered 400. The rule did not say how an in-scope card is counted when the contract itself refuses its upload.",
+      "T1_size_limit": "a staged file over the contract's 10 MB image limit gets 413 by design; the pipeline never runs, so there is no reading to compare. Such cards are reported as their own category, 'refused by the contract's 10 MB limit', with the check that each one answered exactly 413 for both typed IDs. They are not parity mismatches and are not counted in scope. The CLI has no upload limit, so for these cards its reading is compared with the frozen reference directly.",
+      "T2_undecodable": "an upload that answers 400 is compared with the frozen reference's admission status: the frozen pipeline must also have failed to decode it (corrupt_image); otherwise it is a mismatch",
+      "T3_fixes_effect": "in fixes_effect, a card refused by the 10 MB limit counts as not admitted by the service; this is reported beside the fix counts, so a loss caused by the limit is never attributed to a fix"
+    },
+    {
+      "amendment": 3,
+      "utc": "2026-09-28",
+      "why": "The stats-reviewer's first pass on the WSL results (FAIL, 7 gaps). Written after the WSL parity and fix-effect numbers existed and before any container or latency number. Nothing here changes a threshold or a set; it tightens checks and fixes their reference.",
+      "U1_decision_reference": "the expected decision in parity is computed by the sealed scripts/phase2m_h.route() mapped to the contract's names, as `parity.reference` already declares. The first computation used the service's own decider, which could not detect a defect in it.",
+      "U2_fixes_off_in_scope": "where the rows record the recognition (WSL), an in-scope card also requires that no fix fired and that the service's own first pass equals the frozen reference (admitted, reading, margin within 1e-9). For S_orig, whose bytes differ from the reference's ingest image, it requires only that no fix fired. The first pass is also compared with the reference on every recorded S_dev and S_ctl row (status for cards not admitted). Container rows over HTTP record no recognition, so this part is WSL-only.",
+      "U3_latency_selection": "the 100 latency samples are the first 100 S_dev files in development_pool() order that answer 200; a file refused by the 10 MB limit or undecodable is skipped and counted, because it measures no inference",
+      "U4_reporting": "the fixes' effect reports recovered-but-wrong readings for F1v and F8 with the honest applicant's decision, splits newly exact reads by label source (Phase 2L-A target or the D-019 extraction), reports the sign test over all causes and over losses other than the 10 MB limit, unrounded, and states that the controls are not a hold-out. The stage-1 bank cross-check, the staging counts, the refused files' sizes and the WSL CLI timings are computed into reports/phase4_service_parity.json."
+    },
+    {
+      "amendment": 4,
+      "utc": "2026-09-28",
+      "why": "The fresh-context security review failed the image scanner (M2) and found that uploads could exhaust memory (M1). Written before the image was built with these changes and before any scan result existed. No parity, fix-effect, latency or timing number is affected: the pixel cap refuses none of the 966 staged files (largest 52.1 MP).",
+      "V1_scan_every_layer": "the scan reads `docker save` (every layer, so a file deleted in a later layer is still scanned, plus the image config and history) as well as `docker export` (the merged filesystem, for the listing and provenance). The config and history must hold no secret-like variable, no API key value and no 14-digit run; no layer may hold a pip or root cache.",
+      "V2_sequences": "14-digit sequences are searched as ASCII runs (every 14-digit window), ASCII split by single separators or commas, Arabic-Indic and Persian digits in UTF-8, UTF-16 and UTF-32, lists of 14 integers 0-9 in JSON, integer arrays with a last axis of 14 digits and string arrays in .npy, and inside .npz, zip and gzip members. In /app a structurally valid sequence fails unless amendment 1 S2 allows it (ASCII inside a hex hash, or a decimal literal of a hash-pinned model file); a structurally impossible sequence cannot be a national ID and is counted, not failed. Outside /app, structurally valid sequences are listed by path and count.",
+      "V3_images": "image formats: JPEG, PNG, GIF, WebP, BMP, TIFF, HEIF and AVIF brands, JPEG 2000, JPEG XL, PSD, OpenEXR, PDF (a header in the first KB), SVG, and ICO/PNM/TGA/XCF by extension, also inside zip, npz and gzip members. Any in /app fails.",
+      "V4_fonts": "fonts are identified by magic and by extension; the name table (TrueType, OpenType, collections, WOFF) and the OS/2 vendor are read; a Microsoft family, copyright, manufacturer or vendor fails, and so does a font whose names cannot be read",
+      "V5_provenance": "site-packages: every file must be covered by a RECORD (bytecode aside) and match it (except the OpenCV files the headless reinstall replaced, which must match the headless RECORD), and must equal the same file in the independently built service venv (~/venvs/ocrid-service-py3119), dist-info metadata aside. Outside /app and site-packages: a file that holds an image, a font or a structurally valid sequence, in any layer, must be the base image's file or match dpkg's md5sums, and must not be deleted in a later layer.",
+      "V6_pixel_cap": "D-051: the service refuses, with 413, an upload that would decode to more than 60 megapixels (header only, before decoding); the CLI has no cap by default"
+    },
+    {
+      "amendment": 5,
+      "utc": "2026-09-29",
+      "why": "The instrument-validator failed the rebuilt scanner (INSTRUMENT_FAIL) on synthetic ground truth and on the real /app-bound files. Written before any image-scan result exists: the image is still building.",
+      "W1_layers_all_opened": "the scan fails unless it found the image config and opened exactly as many layers as config.rootfs.diff_ids lists, and unless every file of the merged filesystem appears, with the same sha256, at the same path in some scanned layer; the only exceptions are the files the container runtime writes on create (.dockerenv, etc/hostname, etc/hosts, etc/resolv.conf), each under 4 KB",
+      "W2_numeric_arrays": "the bytes of a numeric .npy array (a member of .npz included) are not searched as text: pixel values 48-57 read as ASCII digits, and the golden fixture's synthetic bands produced 24 false 'IDs'. A numeric array is searched as numbers instead: rows along a last axis of 14 digits, 1-D digit vectors (every 14-window when all values are 0-9), and integer values of exactly 14 digits. The .npy header is still searched as text; string arrays are searched as text.",
+      "W3_separated_runs": "separated digits are matched as maximal runs of single digits joined by one consistent separator (space, comma, comma-space, semicolon, pipe, tab, hyphen, dot, slash, colon), in the raw bytes whether or not the file is UTF-8, and every 14-digit window is tested",
+      "W4_config": "the config and history are searched after decoding to text without escaping, with every 14-digit window tested for structural validity; a sequence inside a 40- or 64-character hex token (a layer digest) is not an ID. A structurally valid sequence, a secret-like variable or an API key value fails.",
+      "W5_pinned_by_hash": "the decimal-literal exemption of amendment 1 S2 applies only when the file's sha256 equals the value docker/model_files.sha256 gives for its path",
+      "W6_anchor": "a site-packages file absent from the anchor venv fails, bytecode aside, and so does a difference in a RECORD's rows (path and hash), compared distribution by distribution with the anchor's RECORD, leaving out bytecode rows, rows outside site-packages (..), and the installer's own files (INSTALLER, REQUESTED, RECORD, direct_url.json)",
+      "W7_whiteouts_and_fonts": "whiteout markers (.wh.*) are counted, not inspected; every font of a TrueType collection is read; Microsoft family names are matched as whole words (Georgia is not Noto Sans Georgian); a WOFF2 font still fails as unreadable",
+      "W8_revalidation": "the corrected scanner goes back to the instrument-validator before its result on the image is used"
+    },
+    {
+      "amendment": 6,
+      "utc": "2026-09-29",
+      "why": "The instrument-validator's second pass on the amendment-5 scanner: INSTRUMENT_FAIL on a narrow point. Eight earlier defects fixed; 52/52 planted positives found; 0 inversions in 17,013 planting pairs; 0 failures on the real /app content. But the W2 rewrite skipped object, structured and trailing .npy content silently, float rows were not checked as W2 states, and a repeated diff_id failed closed. None can change this image's result (its only .npy data are the golden fixture's five numeric members, with no trailing bytes).",
+      "X1_non_numeric_arrays": "string, object (pickled) and structured .npy arrays have their body searched as text",
+      "X2_trailing_bytes": "bytes after a numeric array's body (beyond product(shape) x itemsize) are searched as text",
+      "X3_repeated_layers": "the opened-layer count is compared with the number of distinct diff_ids, since identical layers are stored once",
+      "X4_float_rows": "the rows-of-14 and digit-vector rules apply to float arrays whose values are all whole numbers, as W2 states for numeric arrays",
+      "X5_a_scan_before_validation": "a scan of the image at 4578407 was computed while the second validation was still running. Its result was not read and is not used: it is overwritten by the scan run after this amendment and the third validation."
+    },
+    {
+      "amendment": 7,
+      "utc": "2026-09-29",
+      "why": "The instrument-validator's third pass: 52/52 planted positives, 0 inversions in 17,013 planting pairs, 0 failures on the real /app content, and the real anchor venv matching the built image (39,664 files against 39,663; RECORD rows equal for all 99 distributions). It found one certain false positive in the real image and one gap in the layer check. Written before any image-scan result is read.",
+      "Y1_base_files_in_site_packages": "a site-packages file byte-identical to the base image's own file at the same path is the base image's (the provenance V5 already accepts for system files): it needs no RECORD and no anchor copy. The one such file in this image is CPython's 119-byte site-packages/README.txt.",
+      "Y2_listed_layers_opened": "each layer blob is read as a stream (decompressed if gzip) and the sha256 of its uncompressed tar is its diff_id; the scan fails unless every distinct diff_id the config lists is the digest of a layer that was opened and scanned. An extra tar blob can no longer stand in for a listed layer.",
+      "Y3_revalidation": "the scan result is used after a focused fourth validation of Y1 and Y2"
+    },
+    {
+      "amendment": 8,
+      "utc": "2026-09-29",
+      "why": "The stats-reviewer's second pass (FAIL, 7 gaps). Written after the WSL results, both container parity runs and the first latency run existed, and before any 8000-image timing number: the timing sequence that had started was stopped and its partial output discarded.",
+      "Z1_container_gate": "E_container, the environment the parity gate uses, is the shipped image fixed14-ocr-service:fixed14-bcfinal-3101-ce10649 with its own defaults. The first container run (image ...-4578407 on the library thread defaults, on a loaded host) FAILED the parity gate: 5 in-scope non-answers (500 and 503 under timeouts) and 0 wrong answers; it is reported as a failed run. D-053, the change of thread defaults, was committed (ce10649, 02:39:55 +03:00) after run 1's rows existed (02:33) and before run 2's rows existed (03:09). The thread settings change no reading (CLI at 1 and 4 workers, the D-053 A/B, run 2 against WSL).",
+      "Z2_cli_in_the_container": "the CLI inside the image inherits OMP_WAIT_POLICY=PASSIVE (D-053). Its thread counts follow `cli.workers`: at 1 worker the TensorFlow, Paddle and OpenCV counts are the library defaults; at N > 1 they are cpu_count // N. OCR_CPU_THREADS applies to the service only.",
+      "Z3_cli_parity_for_the_shipped_cli": "the CLI shipped in the image (ce10649) is compared with the container service rows of the same image, at 4 workers, on the same 966 files; the WSL CLI comparison (an earlier commit of the CLI) is reported beside it",
+      "Z4_latency": "latency is measured again on the shipped image, with each request's processing time, its position, whether it was one of the 20 images the D-053 A/B used, and its fixes (from the container's allowlisted log lines). The report gives the 100-image figures and, separately, the 80 images outside the A/B. The first latency run is reported beside it.",
+      "Z5_run1_against_wsl": "every container run is compared with the WSL rows field by field over the files where both requests answered, and the typo request's status counts are reported"
+    },
+    {
+      "amendment": 9,
+      "utc": "2026-09-29",
+      "why": "WRITTEN AFTER READING A SCAN RESULT, and said so. The validated scanner (amendment 7, INSTRUMENT_PASS) scanned the measured image ce10649 and returned FAIL with exactly 2 findings, neither of them data: (1) `dev/console`, a 0-byte file the container runtime creates on `docker create` (like etc/hosts, which W1 already exempts), not held by any layer; (2) `numpy/distutils/__pycache__/conv_template.cpython-311.pyc`, whose bytes differ from the hash pip recorded, while its code object is structurally identical to a fresh compile of its RECORD-verified source (checked inside the image: bytecode, constants, names and file name, recursively). Every other check passed. The two exceptions below are narrow and each is checked, not assumed; the amended scanner goes back to the instrument-validator and the full scan is run again, and only that run's verdict is used. The first run's verdict (FAIL, 2 findings) is reported.",
+      "AA1_dev_console": "`dev/console` joins the runtime-created files W1 allows, on the same condition: present in the merged filesystem only, under 4 KB (it is 0 bytes).",
+      "AA2_regenerated_bytecode": "a site-packages .pyc whose bytes differ from its RECORD hash is accepted only when the scanner proves, in the scanning Python (3.11, the image's version), that its code object equals, structurally and recursively (co_code, constants, names, variable names, name, argument count, flags, file name), a compile of its source .py, and that source matches its own RECORD hash. Otherwise it fails as before. Its content was scanned like every other file, in every layer."
+    },
+    {
+      "amendment": 10,
+      "utc": "2026-09-29",
+      "why": "A tightening, after the security recheck (PASS, one LOW). pip writes .pyc rows in RECORD without a hash, so within the scanner's own verdict a RECORD-listed .pyc was covered by content scanning only (amendment 1's 'bytecode aside'). For ce10649 that channel was shown empty by two independent checks outside the verdict (13,375 of 13,375 compile back), but a rescan of a rebuilt image would not check it. The scan of run 2 (amendment 9) stays the verdict for ce10649; this amendment can only add failures. It is validated again before use, and run on ce10649 as run 3 to show it does not fail the measured image.",
+      "AB1_all_bytecode": "every site-packages .pyc that RECORD gives no hash, or no row, fails unless its code object equals a compile of its RECORD-verified source (the AA2 check: this interpreter's magic, the code object ending the file, recursive structural equality). A .pyc byte-identical to the base image's file at the same path is the base's (amendment 7 Y1).",
+      "AB2_provenance": "the summary records the image reference, the image ID and the pinned base reference the scan was run on."
+    },
+    {
+      "amendment": 11,
+      "utc": "2026-09-29",
+      "why": "The instrument-validator's check of amendment 10 (INSTRUMENT_FAIL) found a gap present since aac2ab4: site-packages provenance (RECORD, AB1, the anchor) was checked on the merged filesystem only, so a site-packages file, or a hash-less .pyc, that a later layer deletes or overwrites passed (its cases H11, Y05, S01, S02). AB1's 'every site-packages .pyc' was therefore not what the code checked. The scan run started on ed5eacc's scanner (run 3) was stopped after about 4 minutes, before it wrote any output, and is not used. Run 2 stays the verdict for ce10649; this amendment, like amendment 10, can only add failures, is validated again before use, and is run on ce10649 to show whether it fails the measured image.",
+      "AB3_layer_versions": "every version of a site-packages file in any layer must be byte-equal to the image's final file at that path (which RECORD, AB1 and the anchor check) or to the base image's file at that path; any other version fails."
+    }
+  ]
+}

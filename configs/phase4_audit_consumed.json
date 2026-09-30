@@ -1,0 +1,24 @@
+{
+  "audit_manifest_sha256_lf": "35180908b2732889d39eaf6f79b732a03429191a2f742c2d2ec41ae5f10f15be",
+  "audit_rule_sha256_lf": "f35a670f80c0cefe65267b92f0cc7904760870939de944ac86d06cd5941d9a06",
+  "decision": "AUDIT_PASS",
+  "environment": "WSL2 Ubuntu 26.04.1, ~/venvs/ocrid-py3119, run by the owner in her own terminal (amendment 7h)",
+  "git_head_of_the_read": "0098b99ec7226eedbcedfa7772d841946a46740c",
+  "ledger_audit_card_events": {
+    "setup_check_2026_09_21": 1,
+    "the_read": 377,
+    "total": 378
+  },
+  "never_read_again": "the read markers and the ledger check both refuse a second read (refuse_if_already_read: already_read:read_started.json; refuse_if_the_ledger_shows_a_read: 378 events), verified 2026-09-27",
+  "no_clean_set_remains": "D-001: the verdict binds under these criteria only; there is no clean set left to test different ones",
+  "phase2m_h_rule_sha256_lf": "99a0a6142734ff932c906bdf71514b5cf957e4f852dc66ab063e54e557e48e03",
+  "read_once": true,
+  "read_started_utc": "2026-09-27T18:55:41+00:00",
+  "records": 377,
+  "schema_version": "phase4_audit_consumed_v1",
+  "sealed_predictions_sha256": "172e45e3a285b63e4edd5ec3dbdea90586a8aadc7deadb7f859da469613899d0",
+  "status": "CONSUMED",
+  "use_for_selection_forbidden": true,
+  "utc_finished": "2026-09-27T18:59:42+00:00",
+  "verdict_sha256": "47688e973978e2304d44ce9e695a54a74f1a8e00a3294a4cca81de1ca3281779"
+}

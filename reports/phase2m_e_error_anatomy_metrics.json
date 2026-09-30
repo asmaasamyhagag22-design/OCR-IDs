@@ -1,0 +1,3132 @@
+{
+  "access": {
+    "consumed_internal_validation_reads": 0,
+    "external_test_label_band_or_prediction_reads": 0,
+    "external_test_meta_structural_reads": 5,
+    "external_train_reads": 8684,
+    "external_validation_reads": 4926,
+    "ledger": "artifacts/phase2m_e/access_ledger.json",
+    "ledger_choice": "a new Phase 2M-E ledger, separate from the Phase 2M-C one",
+    "locked_audit_reads": 0,
+    "totals": {
+      "external_test:meta_structural_only": 5,
+      "external_train:annotation": 8676,
+      "external_train:materialized_bands": 1,
+      "external_train:materialized_labels": 4,
+      "external_train:materialized_meta": 3,
+      "external_validation:annotation": 4893,
+      "external_validation:image": 24,
+      "external_validation:materialized_bands": 4,
+      "external_validation:materialized_labels": 2,
+      "external_validation:materialized_meta": 3
+    }
+  },
+  "addendum": {
+    "anchor_error_decomposition_and_realized_advantage": {
+      "decomposition": {
+        "centre_error_pitch_pctl_10_50_90": [
+          -0.036824,
+          0.091729,
+          0.192668
+        ],
+        "identity": "anchor - own digit centre, in pitches = centre error + width error x unit_k - fixed layout pattern - per-record remainder",
+        "inter_digit_gaps_pitch": [
+          1.16599,
+          0.844692,
+          1.202637,
+          0.817998,
+          1.212619,
+          0.819236,
+          1.219106,
+          0.821141,
+          1.231893,
+          0.809274,
+          0.816824,
+          1.1966,
+          0.818519
+        ],
+        "max_reconstruction_error_pitch": 2e-06,
+        "mean_abs_by_term_pitch": {
+          "centre_error": 0.113705,
+          "layout_pattern": 0.099779,
+          "per_record_remainder": 0.025444,
+          "total_displacement": 0.152438,
+          "width_error_times_unit": 0.028052
+        },
+        "per_slot": [
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 2.541564,
+            "errors_all": 2,
+            "errors_collision": 0,
+            "errors_shift": 0,
+            "errors_substitution": 2,
+            "label_entropy_nats": 0.0,
+            "layout_pattern_term": 0.120711,
+            "mean_abs_displacement_pitch": 0.213854,
+            "mean_displacement_pitch": 0.196425,
+            "mean_local_gap_pitch": 1.16599,
+            "remainder_term_mean_abs": 0.033871,
+            "slot": 1,
+            "width_error_term": -0.002346
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 3.706346,
+            "errors_all": 0,
+            "errors_collision": 0,
+            "errors_shift": 0,
+            "errors_substitution": 0,
+            "label_entropy_nats": 0.952192,
+            "layout_pattern_term": -0.045279,
+            "mean_abs_displacement_pitch": 0.099211,
+            "mean_displacement_pitch": 0.030796,
+            "mean_local_gap_pitch": 1.005341,
+            "remainder_term_mean_abs": 0.02333,
+            "slot": 2,
+            "width_error_term": -0.001985
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 4.550119,
+            "errors_all": 4,
+            "errors_collision": 3,
+            "errors_shift": 0,
+            "errors_substitution": 1,
+            "label_entropy_nats": 1.435323,
+            "layout_pattern_term": 0.110029,
+            "mean_abs_displacement_pitch": 0.205027,
+            "mean_displacement_pitch": 0.186465,
+            "mean_local_gap_pitch": 1.023664,
+            "remainder_term_mean_abs": 0.02091,
+            "slot": 3,
+            "width_error_term": -0.001624
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 5.751556,
+            "errors_all": 4,
+            "errors_collision": 2,
+            "errors_shift": 0,
+            "errors_substitution": 2,
+            "label_entropy_nats": 0.541172,
+            "layout_pattern_term": -0.092608,
+            "mean_abs_displacement_pitch": 0.088413,
+            "mean_displacement_pitch": -0.015811,
+            "mean_local_gap_pitch": 1.010318,
+            "remainder_term_mean_abs": 0.016901,
+            "slot": 4,
+            "width_error_term": -0.001263
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 6.5687,
+            "errors_all": 5,
+            "errors_collision": 0,
+            "errors_shift": 3,
+            "errors_substitution": 2,
+            "label_entropy_nats": 2.129379,
+            "layout_pattern_term": 0.089394,
+            "mean_abs_displacement_pitch": 0.188209,
+            "mean_displacement_pitch": 0.166552,
+            "mean_local_gap_pitch": 1.015309,
+            "remainder_term_mean_abs": 0.021449,
+            "slot": 5,
+            "width_error_term": -0.000902
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 7.780091,
+            "errors_all": 4,
+            "errors_collision": 1,
+            "errors_shift": 3,
+            "errors_substitution": 0,
+            "label_entropy_nats": 1.187722,
+            "layout_pattern_term": -0.123225,
+            "mean_abs_displacement_pitch": 0.091156,
+            "mean_displacement_pitch": -0.045706,
+            "mean_local_gap_pitch": 1.015927,
+            "remainder_term_mean_abs": 0.023354,
+            "slot": 6,
+            "width_error_term": -0.000541
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 7.805026,
+            "errors_all": 6,
+            "errors_collision": 0,
+            "errors_shift": 4,
+            "errors_substitution": 2,
+            "label_entropy_nats": 2.259918,
+            "layout_pattern_term": 0.057539,
+            "mean_abs_displacement_pitch": 0.162553,
+            "mean_displacement_pitch": 0.135418,
+            "mean_local_gap_pitch": 1.019171,
+            "remainder_term_mean_abs": 0.027887,
+            "slot": 7,
+            "width_error_term": -0.00018
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 6.587138,
+            "errors_all": 5,
+            "errors_collision": 1,
+            "errors_shift": 4,
+            "errors_substitution": 0,
+            "label_entropy_nats": 0.094409,
+            "layout_pattern_term": -0.161567,
+            "mean_abs_displacement_pitch": 0.107441,
+            "mean_displacement_pitch": -0.083326,
+            "mean_local_gap_pitch": 1.020123,
+            "remainder_term_mean_abs": 0.025977,
+            "slot": 8,
+            "width_error_term": 0.00018
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 5.76685,
+            "errors_all": 0,
+            "errors_collision": 0,
+            "errors_shift": 0,
+            "errors_substitution": 0,
+            "label_entropy_nats": 0.317345,
+            "layout_pattern_term": 0.017293,
+            "mean_abs_displacement_pitch": 0.132787,
+            "mean_displacement_pitch": 0.095894,
+            "mean_local_gap_pitch": 1.026517,
+            "remainder_term_mean_abs": 0.026137,
+            "slot": 9,
+            "width_error_term": 0.000541
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 4.536198,
+            "errors_all": 2,
+            "errors_collision": 0,
+            "errors_shift": 0,
+            "errors_substitution": 2,
+            "label_entropy_nats": 0.098301,
+            "layout_pattern_term": -0.2146,
+            "mean_abs_displacement_pitch": 0.142989,
+            "mean_displacement_pitch": -0.135638,
+            "mean_local_gap_pitch": 1.020583,
+            "remainder_term_mean_abs": 0.022378,
+            "slot": 10,
+            "width_error_term": 0.000902
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 3.727777,
+            "errors_all": 14,
+            "errors_collision": 11,
+            "errors_shift": 0,
+            "errors_substitution": 3,
+            "label_entropy_nats": 1.345539,
+            "layout_pattern_term": -0.023874,
+            "mean_abs_displacement_pitch": 0.107422,
+            "mean_displacement_pitch": 0.05545,
+            "mean_local_gap_pitch": 0.813049,
+            "remainder_term_mean_abs": 0.021266,
+            "slot": 11,
+            "width_error_term": 0.001263
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 2.911815,
+            "errors_all": 1,
+            "errors_collision": 1,
+            "errors_shift": 0,
+            "errors_substitution": 0,
+            "label_entropy_nats": 2.29152,
+            "layout_pattern_term": 0.159302,
+            "mean_abs_displacement_pitch": 0.253473,
+            "mean_displacement_pitch": 0.238987,
+            "mean_local_gap_pitch": 1.006712,
+            "remainder_term_mean_abs": 0.020631,
+            "slot": 12,
+            "width_error_term": 0.001624
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 1.716387,
+            "errors_all": 8,
+            "errors_collision": 1,
+            "errors_shift": 2,
+            "errors_substitution": 5,
+            "label_entropy_nats": 2.293957,
+            "layout_pattern_term": -0.037298,
+            "mean_abs_displacement_pitch": 0.103876,
+            "mean_displacement_pitch": 0.042747,
+            "mean_local_gap_pitch": 1.00756,
+            "remainder_term_mean_abs": 0.029713,
+            "slot": 13,
+            "width_error_term": 0.001985
+          },
+          {
+            "centre_error_term": 0.07806,
+            "distance_to_tensor_edge_pitch": 0.898812,
+            "errors_all": 19,
+            "errors_collision": 6,
+            "errors_shift": 2,
+            "errors_substitution": 11,
+            "label_entropy_nats": 2.157284,
+            "layout_pattern_term": 0.144183,
+            "mean_abs_displacement_pitch": 0.237727,
+            "mean_displacement_pitch": 0.22459,
+            "mean_local_gap_pitch": 0.818519,
+            "remainder_term_mean_abs": 0.042408,
+            "slot": 14,
+            "width_error_term": 0.002346
+          }
+        ],
+        "width_error_pitch_pctl_10_50_90": [
+          -0.170421,
+          0.011187,
+          0.178546
+        ]
+      },
+      "global_versus_local_anchor_error": {
+        "by_error_kind": {
+          "collision": {
+            "abs_anchor_displacement_pitch_median_p90": [
+              0.327581,
+              0.693316
+            ],
+            "positions": 26,
+            "share_displaced_more_than_half_a_pitch": 0.346154
+          },
+          "ok": {
+            "abs_anchor_displacement_pitch_median_p90": [
+              0.131326,
+              0.300352
+            ],
+            "positions": 8984,
+            "share_displaced_more_than_half_a_pitch": 0.006567
+          },
+          "shift": {
+            "abs_anchor_displacement_pitch_median_p90": [
+              0.631713,
+              0.777238
+            ],
+            "positions": 18,
+            "share_displaced_more_than_half_a_pitch": 0.833333
+          },
+          "substitution": {
+            "abs_anchor_displacement_pitch_median_p90": [
+              0.107143,
+              0.329234
+            ],
+            "positions": 30,
+            "share_displaced_more_than_half_a_pitch": 0.033333
+          }
+        },
+        "by_record": {
+          "exact_records": {
+            "abs_centre_error_pitch_p90": 0.198078,
+            "abs_width_error_pitch_p90": 0.232168,
+            "mean_centre_error_pitch": 0.090113,
+            "mean_width_error_pitch": 0.000899,
+            "records": 607
+          },
+          "records_containing_a_collision": {
+            "abs_centre_error_pitch_p90": 0.56799,
+            "abs_width_error_pitch_p90": 0.297859,
+            "mean_centre_error_pitch": -0.183205,
+            "mean_width_error_pitch": 0.036191,
+            "records": 18
+          },
+          "records_containing_a_shift": {
+            "abs_centre_error_pitch_p90": 0.579161,
+            "abs_width_error_pitch_p90": 0.245981,
+            "mean_centre_error_pitch": -0.541567,
+            "mean_width_error_pitch": -0.176398,
+            "records": 4
+          },
+          "records_whose_only_errors_are_substitutions": {
+            "abs_centre_error_pitch_p90": 0.240486,
+            "abs_width_error_pitch_p90": 0.387072,
+            "mean_centre_error_pitch": -0.040737,
+            "mean_width_error_pitch": 0.094224,
+            "records": 22
+          }
+        },
+        "question": "a wrong slot can be displaced on its own, or sit on a line whose two global degrees of freedom were estimated badly for the whole record"
+      },
+      "realized_advantage": {
+        "by_error_kind": {
+          "collision": {
+            "content_advantage_nats_pctl_10_50_90": [
+              -3.939627,
+              -0.272508,
+              0.690454
+            ],
+            "positions": 26,
+            "prior_advantage_nats_pctl_10_50_90": [
+              -2.355622,
+              1.225003,
+              4.482113
+            ],
+            "realized_content_swing_across_the_14_digit_columns_pctl_50_90_99": [
+              2.633546,
+              4.304508,
+              4.480238
+            ],
+            "share_where_content_overturns_the_prior": 0.153846,
+            "total_advantage_nats_pctl_10_50_90": [
+              -2.050482,
+              0.282939,
+              3.852606
+            ]
+          },
+          "shift": {
+            "content_advantage_nats_pctl_10_50_90": [
+              -1.849095,
+              0.069432,
+              0.567568
+            ],
+            "positions": 18,
+            "prior_advantage_nats_pctl_10_50_90": [
+              -2.281488,
+              -1.449632,
+              -0.548463
+            ],
+            "realized_content_swing_across_the_14_digit_columns_pctl_50_90_99": [
+              2.866472,
+              3.882831,
+              4.521364
+            ],
+            "share_where_content_overturns_the_prior": 0.0,
+            "total_advantage_nats_pctl_10_50_90": [
+              -3.494977,
+              -1.514265,
+              -0.691751
+            ]
+          },
+          "substitution": {
+            "content_advantage_nats_pctl_10_50_90": [
+              -3.591136,
+              -0.007841,
+              2.153601
+            ],
+            "positions": 30,
+            "prior_advantage_nats_pctl_10_50_90": [
+              3.000466,
+              5.764892,
+              9.286826
+            ],
+            "realized_content_swing_across_the_14_digit_columns_pctl_50_90_99": [
+              3.131403,
+              4.682611,
+              5.481792
+            ],
+            "share_where_content_overturns_the_prior": 0.0,
+            "total_advantage_nats_pctl_10_50_90": [
+              0.776881,
+              3.97516,
+              10.954533
+            ]
+          }
+        },
+        "by_outcome": {
+          "correct": {
+            "content_advantage_nats_pctl_10_50_90": [
+              -0.744298,
+              0.683327,
+              3.282364
+            ],
+            "positions": 8984,
+            "prior_advantage_nats_pctl_10_50_90": [
+              2.823923,
+              5.646827,
+              8.129006
+            ],
+            "realized_content_swing_across_the_14_digit_columns_pctl_50_90_99": [
+              3.028376,
+              4.757069,
+              5.567493
+            ],
+            "share_where_content_overturns_the_prior": 0.00167,
+            "total_advantage_nats_pctl_10_50_90": [
+              2.903834,
+              6.600494,
+              9.944431
+            ]
+          },
+          "wrong": {
+            "content_advantage_nats_pctl_10_50_90": [
+              -3.553548,
+              0.000642,
+              1.10111
+            ],
+            "positions": 74,
+            "prior_advantage_nats_pctl_10_50_90": [
+              -2.043596,
+              2.822073,
+              8.362487
+            ],
+            "realized_content_swing_across_the_14_digit_columns_pctl_50_90_99": [
+              2.914492,
+              4.425829,
+              5.272721
+            ],
+            "share_where_content_overturns_the_prior": 0.054054,
+            "total_advantage_nats_pctl_10_50_90": [
+              -2.016303,
+              0.824375,
+              8.661594
+            ]
+          }
+        },
+        "cap": 3.0,
+        "competitor": "the adjacent true digit toward which the anchor is displaced",
+        "theoretical_content_swing_nats": 6.0
+      },
+      "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT",
+      "what_carries_the_end_of_line_concentration": {
+        "collision_errors_in_slots_11_to_14": 19,
+        "context_asymmetry": {
+          "context_policy": "0.16 of the line length on the left, 0.04 on the right",
+          "left_band_edge_outside_the_source_image": 4,
+          "left_edge_margin_px_pctl_5_50": [
+            32.78509,
+            51.000124
+          ],
+          "records": 647,
+          "right_band_edge_outside_the_source_image": 194,
+          "right_edge_margin_px_pctl_5_50": [
+            -13.461693,
+            5.433435
+          ]
+        },
+        "correlations_across_the_14_slots": {
+          "abs_layout_pattern": {
+            "all_wrong": -0.067903,
+            "collision": -0.197555,
+            "shift": 0.06486,
+            "substitution": 0.049286
+          },
+          "abs_unit_k_symmetric_width_term": {
+            "all_wrong": 0.249136,
+            "collision": 0.226447,
+            "shift": -0.520581,
+            "substitution": 0.505722
+          },
+          "distance_to_tensor_edge": {
+            "all_wrong": -0.381336,
+            "collision": -0.339744,
+            "shift": 0.48509,
+            "substitution": -0.607228
+          },
+          "label_entropy": {
+            "all_wrong": 0.440747,
+            "collision": 0.199043,
+            "shift": 0.328075,
+            "substitution": 0.410799
+          },
+          "mean_abs_displacement": {
+            "all_wrong": 0.132503,
+            "collision": -0.003244,
+            "shift": -0.116524,
+            "substitution": 0.3106
+          },
+          "mean_abs_remainder": {
+            "all_wrong": 0.530242,
+            "collision": 0.08746,
+            "shift": 0.260346,
+            "substitution": 0.730499
+          },
+          "mean_local_gap": {
+            "all_wrong": -0.819595,
+            "collision": -0.836795,
+            "shift": -0.030657,
+            "substitution": -0.59252
+          },
+          "slot_index": {
+            "all_wrong": 0.556228,
+            "collision": 0.390266,
+            "shift": 0.134755,
+            "substitution": 0.526907
+          }
+        },
+        "error_rate_slots_11_to_14": 0.016229,
+        "error_rate_slots_1_to_10": 0.004946,
+        "shift_errors_in_slots_11_to_14": 4,
+        "shift_errors_total": 18,
+        "slot_1_vs_slot_14": {
+          "distance_to_tensor_edge_pitch": [
+            2.541564,
+            0.898812
+          ],
+          "errors": [
+            2,
+            19
+          ],
+          "symmetric_width_term_pitch": [
+            -0.002346,
+            0.002346
+          ]
+        },
+        "substitution_errors_in_slots_11_to_14": 19,
+        "wrong_positions_in_slots_11_to_14": 42,
+        "wrong_positions_total": 74
+      }
+    },
+    "card_level_views_and_shift_sweep": {
+      "baseline_primary_single_view": {
+        "all_copies": 269,
+        "cards": 293,
+        "majority_vote": 275,
+        "record_exact": 607
+      },
+      "sampling_phase": {
+        "grid_aligned_card_exact_mean": 268.0,
+        "grid_aligned_record_exact": [
+          604,
+          608,
+          607,
+          608,
+          607
+        ],
+        "grid_aligned_record_exact_mean": 606.8,
+        "grid_aligned_shifts_px": [
+          -8,
+          -4,
+          0,
+          4,
+          8
+        ],
+        "phase_changing_card_exact_mean": 270.75,
+        "phase_changing_record_exact": [
+          612,
+          610,
+          612,
+          612,
+          610,
+          612,
+          613,
+          611
+        ],
+        "phase_changing_record_exact_mean": 611.5,
+        "phase_changing_shifts_px": [
+          -6,
+          -3,
+          -2,
+          -1,
+          1,
+          2,
+          3,
+          6
+        ],
+        "separation": "if a shift helped by moving the line, the gain would follow the shift direction and magnitude; if it helps by changing the sampling phase, the split is between grid-aligned and phase-changing shifts regardless of sign"
+      },
+      "shift_sweep": [
+        {
+          "card_all_copies_exact": 264,
+          "card_sign_test_two_sided_p": 0.179688,
+          "is_an_exact_feature_grid_translation": true,
+          "record_exact": 604,
+          "shift_px": -8
+        },
+        {
+          "card_all_copies_exact": 269,
+          "card_sign_test_two_sided_p": 1.0,
+          "is_an_exact_feature_grid_translation": false,
+          "record_exact": 612,
+          "shift_px": -6
+        },
+        {
+          "card_all_copies_exact": 269,
+          "card_sign_test_two_sided_p": 1.0,
+          "is_an_exact_feature_grid_translation": true,
+          "record_exact": 608,
+          "shift_px": -4
+        },
+        {
+          "card_all_copies_exact": 269,
+          "card_sign_test_two_sided_p": 1.0,
+          "is_an_exact_feature_grid_translation": false,
+          "record_exact": 610,
+          "shift_px": -3
+        },
+        {
+          "card_all_copies_exact": 271,
+          "card_sign_test_two_sided_p": 0.6875,
+          "is_an_exact_feature_grid_translation": false,
+          "record_exact": 612,
+          "shift_px": -2
+        },
+        {
+          "card_all_copies_exact": 272,
+          "card_sign_test_two_sided_p": 0.453125,
+          "is_an_exact_feature_grid_translation": false,
+          "record_exact": 612,
+          "shift_px": -1
+        },
+        {
+          "card_all_copies_exact": 269,
+          "card_sign_test_two_sided_p": 1.0,
+          "is_an_exact_feature_grid_translation": true,
+          "record_exact": 607,
+          "shift_px": 0
+        },
+        {
+          "card_all_copies_exact": 269,
+          "card_sign_test_two_sided_p": 1.0,
+          "is_an_exact_feature_grid_translation": false,
+          "record_exact": 610,
+          "shift_px": 1
+        },
+        {
+          "card_all_copies_exact": 272,
+          "card_sign_test_two_sided_p": 0.453125,
+          "is_an_exact_feature_grid_translation": false,
+          "record_exact": 612,
+          "shift_px": 2
+        },
+        {
+          "card_all_copies_exact": 273,
+          "card_sign_test_two_sided_p": 0.289062,
+          "is_an_exact_feature_grid_translation": false,
+          "record_exact": 613,
+          "shift_px": 3
+        },
+        {
+          "card_all_copies_exact": 269,
+          "card_sign_test_two_sided_p": 1.0,
+          "is_an_exact_feature_grid_translation": true,
+          "record_exact": 608,
+          "shift_px": 4
+        },
+        {
+          "card_all_copies_exact": 271,
+          "card_sign_test_two_sided_p": 0.726562,
+          "is_an_exact_feature_grid_translation": false,
+          "record_exact": 611,
+          "shift_px": 6
+        },
+        {
+          "card_all_copies_exact": 269,
+          "card_sign_test_two_sided_p": 1.0,
+          "is_an_exact_feature_grid_translation": true,
+          "record_exact": 607,
+          "shift_px": 8
+        }
+      ],
+      "shift_sweep_reading": {
+        "best_shift_px": 3,
+        "feature_stride": 4,
+        "monotone_in_shift": false,
+        "note": "every shift here is an integer translation, so nothing is interpolated; shifts that are multiples of 4 px leave the phase between the content and the stride-4 feature grid unchanged, and the others change it",
+        "range_of_record_exact": [
+          604,
+          613
+        ],
+        "record_exact_by_shift_px": {
+          "-1": 612,
+          "-2": 612,
+          "-3": 610,
+          "-4": 608,
+          "-6": 612,
+          "-8": 604,
+          "0": 607,
+          "1": 610,
+          "2": 612,
+          "3": 613,
+          "4": 608,
+          "6": 611,
+          "8": 607
+        }
+      },
+      "sign_test": "exact two-sided sign test on the discordant cards only; the unit is the card, so the copies of one card can no longer count as independent evidence",
+      "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT",
+      "views": {
+        "ensemble_B_pair": {
+          "card_all_copies_exact": 265,
+          "card_delta_vs_primary": -4,
+          "card_losses": 5,
+          "card_majority_vote_exact": 277,
+          "card_sign_test_two_sided_p": 0.21875,
+          "card_vote_losses": 1,
+          "card_vote_sign_test_two_sided_p": 0.625,
+          "card_vote_wins": 3,
+          "card_wins": 1,
+          "record_delta_vs_primary": -4,
+          "record_exact": 603
+        },
+        "ensemble_all_four": {
+          "card_all_copies_exact": 266,
+          "card_delta_vs_primary": -3,
+          "card_losses": 5,
+          "card_majority_vote_exact": 276,
+          "card_sign_test_two_sided_p": 0.453125,
+          "card_vote_losses": 1,
+          "card_vote_sign_test_two_sided_p": 1.0,
+          "card_vote_wins": 2,
+          "card_wins": 2,
+          "record_delta_vs_primary": -4,
+          "record_exact": 603
+        },
+        "primary_tta_rule_views": {
+          "card_all_copies_exact": 270,
+          "card_delta_vs_primary": 1,
+          "card_losses": 1,
+          "card_majority_vote_exact": 278,
+          "card_sign_test_two_sided_p": 1.0,
+          "card_vote_losses": 0,
+          "card_vote_sign_test_two_sided_p": 0.25,
+          "card_vote_wins": 3,
+          "card_wins": 2,
+          "record_delta_vs_primary": 2,
+          "record_exact": 609
+        },
+        "shift_+0px": {
+          "card_all_copies_exact": 269,
+          "card_delta_vs_primary": 0,
+          "card_losses": 0,
+          "card_majority_vote_exact": 275,
+          "card_sign_test_two_sided_p": 1.0,
+          "card_vote_losses": 0,
+          "card_vote_sign_test_two_sided_p": 1.0,
+          "card_vote_wins": 0,
+          "card_wins": 0,
+          "record_delta_vs_primary": 0,
+          "record_exact": 607
+        },
+        "shift_+1px": {
+          "card_all_copies_exact": 269,
+          "card_delta_vs_primary": 0,
+          "card_losses": 1,
+          "card_majority_vote_exact": 277,
+          "card_sign_test_two_sided_p": 1.0,
+          "card_vote_losses": 0,
+          "card_vote_sign_test_two_sided_p": 0.5,
+          "card_vote_wins": 2,
+          "card_wins": 1,
+          "record_delta_vs_primary": 3,
+          "record_exact": 610
+        },
+        "shift_+2px": {
+          "card_all_copies_exact": 272,
+          "card_delta_vs_primary": 3,
+          "card_losses": 2,
+          "card_majority_vote_exact": 279,
+          "card_sign_test_two_sided_p": 0.453125,
+          "card_vote_losses": 1,
+          "card_vote_sign_test_two_sided_p": 0.21875,
+          "card_vote_wins": 5,
+          "card_wins": 5,
+          "record_delta_vs_primary": 5,
+          "record_exact": 612
+        },
+        "shift_+3px": {
+          "card_all_copies_exact": 273,
+          "card_delta_vs_primary": 4,
+          "card_losses": 2,
+          "card_majority_vote_exact": 279,
+          "card_sign_test_two_sided_p": 0.289062,
+          "card_vote_losses": 1,
+          "card_vote_sign_test_two_sided_p": 0.21875,
+          "card_vote_wins": 5,
+          "card_wins": 6,
+          "record_delta_vs_primary": 6,
+          "record_exact": 613
+        },
+        "shift_+4px": {
+          "card_all_copies_exact": 269,
+          "card_delta_vs_primary": 0,
+          "card_losses": 2,
+          "card_majority_vote_exact": 277,
+          "card_sign_test_two_sided_p": 1.0,
+          "card_vote_losses": 0,
+          "card_vote_sign_test_two_sided_p": 0.5,
+          "card_vote_wins": 2,
+          "card_wins": 2,
+          "record_delta_vs_primary": 1,
+          "record_exact": 608
+        },
+        "shift_+6px": {
+          "card_all_copies_exact": 271,
+          "card_delta_vs_primary": 2,
+          "card_losses": 3,
+          "card_majority_vote_exact": 279,
+          "card_sign_test_two_sided_p": 0.726562,
+          "card_vote_losses": 1,
+          "card_vote_sign_test_two_sided_p": 0.21875,
+          "card_vote_wins": 5,
+          "card_wins": 5,
+          "record_delta_vs_primary": 4,
+          "record_exact": 611
+        },
+        "shift_+8px": {
+          "card_all_copies_exact": 269,
+          "card_delta_vs_primary": 0,
+          "card_losses": 2,
+          "card_majority_vote_exact": 276,
+          "card_sign_test_two_sided_p": 1.0,
+          "card_vote_losses": 1,
+          "card_vote_sign_test_two_sided_p": 1.0,
+          "card_vote_wins": 2,
+          "card_wins": 2,
+          "record_delta_vs_primary": 0,
+          "record_exact": 607
+        },
+        "shift_-1px": {
+          "card_all_copies_exact": 272,
+          "card_delta_vs_primary": 3,
+          "card_losses": 2,
+          "card_majority_vote_exact": 278,
+          "card_sign_test_two_sided_p": 0.453125,
+          "card_vote_losses": 1,
+          "card_vote_sign_test_two_sided_p": 0.375,
+          "card_vote_wins": 4,
+          "card_wins": 5,
+          "record_delta_vs_primary": 5,
+          "record_exact": 612
+        },
+        "shift_-2px": {
+          "card_all_copies_exact": 271,
+          "card_delta_vs_primary": 2,
+          "card_losses": 2,
+          "card_majority_vote_exact": 279,
+          "card_sign_test_two_sided_p": 0.6875,
+          "card_vote_losses": 1,
+          "card_vote_sign_test_two_sided_p": 0.21875,
+          "card_vote_wins": 5,
+          "card_wins": 4,
+          "record_delta_vs_primary": 5,
+          "record_exact": 612
+        },
+        "shift_-3px": {
+          "card_all_copies_exact": 269,
+          "card_delta_vs_primary": 0,
+          "card_losses": 2,
+          "card_majority_vote_exact": 277,
+          "card_sign_test_two_sided_p": 1.0,
+          "card_vote_losses": 1,
+          "card_vote_sign_test_two_sided_p": 0.625,
+          "card_vote_wins": 3,
+          "card_wins": 2,
+          "record_delta_vs_primary": 3,
+          "record_exact": 610
+        },
+        "shift_-4px": {
+          "card_all_copies_exact": 269,
+          "card_delta_vs_primary": 0,
+          "card_losses": 1,
+          "card_majority_vote_exact": 276,
+          "card_sign_test_two_sided_p": 1.0,
+          "card_vote_losses": 1,
+          "card_vote_sign_test_two_sided_p": 1.0,
+          "card_vote_wins": 2,
+          "card_wins": 1,
+          "record_delta_vs_primary": 1,
+          "record_exact": 608
+        },
+        "shift_-6px": {
+          "card_all_copies_exact": 269,
+          "card_delta_vs_primary": 0,
+          "card_losses": 3,
+          "card_majority_vote_exact": 279,
+          "card_sign_test_two_sided_p": 1.0,
+          "card_vote_losses": 1,
+          "card_vote_sign_test_two_sided_p": 0.21875,
+          "card_vote_wins": 5,
+          "card_wins": 3,
+          "record_delta_vs_primary": 5,
+          "record_exact": 612
+        },
+        "shift_-8px": {
+          "card_all_copies_exact": 264,
+          "card_delta_vs_primary": -5,
+          "card_losses": 7,
+          "card_majority_vote_exact": 278,
+          "card_sign_test_two_sided_p": 0.179688,
+          "card_vote_losses": 1,
+          "card_vote_sign_test_two_sided_p": 0.375,
+          "card_vote_wins": 4,
+          "card_wins": 2,
+          "record_delta_vs_primary": -3,
+          "record_exact": 604
+        },
+        "single_B_seed3202": {
+          "card_all_copies_exact": 265,
+          "card_delta_vs_primary": -4,
+          "card_losses": 6,
+          "card_majority_vote_exact": 277,
+          "card_sign_test_two_sided_p": 0.289062,
+          "card_vote_losses": 2,
+          "card_vote_sign_test_two_sided_p": 0.6875,
+          "card_vote_wins": 4,
+          "card_wins": 2,
+          "record_delta_vs_primary": -2,
+          "record_exact": 605
+        },
+        "single_C_seed3101": {
+          "card_all_copies_exact": 263,
+          "card_delta_vs_primary": -6,
+          "card_losses": 7,
+          "card_majority_vote_exact": 274,
+          "card_sign_test_two_sided_p": 0.070312,
+          "card_vote_losses": 2,
+          "card_vote_sign_test_two_sided_p": 1.0,
+          "card_vote_wins": 1,
+          "card_wins": 1,
+          "record_delta_vs_primary": -8,
+          "record_exact": 599
+        },
+        "single_C_seed3202": {
+          "card_all_copies_exact": 266,
+          "card_delta_vs_primary": -3,
+          "card_losses": 5,
+          "card_majority_vote_exact": 275,
+          "card_sign_test_two_sided_p": 0.453125,
+          "card_vote_losses": 2,
+          "card_vote_sign_test_two_sided_p": 1.0,
+          "card_vote_wins": 2,
+          "card_wins": 2,
+          "record_delta_vs_primary": -3,
+          "record_exact": 604
+        }
+      }
+    },
+    "layout_pattern_replication": {
+      "external_validation": {
+        "attention_pattern_pitch": [
+          -0.093765,
+          0.062013,
+          -0.115501,
+          0.06061,
+          -0.099165,
+          0.133984,
+          -0.062791,
+          0.16624,
+          -0.02834,
+          0.149753,
+          0.051566,
+          -0.141173,
+          0.072247,
+          -0.155678
+        ],
+        "attention_vs_truth": {
+          "amplitude_ratio": 0.997082,
+          "correlation": 0.975529,
+          "slope_estimate_over_truth": 0.920862
+        },
+        "ink_pattern_pitch": [
+          -0.030946,
+          0.000497,
+          -0.042251,
+          0.004138,
+          -0.033156,
+          0.004089,
+          -0.025165,
+          0.01165,
+          -0.017055,
+          0.006068,
+          -0.013319,
+          -0.03604,
+          -0.002071,
+          -0.048136
+        ],
+        "ink_vs_truth": {
+          "amplitude_ratio": 0.196565,
+          "correlation": 0.946386,
+          "slope_estimate_over_truth": 0.159848
+        },
+        "records": 647,
+        "records_read_exactly": 607,
+        "truth_pattern_pitch": [
+          -0.120711,
+          0.045279,
+          -0.110029,
+          0.092608,
+          -0.089394,
+          0.123225,
+          -0.057539,
+          0.161567,
+          -0.017293,
+          0.2146,
+          0.023874,
+          -0.159302,
+          0.037298,
+          -0.144183
+        ]
+      },
+      "internal_replay": {
+        "attention_pattern_pitch": [
+          -0.092155,
+          0.034272,
+          -0.106227,
+          0.058853,
+          -0.09088,
+          0.141881,
+          -0.054285,
+          0.189873,
+          -0.021734,
+          0.130233,
+          0.03798,
+          -0.155746,
+          0.075639,
+          -0.147705
+        ],
+        "attention_vs_external_attention": {
+          "amplitude_ratio": 0.960251,
+          "correlation": 0.992304,
+          "slope_estimate_over_truth": 0.986807
+        },
+        "cards": 664,
+        "cards_read_exactly": 650,
+        "ink_pattern_pitch": [
+          -0.029045,
+          0.006521,
+          -0.027166,
+          0.005904,
+          -0.021308,
+          0.013966,
+          -0.015867,
+          0.025092,
+          -0.002165,
+          0.023476,
+          -0.007467,
+          -0.034008,
+          0.010271,
+          -0.033542
+        ],
+        "ink_vs_external_ink": {
+          "amplitude_ratio": 0.931586,
+          "correlation": 0.966268,
+          "slope_estimate_over_truth": 1.003038
+        },
+        "ink_vs_external_truth": {
+          "amplitude_ratio": 0.183117,
+          "correlation": 0.973309,
+          "slope_estimate_over_truth": 0.170652
+        }
+      },
+      "method": {
+        "attention_pattern": "per-slot attention centroid of correctly read cards, fitted to its own uniform grid; it is biased towards zero because the attention is generated by uniform anchors, so it is calibrated on external first",
+        "ink_pattern": "model-free apart from the two global anchors: the ink centroid inside each anchored cell, in pitches from the cell centre, averaged over cards",
+        "internal_bands": "the 664-card internal replay pool, aggregate counts only; these bands come from the frozen broad-band crop, not from digit boxes",
+        "truth_pattern": "external validation only: the annotated digit-box centres, the same statistic section C3 reports"
+      },
+      "question": "the external archive is fictional, stretched to 640x640 without preserving aspect, and augmented with rotation and shear, so the per-slot layout pattern may be a generator artifact rather than a property of a printed Egyptian card",
+      "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT"
+    },
+    "record_level_fixability": {
+      "by_class": {
+        "alignment_only": {
+          "records": 15,
+          "single_wrong_digit_records": 8,
+          "with_a_c2_assignment_error": 9,
+          "without_one": 6,
+          "wrong_positions": 40
+        },
+        "glyph_only": {
+          "records": 22,
+          "single_wrong_digit_records": 19,
+          "with_a_c2_assignment_error": 0,
+          "without_one": 22,
+          "wrong_positions": 25
+        },
+        "mixed": {
+          "records": 3,
+          "single_wrong_digit_records": 0,
+          "with_a_c2_assignment_error": 1,
+          "without_one": 2,
+          "wrong_positions": 9
+        }
+      },
+      "definition": {
+        "alignment_only": "every wrong position in the record is a shift or a collision",
+        "c2_assignment_error": "at least one wrong position in the record has its attention argmax nearer a neighbouring true digit centre than its own",
+        "glyph_only": "every wrong position is a substitution or a neighbour",
+        "mixed": "the record holds both families"
+      },
+      "exact_records_with_a_c2_assignment_error": 1,
+      "interpretation": "an upper bound: it assumes a perfect alignment repair that fixes every record in the class and breaks nothing, which no real change achieves",
+      "records_with_a_c2_assignment_error": 10,
+      "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT",
+      "upper_bounds": {
+        "loose_any_assignment_error_repaired": {
+          "cards_all_copies_exact": 273,
+          "cards_short_of_291": 18,
+          "cards_total": 293,
+          "records_exact": 617,
+          "records_repaired": 10,
+          "records_short_of_641": 24,
+          "records_total": 647
+        },
+        "strict_alignment_only_records_repaired": {
+          "cards_all_copies_exact": 276,
+          "cards_short_of_291": 15,
+          "cards_total": 293,
+          "records_exact": 622,
+          "records_repaired": 15,
+          "records_short_of_641": 19,
+          "records_total": 647
+        },
+        "today": {
+          "cards_all_copies_exact": 269,
+          "cards_short_of_291": 22,
+          "cards_total": 293,
+          "records_exact": 607,
+          "records_short_of_641": 34,
+          "records_total": 647
+        },
+        "union_of_both_definitions": {
+          "cards_all_copies_exact": 277,
+          "cards_short_of_291": 14,
+          "cards_total": 293,
+          "records_exact": 623,
+          "records_repaired": 16,
+          "records_short_of_641": 18,
+          "records_total": 647
+        }
+      },
+      "wrong_records": 40
+    },
+    "rule_amendment": 2,
+    "status": "descriptive measurements added after the primary finding; no threshold changed and the decision is not re-derived from them"
+  },
+  "alignment": {
+    "c1_mapping": {
+      "box_derived_pitch_feature_columns_median": 8.778604,
+      "box_derived_pitch_u_pctl_10_50_90": [
+        0.060149,
+        0.060963,
+        0.061595
+      ],
+      "chain": "line_rect_from_digit_boxes -> band_quad(context 0.16 left, 0.04 right of line length, band 180x650) -> warp_quad to 180x650 with pad 245 -> phase2l_a.letterbox to 160x576 with pad 245",
+      "digit_centres_strictly_increasing_records": 647,
+      "feature_stride": 4,
+      "feature_width": 144,
+      "letterbox": {
+        "content_hw": [
+          160,
+          576
+        ],
+        "left": 0,
+        "pad_h": 0,
+        "pad_h_fraction": 0.0,
+        "pad_w": 0,
+        "pad_w_fraction": 0.0,
+        "scale": 0.886154,
+        "src_hw": [
+          180,
+          650
+        ],
+        "tensor_hw": [
+          160,
+          576
+        ],
+        "top": 0
+      },
+      "records_mapped": 647
+    },
+    "c2_attention": {
+      "adjacent_slot_overlap_mean": 0.027161,
+      "adjacent_slot_overlap_pctl_90_99": [
+        0.063528,
+        0.190799
+      ],
+      "assignment_error_rate_all_correct_positions": 0.001447,
+      "assignment_error_rate_all_wrong_positions": 0.405405,
+      "assignment_error_rate_on_shift_and_collision": 0.681818,
+      "assignment_error_rate_on_substitutions": 0.0,
+      "by_error_kind": {
+        "collision": {
+          "abs_offset_pitch_pctl_50_90_99": [
+            0.437954,
+            0.770367,
+            0.963306
+          ],
+          "assignment_error_rate": 0.538462,
+          "content_saturated_column_share": 0.008013,
+          "mean_abs_grid_residual_pitch": 0.132516,
+          "mean_abs_offset_pitch": 0.42757,
+          "positions": 26
+        },
+        "neighbour": {
+          "positions": 0
+        },
+        "ok": {
+          "abs_offset_pitch_pctl_50_90_99": [
+            0.031156,
+            0.086798,
+            0.258489
+          ],
+          "assignment_error_rate": 0.001447,
+          "content_saturated_column_share": 0.044978,
+          "mean_abs_grid_residual_pitch": 0.102915,
+          "mean_abs_offset_pitch": 0.043563,
+          "positions": 8984
+        },
+        "shift": {
+          "abs_offset_pitch_pctl_50_90_99": [
+            0.740564,
+            1.044678,
+            1.08275
+          ],
+          "assignment_error_rate": 0.888889,
+          "content_saturated_column_share": 0.015818,
+          "mean_abs_grid_residual_pitch": 0.112868,
+          "mean_abs_offset_pitch": 0.768094,
+          "positions": 18
+        },
+        "substitution": {
+          "abs_offset_pitch_pctl_50_90_99": [
+            0.076032,
+            0.265847,
+            0.421568
+          ],
+          "assignment_error_rate": 0.0,
+          "content_saturated_column_share": 0.051157,
+          "mean_abs_grid_residual_pitch": 0.132507,
+          "mean_abs_offset_pitch": 0.120175,
+          "positions": 30
+        }
+      },
+      "by_position_outcome": {
+        "correct": {
+          "abs_offset_pitch_pctl_50_90_99": [
+            0.031156,
+            0.086798,
+            0.258489
+          ],
+          "assignment_error_rate": 0.001447,
+          "content_saturated_column_share": 0.044978,
+          "mean_abs_grid_residual_pitch": 0.102915,
+          "mean_abs_offset_pitch": 0.043563,
+          "positions": 8984
+        },
+        "wrong": {
+          "abs_offset_pitch_pctl_50_90_99": [
+            0.262889,
+            0.922573,
+            1.057105
+          ],
+          "assignment_error_rate": 0.405405,
+          "content_saturated_column_share": 0.027402,
+          "mean_abs_grid_residual_pitch": 0.127733,
+          "mean_abs_offset_pitch": 0.385781,
+          "positions": 74
+        }
+      },
+      "records_with_any_assignment_error": 12,
+      "records_with_any_assignment_error_and_exact_output": 1
+    },
+    "c3_box_only_non_uniformity": {
+      "external_train_records": 2673,
+      "external_train_worst_residual_pitch_pctl_50_90_99_max": [
+        0.216648,
+        0.25866,
+        0.400115,
+        0.768894
+      ],
+      "mean_abs_residual_pitch_correct_positions": 0.102915,
+      "mean_abs_residual_pitch_wrong_positions": 0.127733,
+      "systematic_versus_per_record": {
+        "correlation_of_the_two_per_slot_patterns": 0.999547,
+        "external_train_mean_abs_residual_after_removing_the_common_per_slot_pattern": 0.027873,
+        "external_train_mean_abs_residual_pitch": 0.103261,
+        "external_train_per_slot_mean_residual_pitch": [
+          -0.12425,
+          0.042308,
+          -0.106367,
+          0.091001,
+          -0.091007,
+          0.122544,
+          -0.051489,
+          0.161987,
+          -0.013771,
+          0.215761,
+          0.025924,
+          -0.155587,
+          0.034008,
+          -0.151061
+        ],
+        "question": "is the departure from a uniform grid a fixed printed layout or per-record noise",
+        "slot_with_the_largest_mean_offset_1_based": 10,
+        "validation_mean_abs_residual_after_removing_the_common_per_slot_pattern": 0.025444,
+        "validation_mean_abs_residual_pitch": 0.103117,
+        "validation_per_slot_mean_residual_pitch": [
+          -0.120711,
+          0.045279,
+          -0.110029,
+          0.092608,
+          -0.089394,
+          0.123225,
+          -0.057539,
+          0.161567,
+          -0.017293,
+          0.2146,
+          0.023874,
+          -0.159302,
+          0.037298,
+          -0.144183
+        ],
+        "validation_per_slot_std_residual_pitch": [
+          0.05515,
+          0.033583,
+          0.026907,
+          0.021869,
+          0.02991,
+          0.034653,
+          0.03964,
+          0.037493,
+          0.037887,
+          0.030896,
+          0.03109,
+          0.029156,
+          0.048478,
+          0.065319
+        ]
+      },
+      "validation_exact_by_worst_residual_bin": [
+        {
+          "exact": 1,
+          "exact_rate": 1.0,
+          "records": 1,
+          "worst_residual_pitch_range": [
+            0.0,
+            0.15
+          ]
+        },
+        {
+          "exact": 542,
+          "exact_rate": 0.959292,
+          "records": 565,
+          "worst_residual_pitch_range": [
+            0.15,
+            0.25
+          ]
+        },
+        {
+          "exact": 55,
+          "exact_rate": 0.797101,
+          "records": 69,
+          "worst_residual_pitch_range": [
+            0.25,
+            0.35
+          ]
+        },
+        {
+          "exact": 9,
+          "exact_rate": 0.75,
+          "records": 12,
+          "worst_residual_pitch_range": [
+            0.35,
+            null
+          ]
+        }
+      ],
+      "validation_worst_residual_pitch_pctl_50_90_99_max": [
+        0.215321,
+        0.254019,
+        0.371178,
+        0.397765
+      ]
+    },
+    "c4_model_internals": {
+      "anchor_minus_true_centre_pitches_mean_abs": 0.152438,
+      "box_derived_line_width_u_pctl_10_50_90": [
+        0.842087,
+        0.853475,
+        0.86233
+      ],
+      "config_attention_key_dim": 32,
+      "config_centre_score_kernel": 9,
+      "config_content_logit_cap": 3.0,
+      "config_line_width_log_range": 0.405465,
+      "config_slot_sigma_init_pitch_fraction": 0.35,
+      "content_saturated_share_correct_slots": 0.044978,
+      "content_saturated_share_wrong_slots": 0.027402,
+      "learned_log_alpha": -1.242701,
+      "learned_sigma_in_pitches": 0.288604,
+      "predicted_line_width_u_pctl_10_50_90": [
+        0.83849,
+        0.853442,
+        0.867444
+      ],
+      "predicted_minus_box_line_width_in_pitches_pctl_10_50_90": [
+        -0.170421,
+        0.011187,
+        0.178546
+      ],
+      "predicted_minus_box_line_width_mean_abs_pitches": 0.112208,
+      "sigma_in_pitches_check_from_model_outputs": 0.288604
+    },
+    "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT"
+  },
+  "anatomy": {
+    "card_concentration": {
+      "A_v2": {
+        "card_exact_rate_all_copies": 0.62116,
+        "cards": 293,
+        "cards_all_copies_exact": 182,
+        "cards_where_a_majority_of_copies_are_exact": 203,
+        "cards_with_any_wrong_copy": 111,
+        "cards_with_every_copy_wrong": 59,
+        "rate_where_a_majority_of_copies_are_exact": 0.692833,
+        "share_of_wrong_records_in_all_wrong_cards": 0.64,
+        "wrong_cards_by_wrong_copies_over_copies": {
+          "1_of_1": 21,
+          "1_of_2": 11,
+          "1_of_3": 21,
+          "2_of_2": 7,
+          "2_of_3": 20,
+          "3_of_3": 31
+        },
+        "wrong_records": 200,
+        "wrong_records_in_cards_with_every_copy_wrong": 128
+      },
+      "B_seed3101": {
+        "card_exact_rate_all_copies": 0.918089,
+        "cards": 293,
+        "cards_all_copies_exact": 269,
+        "cards_where_a_majority_of_copies_are_exact": 271,
+        "cards_with_any_wrong_copy": 24,
+        "cards_with_every_copy_wrong": 14,
+        "rate_where_a_majority_of_copies_are_exact": 0.924915,
+        "share_of_wrong_records_in_all_wrong_cards": 0.6,
+        "wrong_cards_by_wrong_copies_over_copies": {
+          "1_of_1": 7,
+          "1_of_2": 2,
+          "1_of_3": 2,
+          "2_of_2": 4,
+          "2_of_3": 6,
+          "3_of_3": 3
+        },
+        "wrong_records": 40,
+        "wrong_records_in_cards_with_every_copy_wrong": 24
+      },
+      "B_seed3202": {
+        "card_exact_rate_all_copies": 0.904437,
+        "cards": 293,
+        "cards_all_copies_exact": 265,
+        "cards_where_a_majority_of_copies_are_exact": 273,
+        "cards_with_any_wrong_copy": 28,
+        "cards_with_every_copy_wrong": 13,
+        "rate_where_a_majority_of_copies_are_exact": 0.931741,
+        "share_of_wrong_records_in_all_wrong_cards": 0.547619,
+        "wrong_cards_by_wrong_copies_over_copies": {
+          "1_of_1": 6,
+          "1_of_2": 3,
+          "1_of_3": 8,
+          "2_of_2": 4,
+          "2_of_3": 4,
+          "3_of_3": 3
+        },
+        "wrong_records": 42,
+        "wrong_records_in_cards_with_every_copy_wrong": 23
+      },
+      "C_seed3101": {
+        "card_exact_rate_all_copies": 0.897611,
+        "cards": 293,
+        "cards_all_copies_exact": 263,
+        "cards_where_a_majority_of_copies_are_exact": 269,
+        "cards_with_any_wrong_copy": 30,
+        "cards_with_every_copy_wrong": 15,
+        "rate_where_a_majority_of_copies_are_exact": 0.918089,
+        "share_of_wrong_records_in_all_wrong_cards": 0.583333,
+        "wrong_cards_by_wrong_copies_over_copies": {
+          "1_of_1": 7,
+          "1_of_2": 4,
+          "1_of_3": 6,
+          "2_of_2": 3,
+          "2_of_3": 5,
+          "3_of_3": 5
+        },
+        "wrong_records": 48,
+        "wrong_records_in_cards_with_every_copy_wrong": 28
+      },
+      "C_seed3202": {
+        "card_exact_rate_all_copies": 0.90785,
+        "cards": 293,
+        "cards_all_copies_exact": 266,
+        "cards_where_a_majority_of_copies_are_exact": 270,
+        "cards_with_any_wrong_copy": 27,
+        "cards_with_every_copy_wrong": 16,
+        "rate_where_a_majority_of_copies_are_exact": 0.921502,
+        "share_of_wrong_records_in_all_wrong_cards": 0.627907,
+        "wrong_cards_by_wrong_copies_over_copies": {
+          "1_of_1": 8,
+          "1_of_2": 2,
+          "1_of_3": 4,
+          "2_of_2": 5,
+          "2_of_3": 5,
+          "3_of_3": 3
+        },
+        "wrong_records": 43,
+        "wrong_records_in_cards_with_every_copy_wrong": 27
+      }
+    },
+    "error_anatomy": {
+      "A_v2": {
+        "digit_accuracy": 0.924597,
+        "exact": 447,
+        "position_error_share_first_seven_slots": 0.417277,
+        "position_errors_slot_1_to_14": [
+          21,
+          49,
+          33,
+          54,
+          29,
+          53,
+          46,
+          30,
+          52,
+          60,
+          87,
+          42,
+          50,
+          77
+        ],
+        "records": 647,
+        "top_truth_to_pred_confusions": {
+          "0_to_1": 99,
+          "0_to_2": 18,
+          "0_to_4": 49,
+          "1_to_0": 18,
+          "1_to_2": 18,
+          "1_to_4": 75,
+          "2_to_4": 15,
+          "5_to_1": 18,
+          "5_to_4": 28,
+          "5_to_8": 25,
+          "8_to_2": 15,
+          "9_to_4": 21
+        },
+        "wrong_position_kind_shares": {
+          "collision": 0.172767,
+          "neighbour": 0.032211,
+          "shift": 0.2694,
+          "substitution": 0.525622
+        },
+        "wrong_position_kinds": {
+          "collision": 118,
+          "neighbour": 22,
+          "shift": 184,
+          "substitution": 359
+        },
+        "wrong_positions": 683,
+        "wrong_positions_per_wrong_record": {
+          "1": 80,
+          "10": 2,
+          "11": 4,
+          "12": 4,
+          "13": 10,
+          "14": 2,
+          "2": 41,
+          "3": 22,
+          "4": 14,
+          "5": 9,
+          "6": 6,
+          "7": 2,
+          "8": 2,
+          "9": 2
+        },
+        "wrong_records": 200,
+        "wrong_records_containing_a_collision": 82,
+        "wrong_records_containing_a_shift_run": 35
+      },
+      "B_seed3101": {
+        "digit_accuracy": 0.99183,
+        "exact": 607,
+        "position_error_share_first_seven_slots": 0.337838,
+        "position_errors_slot_1_to_14": [
+          2,
+          0,
+          4,
+          4,
+          5,
+          4,
+          6,
+          5,
+          0,
+          2,
+          14,
+          1,
+          8,
+          19
+        ],
+        "records": 647,
+        "top_truth_to_pred_confusions": {
+          "0_to_1": 5,
+          "0_to_2": 2,
+          "1_to_0": 12,
+          "1_to_2": 4,
+          "1_to_4": 5,
+          "2_to_0": 6,
+          "2_to_4": 3,
+          "2_to_7": 4,
+          "4_to_2": 3,
+          "5_to_4": 3,
+          "6_to_9": 5,
+          "9_to_4": 2
+        },
+        "wrong_position_kind_shares": {
+          "collision": 0.351351,
+          "neighbour": 0.0,
+          "shift": 0.243243,
+          "substitution": 0.405405
+        },
+        "wrong_position_kinds": {
+          "collision": 26,
+          "neighbour": 0,
+          "shift": 18,
+          "substitution": 30
+        },
+        "wrong_positions": 74,
+        "wrong_positions_per_wrong_record": {
+          "1": 27,
+          "2": 6,
+          "3": 1,
+          "4": 3,
+          "6": 1,
+          "7": 2
+        },
+        "wrong_records": 40,
+        "wrong_records_containing_a_collision": 18,
+        "wrong_records_containing_a_shift_run": 4
+      },
+      "B_seed3202": {
+        "digit_accuracy": 0.991278,
+        "exact": 605,
+        "position_error_share_first_seven_slots": 0.329114,
+        "position_errors_slot_1_to_14": [
+          2,
+          1,
+          5,
+          3,
+          6,
+          4,
+          5,
+          5,
+          1,
+          3,
+          11,
+          4,
+          9,
+          20
+        ],
+        "records": 647,
+        "top_truth_to_pred_confusions": {
+          "0_to_1": 7,
+          "0_to_2": 2,
+          "1_to_0": 13,
+          "1_to_2": 2,
+          "1_to_4": 5,
+          "1_to_5": 3,
+          "1_to_6": 6,
+          "2_to_0": 5,
+          "2_to_7": 5,
+          "4_to_2": 3,
+          "5_to_4": 3,
+          "7_to_0": 2
+        },
+        "wrong_position_kind_shares": {
+          "collision": 0.253165,
+          "neighbour": 0.012658,
+          "shift": 0.35443,
+          "substitution": 0.379747
+        },
+        "wrong_position_kinds": {
+          "collision": 20,
+          "neighbour": 1,
+          "shift": 28,
+          "substitution": 30
+        },
+        "wrong_positions": 79,
+        "wrong_positions_per_wrong_record": {
+          "1": 30,
+          "2": 6,
+          "3": 1,
+          "4": 1,
+          "7": 3,
+          "9": 1
+        },
+        "wrong_records": 42,
+        "wrong_records_containing_a_collision": 17,
+        "wrong_records_containing_a_shift_run": 5
+      },
+      "C_seed3101": {
+        "digit_accuracy": 0.990174,
+        "exact": 599,
+        "position_error_share_first_seven_slots": 0.280899,
+        "position_errors_slot_1_to_14": [
+          2,
+          0,
+          5,
+          2,
+          7,
+          4,
+          5,
+          6,
+          0,
+          5,
+          16,
+          5,
+          10,
+          22
+        ],
+        "records": 647,
+        "top_truth_to_pred_confusions": {
+          "0_to_1": 10,
+          "1_to_0": 13,
+          "1_to_4": 5,
+          "1_to_5": 3,
+          "1_to_6": 3,
+          "2_to_0": 5,
+          "2_to_7": 5,
+          "4_to_1": 4,
+          "4_to_2": 3,
+          "5_to_4": 3,
+          "6_to_9": 5,
+          "7_to_1": 3
+        },
+        "wrong_position_kind_shares": {
+          "collision": 0.247191,
+          "neighbour": 0.011236,
+          "shift": 0.303371,
+          "substitution": 0.438202
+        },
+        "wrong_position_kinds": {
+          "collision": 22,
+          "neighbour": 1,
+          "shift": 27,
+          "substitution": 39
+        },
+        "wrong_positions": 89,
+        "wrong_positions_per_wrong_record": {
+          "1": 33,
+          "2": 8,
+          "3": 2,
+          "4": 1,
+          "6": 1,
+          "8": 3
+        },
+        "wrong_records": 48,
+        "wrong_records_containing_a_collision": 16,
+        "wrong_records_containing_a_shift_run": 4
+      },
+      "C_seed3202": {
+        "digit_accuracy": 0.991941,
+        "exact": 604,
+        "position_error_share_first_seven_slots": 0.328767,
+        "position_errors_slot_1_to_14": [
+          2,
+          0,
+          4,
+          4,
+          4,
+          4,
+          6,
+          2,
+          0,
+          5,
+          15,
+          3,
+          7,
+          17
+        ],
+        "records": 647,
+        "top_truth_to_pred_confusions": {
+          "0_to_1": 11,
+          "0_to_2": 2,
+          "1_to_0": 13,
+          "1_to_2": 3,
+          "1_to_4": 2,
+          "2_to_0": 3,
+          "2_to_1": 3,
+          "2_to_4": 3,
+          "2_to_7": 3,
+          "4_to_2": 3,
+          "5_to_4": 3,
+          "6_to_4": 2
+        },
+        "wrong_position_kind_shares": {
+          "collision": 0.246575,
+          "neighbour": 0.0,
+          "shift": 0.273973,
+          "substitution": 0.479452
+        },
+        "wrong_position_kinds": {
+          "collision": 18,
+          "neighbour": 0,
+          "shift": 20,
+          "substitution": 35
+        },
+        "wrong_positions": 73,
+        "wrong_positions_per_wrong_record": {
+          "1": 29,
+          "2": 8,
+          "3": 2,
+          "5": 2,
+          "6": 2
+        },
+        "wrong_records": 43,
+        "wrong_records_containing_a_collision": 14,
+        "wrong_records_containing_a_shift_run": 6
+      }
+    },
+    "metric_translation": {
+      "A_v2": {
+        "by_copies_in_split": {
+          "1_copies": {
+            "card_exact_rate_all_copies": 0.776596,
+            "card_exact_rate_by_majority_vote": 0.776596,
+            "cards": 94,
+            "cards_all_copies_exact": 73,
+            "cards_exact_by_majority_vote": 73,
+            "cards_where_a_majority_of_copies_are_exact": 73,
+            "cards_whose_copies_disagree": 0,
+            "digit_accuracy": 0.946809,
+            "exact": 73,
+            "exact_rate": 0.776596,
+            "records": 94
+          },
+          "2_copies": {
+            "card_exact_rate_all_copies": 0.590909,
+            "card_exact_rate_by_majority_vote": 0.704545,
+            "cards": 44,
+            "cards_all_copies_exact": 26,
+            "cards_exact_by_majority_vote": 31,
+            "cards_where_a_majority_of_copies_are_exact": 26,
+            "cards_whose_copies_disagree": 14,
+            "digit_accuracy": 0.948864,
+            "exact": 63,
+            "exact_rate": 0.715909,
+            "records": 88
+          },
+          "3_copies": {
+            "card_exact_rate_all_copies": 0.535484,
+            "card_exact_rate_by_majority_vote": 0.709677,
+            "cards": 155,
+            "cards_all_copies_exact": 83,
+            "cards_exact_by_majority_vote": 110,
+            "cards_where_a_majority_of_copies_are_exact": 104,
+            "cards_whose_copies_disagree": 71,
+            "digit_accuracy": 0.915515,
+            "exact": 311,
+            "exact_rate": 0.668817,
+            "records": 465
+          }
+        },
+        "by_origin": {
+          "roboflow_train_multi_version": {
+            "card_exact_rate_all_copies": 0.545894,
+            "card_exact_rate_by_majority_vote": 0.700483,
+            "cards": 207,
+            "cards_all_copies_exact": 113,
+            "cards_exact_by_majority_vote": 145,
+            "cards_where_a_majority_of_copies_are_exact": 134,
+            "cards_whose_copies_disagree": 85,
+            "digit_accuracy": 0.919786,
+            "exact": 378,
+            "exact_rate": 0.673797,
+            "records": 561
+          },
+          "roboflow_valid_or_test_original": {
+            "card_exact_rate_all_copies": 0.802326,
+            "card_exact_rate_by_majority_vote": 0.802326,
+            "cards": 86,
+            "cards_all_copies_exact": 69,
+            "cards_exact_by_majority_vote": 69,
+            "cards_where_a_majority_of_copies_are_exact": 69,
+            "cards_whose_copies_disagree": 0,
+            "digit_accuracy": 0.95598,
+            "exact": 69,
+            "exact_rate": 0.802326,
+            "records": 86
+          }
+        },
+        "card_level_a_majority_of_copies_exact": 203,
+        "card_level_a_majority_of_copies_exact_rate": 0.692833,
+        "card_level_all_copies_exact": 182,
+        "card_level_all_copies_exact_rate": 0.62116,
+        "card_level_cards": 293,
+        "card_level_majority_vote": {
+          "card_exact_rate_by_majority_vote": 0.730375,
+          "cards": 293,
+          "cards_exact_by_majority_vote": 214,
+          "cards_whose_copies_disagree": 85
+        },
+        "digit_accuracy": 0.924597,
+        "end_to_end_all_records": 699,
+        "end_to_end_exact_rate": 0.639485,
+        "end_to_end_excluded_counted_as_failures": 52,
+        "record_level_cluster_bootstrap_95ci": [
+          0.639266,
+          0.738142
+        ],
+        "record_level_exact": 447,
+        "record_level_exact_rate": 0.690881,
+        "record_level_records": 647,
+        "record_level_wilson_95ci": [
+          0.654233,
+          0.725276
+        ],
+        "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT"
+      },
+      "B_seed3101": {
+        "by_copies_in_split": {
+          "1_copies": {
+            "card_exact_rate_all_copies": 0.925532,
+            "card_exact_rate_by_majority_vote": 0.925532,
+            "cards": 94,
+            "cards_all_copies_exact": 87,
+            "cards_exact_by_majority_vote": 87,
+            "cards_where_a_majority_of_copies_are_exact": 87,
+            "cards_whose_copies_disagree": 0,
+            "digit_accuracy": 0.994681,
+            "exact": 87,
+            "exact_rate": 0.925532,
+            "records": 94
+          },
+          "2_copies": {
+            "card_exact_rate_all_copies": 0.863636,
+            "card_exact_rate_by_majority_vote": 0.909091,
+            "cards": 44,
+            "cards_all_copies_exact": 38,
+            "cards_exact_by_majority_vote": 40,
+            "cards_where_a_majority_of_copies_are_exact": 38,
+            "cards_whose_copies_disagree": 3,
+            "digit_accuracy": 0.991071,
+            "exact": 78,
+            "exact_rate": 0.886364,
+            "records": 88
+          },
+          "3_copies": {
+            "card_exact_rate_all_copies": 0.929032,
+            "card_exact_rate_by_majority_vote": 0.954839,
+            "cards": 155,
+            "cards_all_copies_exact": 144,
+            "cards_exact_by_majority_vote": 148,
+            "cards_where_a_majority_of_copies_are_exact": 146,
+            "cards_whose_copies_disagree": 11,
+            "digit_accuracy": 0.991398,
+            "exact": 442,
+            "exact_rate": 0.950538,
+            "records": 465
+          }
+        },
+        "by_origin": {
+          "roboflow_train_multi_version": {
+            "card_exact_rate_all_copies": 0.903382,
+            "card_exact_rate_by_majority_vote": 0.932367,
+            "cards": 207,
+            "cards_all_copies_exact": 187,
+            "cards_exact_by_majority_vote": 193,
+            "cards_where_a_majority_of_copies_are_exact": 189,
+            "cards_whose_copies_disagree": 14,
+            "digit_accuracy": 0.991087,
+            "exact": 525,
+            "exact_rate": 0.935829,
+            "records": 561
+          },
+          "roboflow_valid_or_test_original": {
+            "card_exact_rate_all_copies": 0.953488,
+            "card_exact_rate_by_majority_vote": 0.953488,
+            "cards": 86,
+            "cards_all_copies_exact": 82,
+            "cards_exact_by_majority_vote": 82,
+            "cards_where_a_majority_of_copies_are_exact": 82,
+            "cards_whose_copies_disagree": 0,
+            "digit_accuracy": 0.996678,
+            "exact": 82,
+            "exact_rate": 0.953488,
+            "records": 86
+          }
+        },
+        "card_level_a_majority_of_copies_exact": 271,
+        "card_level_a_majority_of_copies_exact_rate": 0.924915,
+        "card_level_all_copies_exact": 269,
+        "card_level_all_copies_exact_rate": 0.918089,
+        "card_level_cards": 293,
+        "card_level_majority_vote": {
+          "card_exact_rate_by_majority_vote": 0.938567,
+          "cards": 293,
+          "cards_exact_by_majority_vote": 275,
+          "cards_whose_copies_disagree": 14
+        },
+        "digit_accuracy": 0.99183,
+        "end_to_end_all_records": 699,
+        "end_to_end_exact_rate": 0.868383,
+        "end_to_end_excluded_counted_as_failures": 52,
+        "record_level_cluster_bootstrap_95ci": [
+          0.910515,
+          0.961479
+        ],
+        "record_level_exact": 607,
+        "record_level_exact_rate": 0.938176,
+        "record_level_records": 647,
+        "record_level_wilson_95ci": [
+          0.916908,
+          0.954272
+        ],
+        "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT"
+      },
+      "B_seed3202": {
+        "by_copies_in_split": {
+          "1_copies": {
+            "card_exact_rate_all_copies": 0.93617,
+            "card_exact_rate_by_majority_vote": 0.93617,
+            "cards": 94,
+            "cards_all_copies_exact": 88,
+            "cards_exact_by_majority_vote": 88,
+            "cards_where_a_majority_of_copies_are_exact": 88,
+            "cards_whose_copies_disagree": 0,
+            "digit_accuracy": 0.994681,
+            "exact": 88,
+            "exact_rate": 0.93617,
+            "records": 94
+          },
+          "2_copies": {
+            "card_exact_rate_all_copies": 0.840909,
+            "card_exact_rate_by_majority_vote": 0.886364,
+            "cards": 44,
+            "cards_all_copies_exact": 37,
+            "cards_exact_by_majority_vote": 39,
+            "cards_where_a_majority_of_copies_are_exact": 37,
+            "cards_whose_copies_disagree": 6,
+            "digit_accuracy": 0.99026,
+            "exact": 77,
+            "exact_rate": 0.875,
+            "records": 88
+          },
+          "3_copies": {
+            "card_exact_rate_all_copies": 0.903226,
+            "card_exact_rate_by_majority_vote": 0.967742,
+            "cards": 155,
+            "cards_all_copies_exact": 140,
+            "cards_exact_by_majority_vote": 150,
+            "cards_where_a_majority_of_copies_are_exact": 148,
+            "cards_whose_copies_disagree": 14,
+            "digit_accuracy": 0.990783,
+            "exact": 440,
+            "exact_rate": 0.946237,
+            "records": 465
+          }
+        },
+        "by_origin": {
+          "roboflow_train_multi_version": {
+            "card_exact_rate_all_copies": 0.879227,
+            "card_exact_rate_by_majority_vote": 0.937198,
+            "cards": 207,
+            "cards_all_copies_exact": 182,
+            "cards_exact_by_majority_vote": 194,
+            "cards_where_a_majority_of_copies_are_exact": 190,
+            "cards_whose_copies_disagree": 20,
+            "digit_accuracy": 0.990451,
+            "exact": 522,
+            "exact_rate": 0.930481,
+            "records": 561
+          },
+          "roboflow_valid_or_test_original": {
+            "card_exact_rate_all_copies": 0.965116,
+            "card_exact_rate_by_majority_vote": 0.965116,
+            "cards": 86,
+            "cards_all_copies_exact": 83,
+            "cards_exact_by_majority_vote": 83,
+            "cards_where_a_majority_of_copies_are_exact": 83,
+            "cards_whose_copies_disagree": 0,
+            "digit_accuracy": 0.996678,
+            "exact": 83,
+            "exact_rate": 0.965116,
+            "records": 86
+          }
+        },
+        "card_level_a_majority_of_copies_exact": 273,
+        "card_level_a_majority_of_copies_exact_rate": 0.931741,
+        "card_level_all_copies_exact": 265,
+        "card_level_all_copies_exact_rate": 0.904437,
+        "card_level_cards": 293,
+        "card_level_majority_vote": {
+          "card_exact_rate_by_majority_vote": 0.945392,
+          "cards": 293,
+          "cards_exact_by_majority_vote": 277,
+          "cards_whose_copies_disagree": 20
+        },
+        "digit_accuracy": 0.991278,
+        "end_to_end_all_records": 699,
+        "end_to_end_exact_rate": 0.865522,
+        "end_to_end_excluded_counted_as_failures": 52,
+        "record_level_cluster_bootstrap_95ci": [
+          0.907692,
+          0.959629
+        ],
+        "record_level_exact": 605,
+        "record_level_exact_rate": 0.935085,
+        "record_level_records": 647,
+        "record_level_wilson_95ci": [
+          0.913415,
+          0.951619
+        ],
+        "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT"
+      },
+      "C_seed3101": {
+        "by_copies_in_split": {
+          "1_copies": {
+            "card_exact_rate_all_copies": 0.925532,
+            "card_exact_rate_by_majority_vote": 0.925532,
+            "cards": 94,
+            "cards_all_copies_exact": 87,
+            "cards_exact_by_majority_vote": 87,
+            "cards_where_a_majority_of_copies_are_exact": 87,
+            "cards_whose_copies_disagree": 0,
+            "digit_accuracy": 0.993921,
+            "exact": 87,
+            "exact_rate": 0.925532,
+            "records": 94
+          },
+          "2_copies": {
+            "card_exact_rate_all_copies": 0.840909,
+            "card_exact_rate_by_majority_vote": 0.909091,
+            "cards": 44,
+            "cards_all_copies_exact": 37,
+            "cards_exact_by_majority_vote": 40,
+            "cards_where_a_majority_of_copies_are_exact": 37,
+            "cards_whose_copies_disagree": 6,
+            "digit_accuracy": 0.99026,
+            "exact": 78,
+            "exact_rate": 0.886364,
+            "records": 88
+          },
+          "3_copies": {
+            "card_exact_rate_all_copies": 0.896774,
+            "card_exact_rate_by_majority_vote": 0.948387,
+            "cards": 155,
+            "cards_all_copies_exact": 139,
+            "cards_exact_by_majority_vote": 147,
+            "cards_where_a_majority_of_copies_are_exact": 145,
+            "cards_whose_copies_disagree": 15,
+            "digit_accuracy": 0.989401,
+            "exact": 434,
+            "exact_rate": 0.933333,
+            "records": 465
+          }
+        },
+        "by_origin": {
+          "roboflow_train_multi_version": {
+            "card_exact_rate_all_copies": 0.874396,
+            "card_exact_rate_by_majority_vote": 0.927536,
+            "cards": 207,
+            "cards_all_copies_exact": 181,
+            "cards_exact_by_majority_vote": 192,
+            "cards_where_a_majority_of_copies_are_exact": 187,
+            "cards_whose_copies_disagree": 21,
+            "digit_accuracy": 0.989305,
+            "exact": 517,
+            "exact_rate": 0.921569,
+            "records": 561
+          },
+          "roboflow_valid_or_test_original": {
+            "card_exact_rate_all_copies": 0.953488,
+            "card_exact_rate_by_majority_vote": 0.953488,
+            "cards": 86,
+            "cards_all_copies_exact": 82,
+            "cards_exact_by_majority_vote": 82,
+            "cards_where_a_majority_of_copies_are_exact": 82,
+            "cards_whose_copies_disagree": 0,
+            "digit_accuracy": 0.995847,
+            "exact": 82,
+            "exact_rate": 0.953488,
+            "records": 86
+          }
+        },
+        "card_level_a_majority_of_copies_exact": 269,
+        "card_level_a_majority_of_copies_exact_rate": 0.918089,
+        "card_level_all_copies_exact": 263,
+        "card_level_all_copies_exact_rate": 0.897611,
+        "card_level_cards": 293,
+        "card_level_majority_vote": {
+          "card_exact_rate_by_majority_vote": 0.935154,
+          "cards": 293,
+          "cards_exact_by_majority_vote": 274,
+          "cards_whose_copies_disagree": 21
+        },
+        "digit_accuracy": 0.990174,
+        "end_to_end_all_records": 699,
+        "end_to_end_exact_rate": 0.856938,
+        "end_to_end_excluded_counted_as_failures": 52,
+        "record_level_cluster_bootstrap_95ci": [
+          0.895401,
+          0.953052
+        ],
+        "record_level_exact": 599,
+        "record_level_exact_rate": 0.925811,
+        "record_level_records": 647,
+        "record_level_wilson_95ci": [
+          0.903007,
+          0.943589
+        ],
+        "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT"
+      },
+      "C_seed3202": {
+        "by_copies_in_split": {
+          "1_copies": {
+            "card_exact_rate_all_copies": 0.914894,
+            "card_exact_rate_by_majority_vote": 0.914894,
+            "cards": 94,
+            "cards_all_copies_exact": 86,
+            "cards_exact_by_majority_vote": 86,
+            "cards_where_a_majority_of_copies_are_exact": 86,
+            "cards_whose_copies_disagree": 0,
+            "digit_accuracy": 0.993161,
+            "exact": 86,
+            "exact_rate": 0.914894,
+            "records": 94
+          },
+          "2_copies": {
+            "card_exact_rate_all_copies": 0.840909,
+            "card_exact_rate_by_majority_vote": 0.886364,
+            "cards": 44,
+            "cards_all_copies_exact": 37,
+            "cards_exact_by_majority_vote": 39,
+            "cards_where_a_majority_of_copies_are_exact": 37,
+            "cards_whose_copies_disagree": 4,
+            "digit_accuracy": 0.987825,
+            "exact": 76,
+            "exact_rate": 0.863636,
+            "records": 88
+          },
+          "3_copies": {
+            "card_exact_rate_all_copies": 0.922581,
+            "card_exact_rate_by_majority_vote": 0.967742,
+            "cards": 155,
+            "cards_all_copies_exact": 143,
+            "cards_exact_by_majority_vote": 150,
+            "cards_where_a_majority_of_copies_are_exact": 147,
+            "cards_whose_copies_disagree": 12,
+            "digit_accuracy": 0.992473,
+            "exact": 442,
+            "exact_rate": 0.950538,
+            "records": 465
+          }
+        },
+        "by_origin": {
+          "roboflow_train_multi_version": {
+            "card_exact_rate_all_copies": 0.89372,
+            "card_exact_rate_by_majority_vote": 0.937198,
+            "cards": 207,
+            "cards_all_copies_exact": 185,
+            "cards_exact_by_majority_vote": 194,
+            "cards_where_a_majority_of_copies_are_exact": 189,
+            "cards_whose_copies_disagree": 16,
+            "digit_accuracy": 0.991469,
+            "exact": 523,
+            "exact_rate": 0.932264,
+            "records": 561
+          },
+          "roboflow_valid_or_test_original": {
+            "card_exact_rate_all_copies": 0.94186,
+            "card_exact_rate_by_majority_vote": 0.94186,
+            "cards": 86,
+            "cards_all_copies_exact": 81,
+            "cards_exact_by_majority_vote": 81,
+            "cards_where_a_majority_of_copies_are_exact": 81,
+            "cards_whose_copies_disagree": 0,
+            "digit_accuracy": 0.995017,
+            "exact": 81,
+            "exact_rate": 0.94186,
+            "records": 86
+          }
+        },
+        "card_level_a_majority_of_copies_exact": 270,
+        "card_level_a_majority_of_copies_exact_rate": 0.921502,
+        "card_level_all_copies_exact": 266,
+        "card_level_all_copies_exact_rate": 0.90785,
+        "card_level_cards": 293,
+        "card_level_majority_vote": {
+          "card_exact_rate_by_majority_vote": 0.938567,
+          "cards": 293,
+          "cards_exact_by_majority_vote": 275,
+          "cards_whose_copies_disagree": 16
+        },
+        "digit_accuracy": 0.991941,
+        "end_to_end_all_records": 699,
+        "end_to_end_exact_rate": 0.864092,
+        "end_to_end_excluded_counted_as_failures": 52,
+        "record_level_cluster_bootstrap_95ci": [
+          0.90606,
+          0.958269
+        ],
+        "record_level_exact": 604,
+        "record_level_exact_rate": 0.933539,
+        "record_level_records": 647,
+        "record_level_wilson_95ci": [
+          0.911674,
+          0.950287
+        ],
+        "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT"
+      }
+    },
+    "rule_sha256_lf": "e57bab49f3788b97a74cba8830f15a75ce0a159873b6c1397ba465b4bb1c38b1",
+    "saved_predictions_reproduce_selection_json": true,
+    "seed_complementarity": {
+      "B3101_vs_B3202": {
+        "both_exact": 597,
+        "both_wrong": 32,
+        "either_exact_ORACLE_not_an_accuracy": 615,
+        "identical_predictions": 614,
+        "only_first_exact": 10,
+        "only_second_exact": 8
+      },
+      "B3101_vs_C3101_same_seed": {
+        "both_exact": 597,
+        "both_wrong": 38,
+        "either_exact_ORACLE_not_an_accuracy": 609,
+        "identical_predictions": 621,
+        "only_first_exact": 10,
+        "only_second_exact": 2
+      },
+      "C3101_vs_C3202": {
+        "both_exact": 594,
+        "both_wrong": 38,
+        "either_exact_ORACLE_not_an_accuracy": 609,
+        "identical_predictions": 614,
+        "only_first_exact": 5,
+        "only_second_exact": 10
+      },
+      "any_of_four_exact_ORACLE_not_an_accuracy": 616
+    },
+    "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT",
+    "structure_validity": {
+      "check_digit_used": false,
+      "external_train_labels": 0.998504,
+      "external_validation_labels": 0.996909,
+      "interpretation": "the external identities are fictional and carry intentional semantic inconsistencies, so these are descriptive rates and not correctness tests, and no prediction is ever rewritten or selected with them",
+      "primary_predictions_on_exact_records": 1.0,
+      "primary_predictions_on_wrong_records": 0.8,
+      "v2_predictions_on_wrong_records": 0.71
+    },
+    "target_arithmetic": {
+      "note": "how many units may fail before 99 percent is lost, on each plausible denominator",
+      "test_cards": {
+        "denominator": "137 test cards",
+        "failures_allowed": 1,
+        "minimum_exact_for_99_percent": 136,
+        "triple_copy_cards": 67,
+        "triple_copy_cards_that_may_fail_entirely": 0,
+        "units": 137
+      },
+      "test_denominators_are_structural_only": "record and card counts come from the materialized test meta file; no test label, band or prediction was read",
+      "test_records": {
+        "denominator": "290 test records",
+        "failures_allowed": 2,
+        "minimum_exact_for_99_percent": 288,
+        "triple_copy_cards": 67,
+        "triple_copy_cards_that_may_fail_entirely": 0,
+        "units": 290
+      },
+      "validation_cards": {
+        "denominator": "293 validation cards",
+        "failures_allowed": 2,
+        "minimum_exact_for_99_percent": 291,
+        "triple_copy_cards": 155,
+        "triple_copy_cards_that_may_fail_entirely": 0,
+        "units": 293
+      },
+      "validation_records": {
+        "denominator": "647 validation records",
+        "failures_allowed": 6,
+        "minimum_exact_for_99_percent": 641,
+        "triple_copy_cards": 155,
+        "triple_copy_cards_that_may_fail_entirely": 2,
+        "units": 647
+      }
+    }
+  },
+  "archive_audit": {
+    "claim_1_full_archive": {
+      "exclusion_reasons": {
+        "incomplete_or_unreadable_line": 2,
+        "invalid_boxes": 2,
+        "missing_annotation": 1,
+        "not_exact_14": 596
+      },
+      "files_per_source_group_by_folder": {
+        "test": {
+          "1": 198,
+          "2": 2
+        },
+        "train": {
+          "1": 73,
+          "3": 1059,
+          "4": 171
+        },
+        "valid": {
+          "1": 363,
+          "2": 7
+        }
+      },
+      "records": 4513,
+      "records_by_our_split": {
+        "excluded": 601,
+        "external_test": 321,
+        "external_train": 2892,
+        "external_validation": 699
+      },
+      "records_by_project_and_folder": {
+        "Egyptian National IDs.v3i.yolov4pytorch|test": 26,
+        "Egyptian National IDs.v3i.yolov4pytorch|train": 244,
+        "Egyptian National IDs.v3i.yolov4pytorch|valid": 30,
+        "NID Ar|test": 176,
+        "NID Ar|train": 3690,
+        "NID Ar|valid": 347
+      },
+      "records_by_roboflow_folder": {
+        "test": 202,
+        "train": 3934,
+        "valid": 377
+      },
+      "rows_with_an_identity_group": 3912,
+      "second_source_folder": {
+        "our_split_of_records_carrying_a_shared_source_prefix": {
+          "Egyptian National IDs.v3i.yolov4pytorch|excluded": 300,
+          "NID Ar|excluded": 36,
+          "NID Ar|external_test": 46,
+          "NID Ar|external_train": 494,
+          "NID Ar|external_validation": 138
+        },
+        "projects_in_archive": [
+          "Egyptian National IDs.v3i.yolov4pytorch",
+          "NID Ar"
+        ],
+        "records_carrying_a_shared_source_prefix": {
+          "Egyptian National IDs.v3i.yolov4pytorch|test": 26,
+          "Egyptian National IDs.v3i.yolov4pytorch|train": 244,
+          "Egyptian National IDs.v3i.yolov4pytorch|valid": 30,
+          "NID Ar|test": 35,
+          "NID Ar|train": 621,
+          "NID Ar|valid": 58
+        },
+        "source_prefixes_shared_between_projects": 300
+      },
+      "source_groups_by_roboflow_folder": {
+        "test": 200,
+        "train": 1303,
+        "valid": 370
+      },
+      "unique_identity_groups_by_roboflow_folder": {
+        "test": 164,
+        "train": 1157,
+        "valid": 323
+      }
+    },
+    "claim_1_materialized_3610": {
+      "files_per_source_group_by_folder": {
+        "test": {
+          "1": 160
+        },
+        "train": {
+          "1": 41,
+          "2": 255,
+          "3": 860
+        },
+        "valid": {
+          "1": 319
+        }
+      },
+      "identity_overlap_train_vs_test": 0,
+      "identity_overlap_train_vs_valid": 0,
+      "identity_overlap_valid_vs_test": 0,
+      "records": 3610,
+      "records_by_roboflow_folder": {
+        "test": 160,
+        "train": 3131,
+        "valid": 319
+      },
+      "records_per_identity_group_by_folder": {
+        "test": {
+          "1": 160
+        },
+        "train": {
+          "1": 41,
+          "2": 255,
+          "3": 858,
+          "6": 1
+        },
+        "valid": {
+          "1": 319
+        }
+      },
+      "source_groups_by_roboflow_folder": {
+        "test": 160,
+        "train": 1156,
+        "valid": 319
+      },
+      "unique_identity_groups_by_roboflow_folder": {
+        "test": 160,
+        "train": 1155,
+        "valid": 319
+      }
+    },
+    "claim_1e_repeated_identity_groups": {
+      "identity_groups_full_manifest": 1644,
+      "identity_groups_spanning_more_than_one_source_group": 1,
+      "materialized_roboflow_train_identity_groups": 1155,
+      "materialized_roboflow_train_source_groups": 1156,
+      "phase2m_a_census_repeated_label_identity_groups": 1155,
+      "records_in_repeated_identity_groups": 3421,
+      "repeated_groups_not_in_the_roboflow_train_folder": 0,
+      "repeated_identity_groups_full_manifest": 1153,
+      "roboflow_train_identity_groups_that_are_singletons": 4
+    },
+    "claim_2_random_split_leakage": {
+      "definition": "share of records that would have a same-card sibling in train under a random record-level 80/10/10 split; exact expectation under independent assignment",
+      "full_archive_by_source_group": 0.867808,
+      "materialized_3610_by_identity_group": 0.79918,
+      "monte_carlo_check_materialized": {
+        "reps": 200,
+        "seed": 20260920,
+        "share_with_a_sibling_in_train": 0.800014,
+        "test_records_drawn": 71800
+      }
+    },
+    "claim_3_copies_inside_our_splits": {
+      "external_test": {
+        "cards": 137,
+        "duplicate_groups": 271,
+        "records": 290,
+        "records_per_card": {
+          "1": 51,
+          "2": 19,
+          "3": 67
+        },
+        "records_per_duplicate_group": {
+          "1": 256,
+          "2": 12,
+          "3": 2,
+          "4": 1
+        }
+      },
+      "external_train": {
+        "cards": 1204,
+        "duplicate_groups": 2245,
+        "records": 2673,
+        "records_per_card": {
+          "1": 375,
+          "2": 192,
+          "3": 636,
+          "6": 1
+        },
+        "records_per_duplicate_group": {
+          "1": 2074,
+          "11": 1,
+          "12": 1,
+          "2": 135,
+          "3": 16,
+          "4": 9,
+          "5": 3,
+          "7": 2,
+          "8": 2,
+          "87": 1,
+          "90": 1
+        }
+      },
+      "external_validation": {
+        "cards": 293,
+        "duplicate_groups": 608,
+        "records": 647,
+        "records_per_card": {
+          "1": 94,
+          "2": 44,
+          "3": 155
+        },
+        "records_per_duplicate_group": {
+          "1": 573,
+          "2": 31,
+          "3": 4
+        }
+      },
+      "full_scope_including_border_excluded": {
+        "external_test": {
+          "cards": 137,
+          "records": 321,
+          "records_per_card": {
+            "1": 44,
+            "2": 2,
+            "3": 91
+          }
+        },
+        "external_train": {
+          "cards": 1212,
+          "records": 2892,
+          "records_per_card": {
+            "1": 359,
+            "2": 29,
+            "3": 823,
+            "6": 1
+          }
+        },
+        "external_validation": {
+          "cards": 295,
+          "records": 699,
+          "records_per_card": {
+            "1": 88,
+            "2": 10,
+            "3": 197
+          }
+        },
+        "identity_groups_crossing_our_splits": 0
+      },
+      "identity_groups_crossing_our_splits": 0
+    },
+    "claim_4_and_5_folder_landing": {
+      "full_archive_folder_by_our_split": {
+        "test|excluded": 38,
+        "test|external_test": 20,
+        "test|external_train": 118,
+        "test|external_validation": 26,
+        "train|excluded": 509,
+        "train|external_test": 278,
+        "train|external_train": 2536,
+        "train|external_validation": 611,
+        "valid|excluded": 54,
+        "valid|external_test": 23,
+        "valid|external_train": 238,
+        "valid|external_validation": 62
+      },
+      "test": {
+        "by_our_split": {
+          "external_test": 20,
+          "external_train": 115,
+          "external_validation": 25
+        },
+        "materialized_records": 160
+      },
+      "train": {
+        "by_our_split": {
+          "external_test": 247,
+          "external_train": 2323,
+          "external_validation": 561
+        },
+        "materialized_records": 3131
+      },
+      "valid": {
+        "by_our_split": {
+          "external_test": 23,
+          "external_train": 235,
+          "external_validation": 61
+        },
+        "materialized_records": 319
+      }
+    },
+    "claim_5_origin_of_each_of_our_splits": {
+      "external_test": {
+        "test": 20,
+        "train": 247,
+        "valid": 23
+      },
+      "external_train": {
+        "test": 115,
+        "train": 2323,
+        "valid": 235
+      },
+      "external_validation": {
+        "test": 25,
+        "train": 561,
+        "valid": 61
+      }
+    },
+    "materialization_excluded_records": {
+      "by_our_split": {
+        "external_test": 31,
+        "external_train": 219,
+        "external_validation": 52
+      },
+      "by_roboflow_folder": {
+        "test": 4,
+        "train": 294,
+        "valid": 4
+      },
+      "cards_left_with_no_materialized_copy": 10,
+      "reason": "digit_box_clipped_or_touching_border, the only materialization exclusion reason",
+      "records": 302
+    },
+    "roboflow_test_trained_on_share": 0.71875,
+    "scope_note": "metadata only; no image, label or prediction was read for this command"
+  },
+  "blinded_review": {
+    "blinding_seed": 20260920,
+    "cards_awaiting_review": 24,
+    "location": "artifacts/phase2m_e/review",
+    "sheets_written": 24,
+    "template_filled_in_this_phase": false,
+    "template_rows": 24,
+    "verdict_options": [
+      "A correct",
+      "B correct",
+      "neither",
+      "unreadable",
+      "cannot tell"
+    ]
+  },
+  "decision": {
+    "conditions_as_declared": {
+      "ALIGNMENT_DOMINANT": "shift + collision positions are at least 50 percent of wrong positions AND more than 50 percent of those shift and collision positions show an assignment error in C2",
+      "CARD_CONCENTRATED": "at least 50 percent of wrong validation records belong to cards all of whose copies are wrong",
+      "GLYPH_DOMINANT": "substitution positions are at least 60 percent of wrong positions AND the assignment-error rate over wrong positions is below 50 percent",
+      "MIXED": "none of the above holds",
+      "UNDERFIT": "primary exact-sequence rate on the 2673 materialized external-train records, inference mode and no augmentation, is below 0.990",
+      "VARIANCE": "that train exact rate is at least 0.995 AND the primary validation exact rate is below 0.95"
+    },
+    "conditions_held": {
+      "ALIGNMENT_DOMINANT": true,
+      "CARD_CONCENTRATED": true,
+      "GLYPH_DOMINANT": false,
+      "UNDERFIT": true,
+      "VARIANCE": false
+    },
+    "decision_token": "PHASE2M_E_ANATOMY_COMPLETE:ALIGNMENT_DOMINANT",
+    "evidence": {
+      "assignment_error_rate_on_all_wrong_positions": 0.405405,
+      "assignment_error_rate_on_shift_and_collision": 0.681818,
+      "primary_train_exact_rate": 0.936027,
+      "primary_validation_exact_rate": 0.938176,
+      "share_of_wrong_records_in_cards_whose_copies_are_all_wrong": 0.6,
+      "shift_plus_collision_share": 0.594594,
+      "substitution_share": 0.405405
+    },
+    "primary_finding": "ALIGNMENT_DOMINANT",
+    "secondary_findings": [
+      "UNDERFIT",
+      "CARD_CONCENTRATED"
+    ]
+  },
+  "diagnostic_only": true,
+  "entry": {
+    "all_hash_checks_pass": true,
+    "backup_ref": "backup/phase2m-e-entry-20260920",
+    "backup_ref_head": "39899810fb6ebfbc56f5ed6cc547c6552c537025",
+    "branch": "phase2m-e-error-anatomy",
+    "external_test_consumed_marker_present": true,
+    "head": "896e967e5367b44537d8455624bd850dce438984",
+    "main": "e9a2d31993713a33cbbc914bd4318f447f5de6fa",
+    "phase2m_d_head": "39899810fb6ebfbc56f5ed6cc547c6552c537025"
+  },
+  "froze_anything": false,
+  "frozen_state_at_exit": {
+    "all_hash_checks_pass": true,
+    "v2_and_v3_hash_checks": {
+      "v2_config_sha256": true,
+      "v2_weights_sha256": true,
+      "v3_architecture_config_is_v2_config": true,
+      "v3_candidate_config_sha256_lf": true,
+      "v3_candidate_declares_weights": true,
+      "v3_candidate_output_shape": true,
+      "v3_candidate_seed": true,
+      "v3_rule_config_sha256_lf": true,
+      "v3_weights_sha256": true,
+      "v3_weights_size": true
+    },
+    "v2_hashes_phase2m_c_view": {
+      "config_sha256": true,
+      "weights_sha256": true
+    }
+  },
+  "hashes_match_entry_and_exit": true,
+  "logits": {
+    "best_declared_ensemble": "primary_tta",
+    "bias_vs_variance": {
+      "inference_mode_no_augmentation": true,
+      "internal_replay_note": "aggregate counts only; these are real cards already inside the v2/v3 training pool, so this is a fit measure and not a generalization measure",
+      "primary_external_train_digit_accuracy": 0.990327,
+      "primary_external_train_exact": 2502,
+      "primary_external_train_exact_rate": 0.936027,
+      "primary_external_train_records": 2673,
+      "primary_internal_replay_cards": 664,
+      "primary_internal_replay_digit_accuracy": 0.997741,
+      "primary_internal_replay_exact": 650
+    },
+    "margins": {
+      "by_error_kind": {
+        "collision": {
+          "margin_pctl_10_50_90": [
+            0.143232,
+            0.700731,
+            0.968549
+          ],
+          "positions": 26
+        },
+        "ok": {
+          "margin_pctl_10_50_90": [
+            0.994118,
+            0.999458,
+            0.99994
+          ],
+          "positions": 8984
+        },
+        "shift": {
+          "margin_pctl_10_50_90": [
+            0.277582,
+            0.764097,
+            0.986729
+          ],
+          "positions": 18
+        },
+        "substitution": {
+          "margin_pctl_10_50_90": [
+            0.048081,
+            0.225236,
+            0.948439
+          ],
+          "positions": 30
+        }
+      },
+      "correct_positions_pctl_1_10_50": [
+        0.744227,
+        0.994118,
+        0.999458
+      ],
+      "weakest_position_margin_pctl_5_50": [
+        0.231889,
+        0.993854
+      ],
+      "wrong_positions_pctl_50_90": [
+        0.481838,
+        0.977909
+      ]
+    },
+    "reject_curve_best_ensemble": [
+      {
+        "accepted": 647,
+        "exact_on_accepted": 609,
+        "exact_rate_on_accepted": 0.941267,
+        "reject_fraction": 0.0,
+        "rejected": 0,
+        "wrong_records_caught": 0,
+        "wrong_records_remaining": 38
+      },
+      {
+        "accepted": 641,
+        "exact_on_accepted": 608,
+        "exact_rate_on_accepted": 0.948518,
+        "reject_fraction": 0.01,
+        "rejected": 6,
+        "wrong_records_caught": 5,
+        "wrong_records_remaining": 33
+      },
+      {
+        "accepted": 634,
+        "exact_on_accepted": 605,
+        "exact_rate_on_accepted": 0.954259,
+        "reject_fraction": 0.02,
+        "rejected": 13,
+        "wrong_records_caught": 9,
+        "wrong_records_remaining": 29
+      },
+      {
+        "accepted": 615,
+        "exact_on_accepted": 601,
+        "exact_rate_on_accepted": 0.977236,
+        "reject_fraction": 0.05,
+        "rejected": 32,
+        "wrong_records_caught": 24,
+        "wrong_records_remaining": 14
+      },
+      {
+        "accepted": 582,
+        "exact_on_accepted": 579,
+        "exact_rate_on_accepted": 0.994845,
+        "reject_fraction": 0.1,
+        "rejected": 65,
+        "wrong_records_caught": 35,
+        "wrong_records_remaining": 3
+      }
+    ],
+    "reject_curve_note": "measurement only; no operating point is frozen and no output is selected with truth",
+    "reject_curve_primary": [
+      {
+        "accepted": 647,
+        "exact_on_accepted": 607,
+        "exact_rate_on_accepted": 0.938176,
+        "reject_fraction": 0.0,
+        "rejected": 0,
+        "wrong_records_caught": 0,
+        "wrong_records_remaining": 40
+      },
+      {
+        "accepted": 641,
+        "exact_on_accepted": 606,
+        "exact_rate_on_accepted": 0.945398,
+        "reject_fraction": 0.01,
+        "rejected": 6,
+        "wrong_records_caught": 5,
+        "wrong_records_remaining": 35
+      },
+      {
+        "accepted": 634,
+        "exact_on_accepted": 604,
+        "exact_rate_on_accepted": 0.952681,
+        "reject_fraction": 0.02,
+        "rejected": 13,
+        "wrong_records_caught": 10,
+        "wrong_records_remaining": 30
+      },
+      {
+        "accepted": 615,
+        "exact_on_accepted": 598,
+        "exact_rate_on_accepted": 0.972358,
+        "reject_fraction": 0.05,
+        "rejected": 32,
+        "wrong_records_caught": 23,
+        "wrong_records_remaining": 17
+      },
+      {
+        "accepted": 582,
+        "exact_on_accepted": 578,
+        "exact_rate_on_accepted": 0.993127,
+        "reject_fraction": 0.1,
+        "rejected": 65,
+        "wrong_records_caught": 36,
+        "wrong_records_remaining": 4
+      }
+    ],
+    "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT",
+    "validation_exact_by_view_and_ensemble": {
+      "ensemble_B_pair": 603,
+      "ensemble_B_pair_with_tta": 607,
+      "ensemble_all_four": 603,
+      "per_run_single_view": {
+        "B_seed3101": 607,
+        "B_seed3202": 605,
+        "C_seed3101": 599,
+        "C_seed3202": 604
+      },
+      "per_shift_primary": {
+        "-3": 610,
+        "0": 607,
+        "3": 613
+      },
+      "primary_single_view": 607,
+      "primary_tta": 609
+    }
+  },
+  "phase": "2M-E",
+  "production_changed": false,
+  "readme_audit": {
+    "declared_split_sizes": "neither README states train/valid/test sizes; the sizes are observed from the archive folders and are reported next to the declared image totals",
+    "filename_prefix_census": {
+      "distinct_leading_collection_tokens": [
+        "flipped_election_gathering"
+      ],
+      "records": 4513,
+      "records_whose_source_name_starts_with_flipped": 4513
+    },
+    "flip_or_mirror_finding": "no README declares a flip or mirror augmentation; the token 'flipped' appears as part of one upstream collection name carried by every record identically, so it identifies no subset and cannot be used to split the records",
+    "note": "paraphrased and extracted by pattern; no README line is reproduced verbatim in any tracked output",
+    "observed_folder_sizes_by_project": {
+      "Egyptian National IDs.v3i.yolov4pytorch": {
+        "test": 26,
+        "train": 244,
+        "valid": 30
+      },
+      "NID Ar": {
+        "test": 176,
+        "train": 3690,
+        "valid": 347
+      }
+    },
+    "readmes": [
+      {
+        "annotation_format_yolo_v4_pytorch": true,
+        "augmentation_tokens_present": [],
+        "auto_orientation_with_exif_stripping": true,
+        "declared_gaussian_blur_px": null,
+        "declared_images": 300,
+        "declared_rotation_degrees": null,
+        "declared_shear_degrees_h_low_high_then_v_low_high": null,
+        "declared_split_sizes_in_readme": null,
+        "declared_versions_per_source_image": 1,
+        "declares_geometric_flip_or_mirror": false,
+        "declares_no_augmentation": true,
+        "licence_cc_by_4_0": false,
+        "resize_mode": "stretch",
+        "resize_target": [
+          640,
+          640
+        ],
+        "title_line": "Egyptian National IDs - v3 2025-01-25 7:53am"
+      },
+      {
+        "annotation_format_yolo_v4_pytorch": false,
+        "augmentation_tokens_present": [],
+        "auto_orientation_with_exif_stripping": false,
+        "declared_gaussian_blur_px": null,
+        "declared_images": null,
+        "declared_rotation_degrees": null,
+        "declared_shear_degrees_h_low_high_then_v_low_high": null,
+        "declared_split_sizes_in_readme": null,
+        "declared_versions_per_source_image": null,
+        "declares_geometric_flip_or_mirror": false,
+        "declares_no_augmentation": false,
+        "licence_cc_by_4_0": true,
+        "resize_mode": null,
+        "resize_target": null,
+        "title_line": "# NID Ar Digits > 2025-05-27 3:01pm"
+      },
+      {
+        "annotation_format_yolo_v4_pytorch": true,
+        "augmentation_tokens_present": [
+          "blur",
+          "rotat",
+          "shear"
+        ],
+        "auto_orientation_with_exif_stripping": true,
+        "declared_gaussian_blur_px": [
+          0,
+          1
+        ],
+        "declared_images": 4213,
+        "declared_rotation_degrees": [
+          -5,
+          5
+        ],
+        "declared_shear_degrees_h_low_high_then_v_low_high": [
+          -5,
+          5,
+          -5,
+          5
+        ],
+        "declared_split_sizes_in_readme": null,
+        "declared_versions_per_source_image": 3,
+        "declares_geometric_flip_or_mirror": false,
+        "declares_no_augmentation": false,
+        "licence_cc_by_4_0": false,
+        "resize_mode": "stretch",
+        "resize_target": [
+          640,
+          640
+        ],
+        "title_line": "NID Ar Digits - v2 2025-05-27 3:01pm"
+      },
+      {
+        "annotation_format_yolo_v4_pytorch": false,
+        "augmentation_tokens_present": [],
+        "auto_orientation_with_exif_stripping": false,
+        "declared_gaussian_blur_px": null,
+        "declared_images": null,
+        "declared_rotation_degrees": null,
+        "declared_shear_degrees_h_low_high_then_v_low_high": null,
+        "declared_split_sizes_in_readme": null,
+        "declared_versions_per_source_image": null,
+        "declares_geometric_flip_or_mirror": false,
+        "declares_no_augmentation": false,
+        "licence_cc_by_4_0": true,
+        "resize_mode": null,
+        "resize_target": null,
+        "title_line": "# Egyptian National IDs > 2025-01-25 7:53am"
+      }
+    ],
+    "readmes_found": 4
+  },
+  "rule_committed": true,
+  "rule_sha256_lf": "ede3d37dc0181d5ec6272324f6e9f5573329a1b7a3428d100e0290c384f5d18d",
+  "schema_version": "phase2m_e_metrics_v1",
+  "selected_anything_with_truth": false,
+  "trained_anything": false,
+  "validation_status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT"
+}

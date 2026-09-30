@@ -1,0 +1,11 @@
+{
+  "decision": "FIXED14_V3_IMPROVEMENT_CONFIRMED",
+  "frozen_candidate_sha256_lf": "dc968ce313a4ff685620a66b288fa8d96b461a9376dcc0b4d238b7a7ad435362",
+  "git_head": "96683734371a5cbc899b50d76e71c427b006b55e",
+  "records": 321,
+  "schema_version": "phase2m_c_external_test_consumed_v1",
+  "sealed_predictions_sha256": "5234ed2ba8f4befc77cf071a9c130c83065da188e0ca7c9fc98bcbd75e4f5f55",
+  "status": "CONSUMED",
+  "use_for_selection_forbidden": true,
+  "utc": "2026-09-15T20:42:35+00:00"
+}

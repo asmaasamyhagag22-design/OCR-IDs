@@ -1,0 +1,36 @@
+{
+  "schema_version": "phase2l_d_fixed14_smoke_result_v1",
+  "aggregate_only": true,
+  "fixture": "synthetic_non_sensitive_card",
+  "passed": true,
+  "frozen_candidate": {
+    "config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+    "seed": 271828,
+    "weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b"
+  },
+  "adapter_smoke": {
+    "cold_start_and_inference_ms": 67900.951,
+    "warm_end_to_end_inference_ms": 1726.722,
+    "output_ascii_digits": true,
+    "output_length": 14,
+    "repeated_output_identical": true,
+    "model_load_count": 1
+  },
+  "gui_smoke": {
+    "first_process_elapsed_ms": 31339.409,
+    "restart_process_elapsed_ms": 34856.339,
+    "copy_matches_visible_result": true,
+    "reset_clears_image_and_result": true,
+    "restart_passed": true
+  },
+  "privacy": {
+    "card_or_result_persisted": false,
+    "result_printed_or_logged": false,
+    "screenshot_contains_card_or_result": false
+  },
+  "scope": {
+    "internal_validation_cards_accessed": 0,
+    "locked_audit_cards_accessed": 0,
+    "production_routing_changed": false
+  }
+}

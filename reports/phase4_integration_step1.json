@@ -1,0 +1,54 @@
+{
+  "admitted": 168,
+  "crop": "K2",
+  "decision": {
+    "rule": "ORACLE - BC-final exact <= 1 card stops the integration (D-008)",
+    "stop": true,
+    "token": "INTEGRATION_NOT_WORTH_IT:oracle_adds_at_most_one_card_over_bc_final"
+  },
+  "end_to_end": {
+    "ORACLE": 160,
+    "ORACLE_minus_bc_final": 1,
+    "bc_final_exact": 159,
+    "bc_final_interval": [
+      0.9007429060341441,
+      0.9752142098178704
+    ],
+    "both_right": 90,
+    "both_wrong": 8,
+    "cards": 168,
+    "only_bc_final_right": 69,
+    "only_second_model_right": 1,
+    "second_model_exact": 91,
+    "second_model_interval": [
+      0.46318725614217027,
+      0.618649996436655
+    ]
+  },
+  "identity_components": 168,
+  "independence": "intervals treat cards as independent",
+  "label": "possibly contaminated (D-008); the controls have been read as a gate 13+ times",
+  "not_admitted": 0,
+  "rule": "configs/phase4_integration_rule_v1.json step_1_complementarity and amendment 4",
+  "schema_version": "phase4_step1_result_v1",
+  "sensitivity_bc_final_from_bands": {
+    "ORACLE": 160,
+    "ORACLE_minus_bc_final": 1,
+    "bc_final_exact": 159,
+    "bc_final_interval": [
+      0.9007429060341441,
+      0.9752142098178704
+    ],
+    "both_right": 90,
+    "both_wrong": 8,
+    "cards": 168,
+    "only_bc_final_right": 69,
+    "only_second_model_right": 1,
+    "second_model_exact": 91,
+    "second_model_interval": [
+      0.46318725614217027,
+      0.618649996436655
+    ]
+  },
+  "utc": "2026-09-27T18:14:43+00:00"
+}

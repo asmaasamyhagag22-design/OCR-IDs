@@ -1,0 +1,162 @@
+{
+  "schema_version": "phase2m_h_frozen_candidate_v1",
+  "phase": "2M-H",
+  "candidate": "BC-final seed 3101",
+  "weights_path": "artifacts/phase2m_g/runs/BCFINAL_seed3101/final.weights.h5",
+  "weights_sha256": "00e23a14b3e9cf976864241f3e494ce383cdc52c8bbd2e52e54b53d03657d4df",
+  "weights_size_bytes": 538296,
+  "seed": 3101,
+  "architecture": "phase2l_b.build_v2 conditioned 160x576, unchanged from v2",
+  "output_shape": [
+    null,
+    14,
+    10
+  ],
+  "inference_configuration": {
+    "name": "single_view_no_tta",
+    "four_phase_tta": false,
+    "why": "4.08x the per-image latency for a delta of zero cards on the 168 controls. Item 2 settled before item 3 froze anything, because averaging four softmax outputs changes every margin.",
+    "measured_latency_ms": {
+      "with_tta": {
+        "mean_ms": 179.9,
+        "median_ms": 110.91,
+        "n": 504,
+        "p95_ms": 785.55
+      },
+      "without_tta": {
+        "mean_ms": 44.13,
+        "median_ms": 27.19,
+        "n": 504,
+        "p95_ms": 188.73
+      }
+    },
+    "latency_scope": "the band is already materialized; this excludes capture, detection and rectification"
+  },
+  "operating_point": {
+    "ranking_statistic": "weakest-position margin: per record, the minimum over the 14 slots of top-1 minus top-2 probability",
+    "primary": {
+      "margin": 0.966875,
+      "derived_from": "the 90-percent-coverage level of the BC-final curve on external validation",
+      "made_primary_by": "rule amendment 5, which reversed amendment 4"
+    },
+    "reference": {
+      "margin": 0.816601,
+      "derived_from": "the 95-percent-coverage level",
+      "was_primary_between": "amendment 4 and amendment 5"
+    },
+    "provenance": {
+      "set": "external validation 647",
+      "spent": true,
+      "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT",
+      "declared_in": "configs/phase2m_h_rule_v1.json amendments 1 and 4",
+      "not_re_chosen_after_the_audit_is_read": true
+    }
+  },
+  "release_design": {
+    "accept": "the reading matches the national ID the user typed, at any confidence",
+    "check_the_number_you_typed": "mismatch, margin at or above the primary value",
+    "retake_the_photo": "mismatch, margin below it",
+    "human_review": "after 2 retakes, which is 3 capture attempts in total",
+    "the_ocr_never_sees_the_typed_value": true,
+    "the_reading_is_never_shown_to_the_user": true
+  },
+  "measured_on_external_validation_647": {
+    "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT",
+    "records": 647,
+    "cards": 293,
+    "exact_records": 628,
+    "exact_cards": 278,
+    "at_the_primary_value": {
+      "D_correct": {
+        "ci95": [
+          0.048494,
+          0.104598
+        ],
+        "k": 47,
+        "n": 628,
+        "rate": 0.074841
+      },
+      "D_wrong": {
+        "ci95": [
+          0.842105,
+          1.0
+        ],
+        "k": 18,
+        "n": 19,
+        "rate": 0.947368
+      },
+      "threshold": 0.966875
+    },
+    "at_the_reference_value": {
+      "D_correct": {
+        "ci95": [
+          0.014308,
+          0.045161
+        ],
+        "k": 18,
+        "n": 628,
+        "rate": 0.028662
+      },
+      "D_wrong": {
+        "ci95": [
+          0.5,
+          0.944444
+        ],
+        "k": 14,
+        "n": 19,
+        "rate": 0.736842
+      },
+      "threshold": 0.816601
+    }
+  },
+  "measured_on_the_168_internal_controls": {
+    "status": "a regression gate read at least 13 times; the cleanest real-photo evidence available",
+    "exact": 159,
+    "wrong": 9,
+    "at_the_primary_value": {
+      "D_correct": {
+        "ci95": [
+          0.025157,
+          0.100629
+        ],
+        "k": 10,
+        "n": 159,
+        "rate": 0.062893
+      },
+      "D_wrong": {
+        "ci95": [
+          0.444444,
+          1.0
+        ],
+        "k": 7,
+        "n": 9,
+        "rate": 0.777778
+      },
+      "threshold": 0.966875
+    },
+    "at_the_reference_value": {
+      "D_correct": {
+        "ci95": [
+          0.0,
+          0.018868
+        ],
+        "k": 1,
+        "n": 159,
+        "rate": 0.006289
+      },
+      "D_wrong": {
+        "ci95": [
+          0.444444,
+          1.0
+        ],
+        "k": 7,
+        "n": 9,
+        "rate": 0.777778
+      },
+      "threshold": 0.816601
+    }
+  },
+  "production_changed": false,
+  "shadow_mode_only": true,
+  "the_locked_audit_has_not_been_opened": true
+}

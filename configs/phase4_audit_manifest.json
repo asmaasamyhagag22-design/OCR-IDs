@@ -1,0 +1,78 @@
+{
+  "command": {
+    "environment": {
+      "DISABLE_MODEL_SOURCE_CHECK": "True",
+      "GIT_CONFIG_COUNT/KEY_0/VALUE_0": "safe.directory for the vendored DocCornerNet repository only, process scope",
+      "OCRID_GOVERNANCE_OVERRIDE": "OPEN-377-AUDIT-<WSL local date of the read, date +%F>",
+      "PHASE2M_H_OPEN_THE_AUDIT": "yes-open-the-locked-377-once"
+    },
+    "preflight_first": "~/venvs/ocrid-py3119/bin/python scripts/phase4_audit.py preflight, without the two authorisations; it must print all_pass true",
+    "run": "~/venvs/ocrid-py3119/bin/python -m pytest -q -p no:cacheprovider \"tests/test_phase4_audit.py::test_the_locked_audit_read\"",
+    "shell": "the owner's own WSL terminal (Ubuntu), from the repository root (amendment 7h)"
+  },
+  "expected_audit_rows": 377,
+  "frozen": {
+    "inference": "single view, no TTA",
+    "primary_margin": 0.966875,
+    "typo_generator_seed": 20260922
+  },
+  "git_commit": "5bbd5b831ee40b70b070670ee7eac691e52661f0",
+  "inputs_sha256": {
+    "bc_final_weights": "00e23a14b3e9cf976864241f3e494ce383cdc52c8bbd2e52e54b53d03657d4df",
+    "governance_blocklist": "058afbaaa64e142f8d09a37488cc409db7df0b4d525128f2e6a70c7921f4db56",
+    "label_lookup": "fdf1a2717f2628764c07f4973ac32d0493f4ee80767811a66d17f88dc3e1dad8",
+    "paddle_model_files": {
+      "artifacts/arabic_PP-OCRv3_mobile_rec_infer/inference.json": "adab27210eae2b26c76e90abb8240d33cdf962b50f693e4a0bb3e4836db71f90",
+      "artifacts/arabic_PP-OCRv3_mobile_rec_infer/inference.pdiparams": "ab7a01be7e76cac4b25f52a81a9079856f1b9aa7e4b48370b7efeb77dff63ee7",
+      "artifacts/arabic_PP-OCRv3_mobile_rec_infer/inference.yml": "fd801db0002ff29e8f5908c72a2635eb88d5e744c1aebe0e8d857695a74ae159",
+      "artifacts/arabic_PP-OCRv5_mobile_rec_infer/inference.json": "d43832804d89c0e18d59f8446a3babd0ef60c44bc335efddac3176caf71d50af",
+      "artifacts/arabic_PP-OCRv5_mobile_rec_infer/inference.pdiparams": "4b4271fd1dd89a40b2056e1a42e58de7c0df2fdcf1a97ca9a8916d7ec45f9143",
+      "artifacts/arabic_PP-OCRv5_mobile_rec_infer/inference.yml": "21368419e6c016c31db55d316d59e11c128e1913e6e6fe10287084710043d3a6",
+      "artifacts/latin_PP-OCRv3_mobile_rec_infer/inference.json": "022b9fd837182ee83bb699d3d1cee7d05811997c887cae179a8c128ea29da3fa",
+      "artifacts/latin_PP-OCRv3_mobile_rec_infer/inference.pdiparams": "fa6f22a8b2a669c7d5b4dfd2607491abd4cd2467adf7077c9cc70ce8c47b61d9",
+      "artifacts/latin_PP-OCRv3_mobile_rec_infer/inference.yml": "f193ba660245a417090b757722f955930a2af750ac9258166cc006fe147e6794"
+    },
+    "split_manifest": "cc19d7d419a3e028cf8030e7557a656399d73ede300d4f127e3b90ccba578a1c",
+    "v2_architecture_config": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+    "v2_weights": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b"
+  },
+  "outputs": {
+    "read_started_marker": "artifacts/phase4_audit/read_started.json",
+    "sealed_predictions": "artifacts/phase4_audit/predictions.npz",
+    "sealed_predictions_sha256": "artifacts/phase4_audit/predictions.sha256",
+    "verdict": "artifacts/phase4_audit/verdict.json",
+    "verdict_sha256": "artifacts/phase4_audit/verdict.sha256"
+  },
+  "pinned_input_checks": {
+    "bc_final_weights": true,
+    "frozen_candidate": true,
+    "label_lookup": true,
+    "phase2m_h_rule": true,
+    "primary_margin": true,
+    "split_manifest": true,
+    "typo_generator_seed": true
+  },
+  "read_environment_parity": {
+    "estimated_seconds_for_377": 450,
+    "record": "reports/phase4_integration_parity_linux.json",
+    "sha256": "4062947e582b4790e34ca336decf7b935a8aea3bc3b979f4e74eda054e903ec9",
+    "wsl_seconds_per_image": 1.172
+  },
+  "rehearsal": {
+    "cards": 20,
+    "estimated_seconds_for_377": 252.0,
+    "sealed_predictions_sha256": "72bae623fb3d8925b90bd589cbe2f773f1ba0a61e09842099ff415bc59e6209a",
+    "seconds_per_image": 0.635,
+    "status_counts": {
+      "RETAKE_REQUIRED": 2,
+      "SHADOW_COMPARISON_READY": 18
+    }
+  },
+  "rule_files": {
+    "configs/phase2m_h_frozen_candidate.json": "1ff1fcaeda5f7e8bb4899a373833b1c15db432a34c46aa38dded1317ce84f513",
+    "configs/phase2m_h_rule_v1.json": "99a0a6142734ff932c906bdf71514b5cf957e4f852dc66ab063e54e557e48e03",
+    "configs/phase4_audit_rule_v1.json": "f35a670f80c0cefe65267b92f0cc7904760870939de944ac86d06cd5941d9a06"
+  },
+  "schema_version": "phase4_audit_manifest_v1",
+  "utc": "2026-09-27T18:44:44+00:00"
+}

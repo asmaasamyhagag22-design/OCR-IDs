@@ -1,0 +1,199 @@
+{
+  "schema_version": "phase4_final_rule_v1",
+  "phase": "Phase 4 final pass: a visual diagnosis of every residual failure, fixes by failure type, one rebuilt image",
+  "branch": "phase4-final, from phase4-ocr-service b648702; backup ref backup/phase4-final-entry-20260929; not pushed, to git or to any registry",
+  "declared_before_any_number": "This file is committed before any diagnosis count, fix effect, parity, latency or projection is computed. The Stage 2 fix designs are declared as an amendment after the Stage 1 diagnosis and before any fix is measured. Amendments are appended under `amendments`, never edited in place, and each states its reason.",
+  "owner_instruction": "run fully autonomously after one owner step; every choice is recorded in docs/release/decision_log.md as taken autonomously under owner instruction; a hard line skips the item, records it, and the run continues; commit after each completed stage, under the owner's name, with reports/phase4_final_progress.md updated first",
+  "scope_caps": {
+    "validation": "at most one validation cycle per instrument; an instrument that fails its second validation is recorded as a known limit and the conservative option is taken",
+    "image_scan": "no full image rescan; only the layers that changed are verified"
+  },
+
+  "hard_lines": {
+    "sealed_modules": "no edit to a sealed or hash-pinned module (scripts/phase4_accuracy.py SEALED_MODULES, src/geometry/*, every earlier configs/ file, config/); new code wraps them",
+    "training": "no training or fine-tuning",
+    "contract": "no breaking change to docs/release/ocr_api_contract_v1.md; additive changes only, each recorded as a decision",
+    "privacy": "no national ID, name, address or face description in any output, log, commit, report or chat message. Images may be looked at; only categories, verdicts and counts are reported. Tracked outputs are aggregate and pass the privacy scan",
+    "override": "the governance override is never set, simulated or bypassed by this session; the owner sets it in her own terminal",
+    "platform": "everything Paddle-dependent runs in WSL"
+  },
+
+  "owner_grant_D060": {
+    "text": "As project owner, I grant visual inspection, for diagnosis only, of the remaining failure images: the retired audit's residual losses (D-016 allows diagnostic use; no accuracy claim will ever be made on the 377); the permitted development pool's residual losses; the 168 controls' errors. The official audit result stays sealed as it is.",
+    "how_the_audit_part_is_used": "only through the folder the owner's own export writes (artifacts/phase4_final/diag_audit/). Its copies are looked at, and run through the pipeline to report the fixes' effect on them, labelled DIAGNOSTIC. They are never used to choose a parameter. The owner-only index is never read by phase code. No accuracy claim is made on the 377."
+  },
+
+  "stage_0": {
+    "session_checks": "CLAUDE.md present; the data guard probed with a non-existent external-test derivative (D-018's method): Read and Grep must be denied",
+    "entry": "scripts/phase4_final.py entry: the accuracy stage's frozen state (18 BC-final shadow checks, BC-final's known prediction, the DocCornerNet checkpoint, the nine Paddle model files the audit manifest pins, the primary margin 0.966875) and the LF sha256 of every sealed module; `check` before every commit compares with entry",
+    "audit_export": {
+      "who": "the owner only, in her WSL terminal, with OCRID_GOVERNANCE_OVERRIDE set there; without it the command refuses before reading anything (AUDIT_EXPORT_REFUSED)",
+      "residual": "the stage-1 audit diagnostic's own losses, in its own card order and selection (cmd_audit_diagnostic): an admission failure whose file is missing (the pinned card, an MP4 video; counted, not copied); an admission failure F1v did not recover; an admission failure F1v admitted but misread; an admitted misread F8 did not make exact",
+      "names": "neutral indices a01, a02, ... in a shuffled order, never the card_id",
+      "ledger": "the runtime guard records each read in the override ledger, and each copy adds its own event audit:diagnostic_copy:<neutral>",
+      "index": "owner_index_private.json maps each neutral name to its sealed row (row number and card_id); no phase code reads it",
+      "labels": "never written as text: a rendered strip of 14 numbered boxes (pixels) for the visual label verdict, and a salted sha256 for exact-match scoring",
+      "folder": "artifacts/phase4_final/diag_audit/: git-ignored (artifacts/), outside the Docker context (built from git archive plus the model manifest; .dockerignore names it too), deleted at the end of the phase with the deletion recorded",
+      "rehearsal": "audit-export-rehearsal runs the identical code path on the stage-1 rehearsal's development losses before the owner runs it"
+    }
+  },
+
+  "stage_1": {
+    "sources": {
+      "A_audit": "the diagnostic folder's residual losses (retired audit, DIAGNOSTIC)",
+      "D_dev": "S_dev (771): every card whose shipped-service reading (artifacts/phase4_service/service_rows_wsl.json, pipeline phase4-service-f1v-f8-v1) is not exact against its label (Phase 2L-A target, else the D-019 extraction), and the one undecodable file. The 3 files refused only by the 10 MB limit are Stage 4's, not a recognition loss: the CLI reads them as the frozen reference does",
+      "C_ctl": "S_ctl (168): every card the shipped service does not read exactly, with the 10 MB refusal handled as above"
+    },
+    "deduplication": "by card: a card appears once, under its first source in the order A, D, C. The sets are disjoint by construction (the pool excludes the controls, the audit and the consumed validation), and the count of duplicates removed is reported",
+    "exclusions": "known label errors: the cards named in the label-correction ledger (artifacts/phase2m_g/label_corrections.json, E1). It indexes external-train records only, so none is expected here; the count is reported. A card whose visual label verdict is `model right` is a newly found label error: it stays in the table, is counted separately, and is not a failure to fix",
+    "per_card_panel": "for each card, one private image under artifacts/phase4_final/: the original image (downscaled), the canonical card and the band BC-final read when there is one, the final reading as a digit strip, and the label as a digit strip",
+    "per_card_table": {
+      "where": "artifacts/phase4_final/diag_table_private.json, keyed by neutral index; never tracked",
+      "category": "one primary category from: upside_down_or_rotated; wrong_text_line_read; card_partly_outside_frame; glare_over_digits; blur_or_motion; low_resolution; occlusion; photocopy_or_screen_photo; not_an_id_card; video; other (described by type only, never by content). Secondary categories may be listed",
+      "label_verdict": "for misreads only, from my own reading of the image, compared internally and never written down: label_right, model_right, neither, unreadable",
+      "human_readable": "whether a human could read all 14 digits from this image: yes, partly, no"
+    },
+    "consistency_check": "a blind repeat: 10 cards drawn with seed 20260929 are re-categorised from their panels without the first pass in view; the agreement on the primary category is reported. It is a report on the instrument, not a gate",
+    "output": "an aggregate table of primary categories by source, with counts, and the list of categories large enough to fix: whole-line categories (upside_down_or_rotated, wrong_text_line_read) always, then any category with at least 3 cards across the three sources after deduplication and exclusions"
+  },
+
+  "stage_2": {
+    "declaration": "each fix's design, trigger, candidate parameters and selection rule are declared in an amendment to this file, committed before the fix is run on any card",
+    "safety_rule": "a fix may run only on (a) a detector failure (document_not_found, after F1v), (b) a structurally invalid reading (after F8), or (c) a structurally valid reading whose BC-final margin is below 0.966875. It never alters a structurally valid reading at or above 0.966875. Proven by unit tests, and by a zero-change count on those cards in S_dev and S_ctl",
+    "selection": "every parameter is chosen on S_dev only. A fix is adopted only if, on S_dev: the zero-change count holds; newly exact cards exceed lost ones; at most 1 card is lost; and no typo-typed ID (the label with its 12th digit changed, rule parity.typed_ids of the service phase) becomes silently accepted, on S_dev or S_ctl",
+    "reporting": {
+      "S_dev": "the selection set: in-sample to every choice, and 664 of its cards are BC-final replay-training cards",
+      "S_ctl": "labelled not pristine (read as a gate 13 or more times)",
+      "A_audit": "labelled DIAGNOSTIC; the fixes were designed after viewing these cards, and the report says so",
+      "unit": "cards; newly exact against lost, exact two-sided sign test; Clopper-Pearson intervals"
+    },
+    "projection": {
+      "what": "the projected end-to-end exact rate on 377-like data",
+      "method": "the audit's 377 cards are stratified label-free from the sealed outputs (keys admission_status, admitted, margin, bc_final only, D-020): document_not_found; admitted with a structurally invalid reading; admitted, valid, margin below 0.966875; admitted, valid, margin at or above; other (the missing file). Per stratum, the development gain of the whole new pipeline over the frozen one is (newly exact - lost) / n on S_dev, with S_dev stratified by the frozen reference in the same way. Projected exact = 342 + sum over strata of n_audit(stratum) x gain_dev(stratum)",
+      "interval": "95% percentile interval from 4000 bootstrap resamples of S_dev cards within strata, clustered by identity group where the manifests give one (else by card), seed 20260929, the audit strata held fixed; this covers the development rates' uncertainty only. Beside it, the stage-1 comparison and the DIAGNOSTIC count on the audit's own residuals, which is in-sample to the design and is not the projection"
+    }
+  },
+
+  "stage_3": {
+    "integration": "the adopted fixes go into the shared pipeline (src/service/recognizer.py and new modules under src/), so the service and the CLI both get them; no sealed module is edited",
+    "versions": "decision_rule_version is bumped as the owner instructs (route() and the threshold are unchanged; the version now names the whole decision path including the new fixes), and pipeline_version is bumped",
+    "golden_parity": "on S_dev and S_ctl, every card on which no new fix triggers produces the identical reading, margin and decisions (both typed IDs) as the shipped rows (service_rows_wsl.json)",
+    "measure": "the fixes' effect on S_dev (in-sample), S_ctl (not pristine), and the audit folder (DIAGNOSTIC)",
+    "tests": "unit tests for every trigger and for the safety rule; the existing suites updated"
+  },
+
+  "stage_4": {
+    "limit": "the upload limit is read from the environment (OCR_MAX_UPLOAD_MB); 25 MB is the documented production value and the code default; the 60-megapixel cap stays",
+    "check": "the 4 development files the 10 MB limit refused are answered, and their reading and margin equal the frozen reference",
+    "contract": "an additive change (a larger accepted size, and an environment setting), recorded as a decision; README_SERVICE.md updated"
+  },
+
+  "stage_5": {
+    "build": "one rebuild with every change, from the committed HEAD, by scripts/phase4_service_docker.sh build",
+    "layers": "the base, system-library, pip and model layers (every layer up to and including the model-file check) must have diff_ids identical to image ce10649's; only the code layers may differ",
+    "scan": "only the changed layers are scanned (no full rescan): each is exported from `docker save` and checked by the validated scanner's /app rules - no image, PDF, font or cache; every 14-digit run structurally impossible; every file either a committed file at HEAD (byte-equal) or the image's own user and label metadata",
+    "container_parity": "the controls (168), the 4 large files, and every card any fix touched, sent to the rebuilt container; readings and decisions equal to the WSL rows of the final pipeline",
+    "latency": "p50 and p95 of server processing_ms over the first 100 S_dev images in development_pool() order, one worker, sequential, after /ready",
+    "cleanup": "the diagnostic folders are deleted (scripts/phase4_final.py diag-delete) and the deletion recorded"
+  },
+
+  "verification": {
+    "reviews": "the stats-reviewer reviews the Stage 1 and Stage 2 reports; the instrument-validator validates any new derived measure before it drives a decision",
+    "every_commit": "the full suite, the privacy scan (no skip) and scripts/phase4_final.py check"
+  },
+
+  "amendments": [
+    {
+      "number": 1,
+      "date": "2026-09-29",
+      "reason": "The visual diagnosis of the development and control residuals (before any audit image was seen, and before any fix was run) showed that most whole-line losses come from the geometry's quarter turn: the orientation chooser picks a wrong turn on some cards, and F8 keeps the first structurally valid turn even when it reads a non-number region at a margin near 0. To design the Stage 2 fixes, the turn behaviour is measured first. This is a diagnosis, not a fix, and it decides nothing by itself.",
+      "stage_1b_turn_anatomy": {
+        "cards": "the Stage 1 residuals of S_dev and S_ctl (diag_dev, diag_ctl) whose frozen first pass found a card (a quad), and nothing else; never the audit folder",
+        "measured": "for each of the 4 quarter turns of the frozen geometry (the sealed canonicalize_from_source, the frozen band box and letterbox, BC-final through the loaded runtime): structural validity, BC-final's weakest margin, and exactness against the salted label hash; the same for the frozen band turned 180 degrees in place",
+        "output": "per card, private (traces_turns_private.json in the card's folder); aggregates only in print: how often a turn other than the chosen one reads exactly, and the margin of exact against wrong valid turns"
+      }
+    },
+    {
+      "number": 2,
+      "date": "2026-09-29",
+      "reason": "Stage 2's fix design, declared after the Stage 1 diagnosis of S_dev and S_ctl and the Stage 1b turn anatomy, and before any fix is run on any card. At the time of writing, no audit image had been seen: the owner's export had not run. Stage 1 (41 cards): 10 are label errors (the model read the printed number); the fixable categories of 3 or more cards are both card sides in one image (10), orientation (5 primary), and a card that fills or leaves the frame (4 tight crops, 2 partly outside); a wrong text line is involved in 14. The turn anatomy found that re-reading the frozen quad at another quarter turn reads exactly on 1 of 22 cards with a quad, because on rotated photos the quad itself is wrong. So the fix searches regions and re-detects, besides re-turning. One more mechanism seen in the panels: F1v stops at the first cascade step that yields a band and, when that reading is impossible, gates the card without trying the later steps; and F8 keeps the first structurally valid turn even at a margin near 0.",
+      "fix_F9": {
+        "module": "src/service/region_search.py (new; nothing sealed is edited)",
+        "position": "after F1v and F8, on their final result",
+        "trigger": "the safety rule exactly: not admitted, or a structurally invalid reading, or a structurally valid reading with margin below 0.966875 (region_search.triggered). A valid reading at or above 0.966875 is never touched",
+        "candidates_in_order": [
+          "turn_<k>: the frozen quad of the first pass (when there is one) at each quarter turn, the band read by BC-final",
+          "<region>:border_turn_<k>: each region's own border taken as the card outline at each quarter turn, when the region is card-shaped (aspect within 0.30 of ID-1). Regions: the whole image; the image trimmed of its uniform margin (every channel within 24 of the border's median; skipped if it shrinks by less than 3%); the top, bottom, left and right halves (0.55 of the side each)",
+          "<region>:detector: the frozen detector on each region (frozen gates, then the F1 relaxation at s_min 0.30) and the unchanged frozen downstream (orientation chooser, band, BC-final) on its quad",
+          "cascade:<step>: for a card that is not admitted only, the F1v cascade steps after relaxed_original (pad 0.10, the image turned 90/180/270, the four quadrant crops and the centre crop), each through the unchanged downstream"
+        ],
+        "choice": "structurally valid first, then the highest margin; the search stops at the first valid candidate at or above 0.966875",
+        "acceptance": "not admitted or invalid before: the best valid candidate is taken if its margin is at least accept_margin. Valid below the threshold before: replaced only by a different valid candidate at or above 0.966875. Otherwise nothing changes",
+        "parameter": "accept_margin, from the grid (0.30, 0.50, 0.80, 0.90, 0.966875), chosen on S_dev only",
+        "fix_label": "fixes_triggered gains F9:accepted or F9:not_accepted; geometry_source F9:<candidate>"
+      },
+      "measurement": {
+        "collection": "scripts/phase4_final.py f9-candidates (WSL, the service venv): every candidate (no early stop) on every triggered S_dev and S_ctl card, and on the stage-1 card-erased negatives (both sets, rebuilt by the same construction from the same pool indices); sealed before any label is read. The audit folder's copies are collected separately, later, labelled DIAGNOSTIC, and never enter the choice",
+        "scoring": "f9-score (Windows): labels in process; for each accept_margin, the early-stop and acceptance rules above are replayed from the sealed candidates",
+        "selection": "eligible if, on the rows: no change to any valid reading at or above the threshold (S_dev and S_ctl); on S_dev, newly exact > lost and lost <= 1; no reading equal to the typo-typed ID (S_dev and S_ctl); on the negatives, at most 3 new admissions and at most 1 of them at or above the threshold. Among the eligible, the largest S_dev net gain (newly exact - lost); a tie goes to the larger accept_margin. If none is eligible, F9 is not adopted",
+        "reported": "S_dev (in-sample to the choice), S_ctl (not pristine), the negatives, and a sensitivity without the 10 visual label errors; the exact two-sided sign test on newly exact against lost; latency per triggered card"
+      }
+    },
+    {
+      "number": 3,
+      "date": "2026-09-29",
+      "written_after": "the first f9-score result (F9_NOT_SELECTED), and says so",
+      "reason": "Amendment 2's selection shorthand, 'no reading equal to the typo-typed ID (S_dev and S_ctl)', contradicts the base rule it implements: stage_2.selection says a fix is adopted only if 'no typo-typed ID ... becomes silently accepted'. The scorer followed the shorthand and counted a case that exists identically in the shipped rows. F9 created 0 such cases at every grid point. The one case is a S_dev card whose shipped reading is structurally valid at a margin at or above 0.966875, which F9 can never touch (0 changes on such readings, by test and by count). It is Stage 1's d34, a visual label error: the model reads the printed number, and the simulated typo (the label with its 12th digit changed) equals that printed number.",
+      "change": "the criterion becomes the base rule's: typo-typed IDs silently accepted after F9 and not before (created by F9) must be 0 on S_dev and S_ctl. The count after F9, including pre-existing cases, is reported beside it",
+      "what_it_cannot_do": "no other criterion or the grid changes; the conservative reading (F9 not adopted) is reported as the alternative in the Stage 2 report"
+    },
+    {
+      "number": 4,
+      "date": "2026-09-29",
+      "written_after": "container parity run 1's result, and says so",
+      "reason": "Container parity run 1 (image d9f6301, the shipped configuration) FAILED: 290 of 296 files equal to the WSL rows in all 11 fields, and the 6 others are non-answers (5 x 500, the 60 s processing timeout; 1 x 503, busy), with no wrong answer. It ran while the owner's audit-final-read (a second full Paddle process) ran on the same 8 CPUs. F9's slowest search took 44.7 s alone in WSL.",
+      "change": "one rerun (run 2) of the same subset against a freshly started container of the same image, with the same flags and the 60 s default timeout, and nothing else of this session or the owner's running. Run 1 stays reported as FAIL beside it; run 2 is the gate. No timeout, thread or code change. Each run's non-answers are counted by whether F9 triggered on that file in WSL.",
+      "if_run_2_fails": "the image is not declared parity-clean; the report says so and the token is FINAL_PARTIAL"
+    },
+    {
+      "number": 5,
+      "date": "2026-09-30",
+      "reason": "The owner's Stage 6 (speed; no accuracy regression), declared before any Stage 6 number. The owner kept F9 (D-073).",
+      "stage_6": {
+        "measure": {
+          "where": "the shipped image, d9f6301, in a measurement container: the same hardened flags except a writable root, so that the S_dev images (771) can be copied into the container's own filesystem (docker cp), never mounted; one measurement script copied in the same way",
+          "per_image": "one worker, sequential, in development_pool() order: total time per image (p50, p95, p99, maximum; nearest rank), and the time inside each stage: the first pass with F1v (read_with_second_pass), F8 (reread_if_invalid), F9 (region_search.search); timers wrap these calls in the measurement process only, and the product code is not changed to time them",
+          "shares": "the share of images on which F1v, F8 and F9 trigger, and the mean and maximum time each takes when it triggers",
+          "projection_8000": "the competition CLI with 4 workers on the same in-container S_dev images: its wall time, including model loading, scaled to 8000 images as load + (wall - load) x 8000 / 771",
+          "identity_reference": "the per-image reading, margin and fixes of this measurement are the reference every speed-up must reproduce"
+        },
+        "speed_ups": {
+          "rule": "only changes that cannot change a reading; each is proven output-identical card for card on S_dev (reading, margin to 1e-9, admitted, reason_code and fixes on every one of the 771 images, and on the 168 controls as well) against the reference; a speed-up that is not identical on every card is dropped, not tuned",
+          "candidates": [
+            "memoisation within one recognize() call: the frozen detector's prediction on an identical image array, and the frozen downstream on an identical (image, quad), are computed once and reused by F1v, F8 and F9; deterministic functions on identical inputs",
+            "the card search (the detector, and the relaxed quad) on a downscaled working copy, the band then read from the full-resolution image, only where the detector input the frozen code builds is itself identical",
+            "F9's candidate order by how often each family wins on S_dev, stopping at the first candidate that passes acceptance, only if the final choice is identical card for card on S_dev and S_ctl"
+          ]
+        },
+        "time_budget": "only if, after the identical speed-ups, the worst S_dev image exceeds 20 s or the projected 8000 images at 4 workers exceed 2.5 h: a declared per-image F9 budget below the request timeout, with the exact reads lost on S_dev reported against the time saved",
+        "request_timeout": "OCR_REQUEST_TIMEOUT_S defaults to 120 (owner decision 3); the worst measured image must stay below half of it",
+        "rebuild": "if code changes, one rebuild; the changed layers only are scanned with the validated layer scanner (layers 1-15 identical to ce10649); the container parity subset of stage_5 is rerun against the new image (every file identical to the final WSL rows) and latency re-measured",
+        "token": "STAGE6_READY when every item holds; otherwise STAGE6_PARTIAL:<last completed item>"
+      }
+    },
+    {
+      "number": 6,
+      "date": "2026-09-30",
+      "reason": "The owner's Stage 7 (handover quality; no behaviour change), declared before any change.",
+      "stage_7": {
+        "scope": "what ships is the static import closure of the image's three entry points (src.service, src.service.cli, src.service.healthcheck), following every import statement at every level, plus the golden data files; scripts/phase4_final_scope.py computes it and writes docker/app_code_files.txt, and the image's code layer is built from that list instead of the whole src/. Files in src/ outside the closure are research history: marked in their headers, never copied into the image (a test proves it)",
+        "static_analysis": "ruff check and ruff format, and mypy (strict where the code can reach it), on the shipped files that are not sealed or hash-pinned. Sealed modules (scripts/phase4_accuracy.py SEALED_MODULES, src/geometry/*, scripts/phase2l_b.py, and every file whose hash a test or config pins) are analysed and reported, never edited. Tool versions pinned in requirements-lint.txt; the tools run from their own venv (~/venvs/lint-py311), never the service venv",
+        "no_behaviour_change": "every edit must keep every reading and decision identical: only formatting, annotations, names local to a module, docstrings, dead-code removal proven unreachable, and splits of long functions that keep the same statements in the same order. Proof: the full suite and the privacy scan; the golden self-test; one rebuild with the changed layers scanned; and the container parity subset of stage_5 identical in all 11 fields to the final WSL rows",
+        "review": "a fresh-context subagent reviews the shipped code for maintainability only; its findings are fixed under the rule above, or listed with a reason",
+        "tests": "a fast target running only the shipped-code tests in under 2 minutes, documented; the full suite unchanged",
+        "docs": "docs/ARCHITECTURE.md (one page) and docs/CODE_WALKTHROUGH.md",
+        "token": "STAGE7_READY when every item holds; otherwise STAGE7_PARTIAL:<last completed item>"
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "access": {
+    "consumed_internal_validation": 0,
+    "external_test_opened": 0,
+    "external_validation_opened": 0,
+    "locked_audit": 0
+  },
+  "closed_by": "owner_instruction_before_implementation",
+  "decision": "FRONT_EVIDENCE_UNDERPOWERED",
+  "entry": {
+    "backup_ref": "backup/phase2m-b1-rejected-20260915",
+    "base_commit": "ac2f0eac2cecd2a912c93c006519a19cd9694a5b",
+    "branch": "phase2m-b2-preprocessing-repair",
+    "worktree_clean": true
+  },
+  "fallback_enabled": false,
+  "fixed14_v2": {
+    "config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+    "internal_validation_exact": "576/618",
+    "reconstruction_168_intact": true,
+    "weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b"
+  },
+  "implementation_started": false,
+  "phase2m_b_candidate_hashes_verified": true,
+  "production_changed": false,
+  "safety_set_inventory": {
+    "available_real": {
+      "egyptian_id_back": 0,
+      "non_card_local": 37,
+      "not_an_id": 5,
+      "wrong_side": 1
+    },
+    "required": {
+      "genuine_front_positive": 200,
+      "non_card_negative": 100,
+      "synthetic_clipped_line_negative": 300,
+      "wrong_side_or_not_id_negative": 100
+    },
+    "shortfall_blocking": "wrong_side_or_not_id_negative"
+  },
+  "schema_version": "phase2m_b2_metrics_v1",
+  "training_runs": 0
+}

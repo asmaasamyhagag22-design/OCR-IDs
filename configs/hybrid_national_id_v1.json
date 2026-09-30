@@ -1,0 +1,29 @@
+{
+  "config_version": "hybrid_national_id_v1",
+  "semantic_owner": "configs/field_regions_v5.json:id_number",
+  "scope": "national_id_number_only",
+  "margin_grid": [
+    {"x_fraction_of_roi": 0.00, "y_fraction_of_roi": 0.00},
+    {"x_fraction_of_roi": 0.02, "y_fraction_of_roi": 0.10},
+    {"x_fraction_of_roi": 0.04, "y_fraction_of_roi": 0.15}
+  ],
+  "candidate_rules": {
+    "minimum_detector_score": 0.50,
+    "minimum_aspect_ratio": 2.0,
+    "maximum_height_fraction_of_fixed_roi": 1.5,
+    "center_must_be_inside_fixed_roi": true
+  },
+  "detector": {
+    "model_name": "PP-OCRv5_mobile_det",
+    "source_url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv5_mobile_det_infer.tar",
+    "mode": "text_detection_inside_expanded_roi_only",
+    "preprocessing": "none_outside_model_required_input_transform"
+  },
+  "selection": {
+    "target_digit_count": 14,
+    "uses_ground_truth": false,
+    "tie_policy": "fallback_to_fixed_roi_and_needs_review",
+    "no_candidate_policy": "fallback_to_fixed_roi"
+  },
+  "padding_pixels": 0
+}

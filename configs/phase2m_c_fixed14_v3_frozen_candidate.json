@@ -1,0 +1,59 @@
+{
+  "architecture": "phase2l_b.build_v2 conditioned 160x576",
+  "best_epoch": 6,
+  "controls": {
+    "baseline_digit_accuracy": 0.967687,
+    "baseline_exact": 152,
+    "candidate_digit_accuracy": 0.972789,
+    "candidate_exact": 158,
+    "cards": 168,
+    "net_exact_change": 6,
+    "newly_exact": 6,
+    "regressed_exact": 0
+  },
+  "families": {
+    "B": {
+      "complete": true,
+      "eligible": true,
+      "mean_validation_exact": 606.0,
+      "seed_stable": true,
+      "validation_exact_rates": [
+        0.938176,
+        0.935085
+      ]
+    },
+    "C": {
+      "complete": true,
+      "eligible": true,
+      "mean_validation_exact": 601.5,
+      "seed_stable": true,
+      "validation_exact_rates": [
+        0.925811,
+        0.933539
+      ]
+    }
+  },
+  "family": "B",
+  "frozen_utc": "2026-09-15T20:38:43+00:00",
+  "output_shape": [
+    null,
+    14,
+    10
+  ],
+  "production_changed": false,
+  "rule_sha256_lf": "e4bdac468adf311151313650c0313935419f08627e6568c0616eb2113348d2aa",
+  "schema_version": "phase2m_c_fixed14_v3_frozen_candidate_v1",
+  "seed": 3101,
+  "validation": {
+    "baseline_digit_accuracy": 0.924597,
+    "baseline_exact": 447,
+    "candidate_digit_accuracy": 0.99183,
+    "candidate_exact": 607,
+    "cards": 647,
+    "net_exact_change": 160,
+    "newly_exact": 160,
+    "regressed_exact": 0
+  },
+  "weights_path": "artifacts/phase2m_c/frozen/fixed14_v3.weights.h5",
+  "weights_sha256": "27cbcf9f93890d85a91f63c3c1a07ed1f8a7a4e85803ad3d90b60394ffdc492a"
+}

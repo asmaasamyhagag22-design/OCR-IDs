@@ -1,0 +1,158 @@
+{
+  "schema_version": "phase2l_b_fixed14_config_v2",
+  "phase": "2L-B",
+  "production_changed": false,
+  "source_scope": "frozen_888_card_calibration_only",
+  "excluded_scopes": [
+    "618_card_internal_validation",
+    "377_card_locked_audit",
+    "all_audit_artifacts"
+  ],
+  "phase2l_a_inputs": {
+    "config_sha256": "52f412c5da078ff4735da2b7fdd2b86609aa284d6388ee89772d4b8214c26a36",
+    "private_manifest_sha256": "36975c87b1993fafc47ebf787eb08ef8794329c99fa1e2cf6536a4205a288438",
+    "inner_train_cards": 720,
+    "inner_holdout_cards": 168
+  },
+  "broad_band": {
+    "canonical_size": [1000, 630],
+    "bbox_xyxy": [350, 430, 1000, 610],
+    "native_hw": [180, 650],
+    "owner_bbox_xyxy": [420, 479, 980, 558],
+    "owner_in_band_xyxy": [70, 49, 630, 128],
+    "runtime_truth_dependent": false
+  },
+  "resolution_contract": {
+    "phase2l_a_broad_band_hw": [[80, 560], [64, 448]],
+    "paddle_narrow_crop_height": 48,
+    "paddle_narrow_crop_min_width": 320,
+    "corrected_broad_band_hw": [160, 576],
+    "corrected_broad_band_justification": "650:180 band aspect 3.611; 576/650 = 0.886 and 160/180 = 0.889, so the band fills the tensor with at most one padded row and no stretching",
+    "narrow_crop_control_hw": [64, 448],
+    "padding_value": 245,
+    "minimum_owner_pixels_per_digit": 24.0,
+    "maximum_padding_fraction_each_axis": 0.05
+  },
+  "model_v2": {
+    "family": "fixed14_v2_groupnorm_cnn_vertical_attention_ordered_slots",
+    "output_shape": [null, 14, 10],
+    "normalization": "group_norm_8_groups_and_layer_norm",
+    "dropout": 0.0,
+    "horizontal_stride": 4,
+    "vertical_stride": 16,
+    "height_reduction": "per_column_softmax_attention",
+    "static_control_alignment": "global_trainable_gaussian_slots_same_as_phase2l_a_but_on_v2_encoder",
+    "conditioned_alignment": "per_image_soft_argmax_line_center_and_width_ordered_anchors_plus_content_cross_attention",
+    "slot_sigma_init_pitch_fraction": 0.35,
+    "line_width_log_range": 0.405465,
+    "attention_key_dim": 32,
+    "content_logit_cap": 3.0,
+    "center_score_kernel": 9
+  },
+  "overfit_ladder": {
+    "tag": "phase2l-b-overfit-v1",
+    "pool": "inner_train_and_crop_integrity_complete_auto_current_exact",
+    "sizes": [1, 8, 32],
+    "nested_subsets": true,
+    "augmentation": false,
+    "dropout": false,
+    "seed": 20260915,
+    "optimizer": {
+      "name": "adam",
+      "learning_rate": 0.001,
+      "global_clipnorm": 5.0,
+      "full_batch": true,
+      "learning_rate_schedule": "constant"
+    },
+    "max_steps": 1500,
+    "evaluate_every_steps": 25,
+    "early_stop_requires_train_loss_at_most": 0.01,
+    "early_stop_requires_gate_thresholds_in_inference_mode": true,
+    "thresholds": {
+      "1": {"digit_accuracy": 1.0, "sequence_accuracy": 1.0},
+      "8": {"digit_accuracy": 0.995, "sequence_accuracy": 1.0},
+      "32": {"digit_accuracy": 0.99, "sequence_accuracy": 0.95}
+    }
+  },
+  "phase2l_a_reproduction": {
+    "protocol": "phase2l_a_overfit_gate_exact_keras_fit_batch8_four_50_epoch_blocks_learning_rate_halving",
+    "resolution_hw": [80, 560],
+    "seed": 271828
+  },
+  "synthetic_gate_a": {
+    "canvas_hw": [64, 448],
+    "slots": 14,
+    "slot_pitch_px": 32,
+    "glyph_center_y_px": 32,
+    "font": "C:/Windows/Fonts/arial.ttf",
+    "font_size_px": 40,
+    "background_gray": 240,
+    "ink_gray": 20,
+    "rendering": "one_glyph_per_draw_call_at_explicit_slot_center",
+    "seed": 5151
+  },
+  "synthetic_broad_band": {
+    "canvas_hw": [180, 650],
+    "fonts": [
+      "C:/Windows/Fonts/arial.ttf",
+      "C:/Windows/Fonts/tahoma.ttf",
+      "C:/Windows/Fonts/trado.ttf",
+      "C:/Windows/Fonts/majalla.ttf",
+      "C:/Windows/Fonts/times.ttf"
+    ],
+    "font_size_px": [46, 64],
+    "slot_pitch_px": [34.0, 44.0],
+    "line_left_px": [8, 170],
+    "line_center_y_px": [55, 125],
+    "background_gray": [205, 250],
+    "ink_gray": [10, 80],
+    "rendering": "one_glyph_per_draw_call_at_explicit_slot_center",
+    "distractor_rows": "short_non_digit_bars_above_and_below_only_in_degraded_mode",
+    "degraded": {
+      "gaussian_blur_sigma": [0.3, 1.3],
+      "noise_sigma": [0.0, 8.0],
+      "jpeg_quality": [45, 95],
+      "rotation_degrees": [-1.5, 1.5],
+      "glyph_jitter_px": [-2, 2],
+      "glare_probability": 0.35,
+      "background_line_pattern_probability": 0.7
+    }
+  },
+  "translation_proof": {
+    "training_samples": 4000,
+    "training_steps": 1800,
+    "batch_size": 32,
+    "seed": 7373,
+    "fixture_count": 48,
+    "fixture_seed": 9191,
+    "shifts_native_px": [[-48, 0], [48, 0], [0, -18], [0, 18]],
+    "required_prediction_unchanged_rate": 0.95,
+    "required_mean_abs_horizontal_center_error_tensor_px": 8.0
+  },
+  "candidate": {
+    "family": "fixed14_v2_conditioned_160x576",
+    "seeds": [271828, 314159],
+    "batch_size": 32,
+    "clean_synthetic_samples": 6000,
+    "clean_synthetic_epochs": 2,
+    "degraded_synthetic_samples": 12000,
+    "degraded_synthetic_epochs": 2,
+    "synthetic_learning_rate": 0.001,
+    "real_learning_rate": 0.0005,
+    "real_epochs": 60,
+    "real_training_pool": "inner_train_usable_complete_line_only",
+    "real_augmentation": {
+      "translate_native_px": [-10, 10],
+      "brightness_scale": [0.85, 1.15],
+      "probability": 0.8
+    },
+    "hard_example_pass": {
+      "source": "inner_train_sequence_errors_after_real_fine_tuning",
+      "epochs": 10,
+      "learning_rate": 0.0001,
+      "random_inner_train_mix_ratio": 1.0
+    },
+    "holdout_use": "single_evaluation_after_configuration_frozen",
+    "epoch_selection": "final_epoch_no_holdout_monitoring"
+  }
+}

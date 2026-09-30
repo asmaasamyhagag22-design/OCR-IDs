@@ -1,0 +1,490 @@
+{
+  "schema_version": "phase2m_g_rule_v1",
+  "phase": "2M-G",
+  "goal": "Fixed14 toward 641 of 647 external-validation records on its own, with no third-party model and no Phase 2M-F material",
+  "committed_before": [
+    "any training",
+    "any inner-validation read",
+    "any probe result"
+  ],
+  "production_changed": false,
+  "amendments": [
+    {
+      "id": 1,
+      "utc": "2026-09-21",
+      "section": "recipe design, the control gate reference, and two reporting constraints",
+      "committed_before": "any item-3 training result exists",
+      "item_1_recipes_B_and_C_are_merged": {
+        "power_argument_verified_here": {
+          "inner_validation_cards": 241,
+          "control_model_card_error_on_the_only_set_it_did_not_train_on": 0.058,
+          "expected_wrong_cards": 14,
+          "concordant_wins_needed_for_p_below_0_05": 6,
+          "p_for_2_wins_0_losses": 0.5,
+          "p_for_3_wins_0_losses": 0.25,
+          "conclusion": "a recipe change that fixes 2 or 3 cards cannot be separated from seed noise, so running B and C separately would most likely leave both inconclusive and spend two extra runs to learn nothing"
+        },
+        "replaces": "the sequential B then C design",
+        "with": {
+          "BC": "cosine learning-rate decay to zero over the budget, weight EMA with decay 0.999, and shear augmentation at the archive's declared plus or minus 5 degrees horizontally and vertically"
+        },
+        "runs": "A and BC, two seeds each",
+        "if_BC_advances": "apply item 4, capacity, on top of BC",
+        "ablate_B_against_C": "only if BC fails to advance, or later if attribution is needed",
+        "cpu_saved": "four runs instead of eight in the item-3 batch"
+      },
+      "item_2_recipe_D_removed": {
+        "why": "item 0 measured zero-attraction on the control model at 8.3 percent of wrong positions on external validation, against 27.1 percent on frozen v3, and the direction reversed: 2 errors predict zero against 6 errors on a true zero. The precondition the rule set for D is not met.",
+        "item_1b_still_runs": "as a probe",
+        "if_it_shows_a_prior_driven_gain": "report it, and do not reinstate D without a further amendment"
+      },
+      "item_3_control_gate_reports_both_references": {
+        "v2": {
+          "exact": 152,
+          "control_model": 160,
+          "newly": 8,
+          "regressed": 0,
+          "net": 8
+        },
+        "v3": {
+          "exact": 158,
+          "control_model": 160,
+          "newly": 2,
+          "regressed": 0,
+          "net": 2
+        },
+        "rule": "every candidate reports the 168-control check against both frozen v2 and frozen v3; the cap is applied to the v2 reference as the Phase 2M-C rule defined it, and the v3 figure is reported beside it"
+      },
+      "item_4_inner_validation_is_never_a_final_accuracy": {
+        "why": "the 42-sheet label review will correct some inner-validation cards, and only disagreements are reviewed, so absolute accuracy on corrected labels is biased upward",
+        "what_is_unaffected": "recipe comparisons, because every recipe is scored against the same corrected labels and the bias is shared",
+        "forbidden": "reporting any inner-validation number as a final accuracy, corrected or original"
+      },
+      "item_5_the_phase_2m_e_lesson": {
+        "record_in_the_report": true,
+        "lesson": "two Phase 2M-E findings that looked structural disappeared under longer training. Alignment dominance fell from 15 of 40 wrong records to 4 of 21, and zero-attraction fell from 27.1 percent of wrong positions to 8.3 percent and reversed direction.",
+        "conclusion": "error anatomy performed on an unconverged model describes the undertraining, not the model. Convergence has to be established before an anatomy is read as a property of the architecture.",
+        "consequence_for_this_phase": "the ALIGNMENT_DOMINANT token from Phase 2M-E stands as evaluated, and is reported with this qualification attached wherever it is cited"
+      }
+    },
+    {
+      "id": 2,
+      "utc": "2026-09-21",
+      "section": "the first review batch is withdrawn; a second design supersedes it",
+      "what_went_wrong": {
+        "finding": "in 26 of the 37 sheets the only disagreement between the two candidates was slot 14, and in 28 of 37 slot 14 was among the disagreements",
+        "why_that_is_a_defect": "slot 14 sits about 0.8 digit pitches from the band edge while slot 1 sits about 2.6, because the band context is 0.16 of the line length on the left and 0.04 on the right. The card edge and its shadow fall there. The sheet showed that cell at native scale and asked the owner to adjudicate it.",
+        "the_owner_flagged_it": "the last digit is cropped",
+        "verdicts_returned": 25,
+        "disposition": "the 25 verdicts from batch G are not used for any label correction. They were collected against a sheet that did not show what it asked about."
+      },
+      "second_design": {
+        "batch": "H, in artifacts/phase2m_g/review_train_42_v2",
+        "changes": [
+          "the source crop extends a full band width past the line instead of a third, so the card edge and what lies beyond it are visible",
+          "every panel is contrast-stretched on its own percentiles",
+          "each disputed digit is shown magnified to 280 px with its slot number named",
+          "the disputed positions are bracketed in both candidate strings, which tells the reviewer where to look without revealing which string is the annotation"
+        ],
+        "unreadable_is_first_class": "if the digit still cannot be read, unreadable is the correct answer and is more informative than a guess"
+      },
+      "a_fourth_instrument_failed": {
+        "instrument": "a per-cell contrast proxy, the 2nd-to-98th percentile dynamic range inside the disputed cell",
+        "what_it_reported": "the disputed cells carry HIGHER contrast than the mid-line cells, median ratio 1.19 against 1.10 at slot 1, and none severely degraded",
+        "why_it_is_wrong": "dynamic range cannot separate crisp ink on paper from paper lying next to a black void. A half-occluded cell scores as high contrast.",
+        "disposition": "not reported as evidence, and no fifth instrument is built. The human verdict is the instrument here, and it is the only one in this project that has not failed a validation.",
+        "running_count": "this is the fourth measurement instrument in Phases 2M-E and 2M-G to fail a check after a number had already been computed from it"
+      },
+      "consequence_if_records_come_back_unreadable": {
+        "meaning": "a record whose disputed digit is not present in the image cannot be read correctly by any model, and its label cannot be verified either",
+        "effect_on_the_ceiling": "such records lower the attainable train exact further, compounding amendment 10 of the Phase 2M-E rule, which already recorded the 36-record label-error estimate as a lower bound",
+        "effect_on_this_phase": "they are excluded from the label-correction ledger and counted separately as an unlabelable floor"
+      }
+    },
+    {
+      "id": 3,
+      "utc": "2026-09-21",
+      "section": "verdict parsing extended to three free-text phrases the owner used",
+      "phrases": {
+        "DOESN'T APPEAR": "unreadable_or_cannot_tell",
+        "DON'T KNOW": "unreadable_or_cannot_tell",
+        "NOT A OR B": "neither"
+      },
+      "why_this_is_safe": "each phrase is an unambiguous synonym of an option already printed on the sheet, which offered A correct, B correct, neither, unreadable and cannot tell. All three map to non-endorsements, so the extension cannot move a single record into or out of the label or prediction counts, and therefore cannot move the label-error rate in either direction. It only moves records out of unparsed and into the unlabelable floor.",
+      "counts_at_the_time_of_writing": {
+        "answered": 37,
+        "endorsed_a_string": 24,
+        "unparsed_before_this": 13
+      },
+      "rule_for_the_future": "the verdict template will offer the five options as a closed list rather than free text"
+    },
+    {
+      "id": 4,
+      "utc": "2026-09-21",
+      "section": "owner decision: no further human review; a geometric visibility proxy replaces it",
+      "reviewer_budget": "exhausted at 111 sheets across four batches; options (a) rebuild-and-re-review and (c) declare futile are rejected",
+      "item_1_visibility_proxy": {
+        "features_per_digit_box_geometry_only": [
+          "distance from the box to the nearest source-image border, in digit pitches",
+          "fraction of the box area lying outside the source image",
+          "fraction of the box area landing in band padding, that is the constant 245 fill the warp writes outside the source",
+          "whether the band edge clips the box"
+        ],
+        "record_flag": "a record is flagged when any of its 14 boxes has (fraction outside the source image + fraction in band padding) at or above theta",
+        "theta_selection": "leave-one-out cross-validation over the 57 existing training verdicts; the reported sensitivity and specificity are the out-of-fold ones, so theta is never tuned and scored on the same record",
+        "calibration_target": "unreadable-or-neither against readable, on the 20-sheet and 37-sheet training batches, 57 verdicts in total",
+        "usability_threshold_declared_before_computing": {
+          "sensitivity_at_least": 0.6,
+          "specificity_at_least": 0.7,
+          "balanced_accuracy_at_least": 0.7,
+          "rationale": "a proxy used to estimate a ceiling must not over-flag, so specificity carries the higher bar; all three are reported with Wilson intervals"
+        },
+        "if_it_passes": "apply it to external validation and report the readable ceiling directly",
+        "if_it_fails": "report the 37-sheet extrapolation interval as it stands and say plainly that the proxy failed"
+      },
+      "item_2_source_clipping_versus_band_clipping": {
+        "distinction": "a digit visible in the source image but clipped by our band is a materialization defect of ours, not unreadable data",
+        "report": "how many records and digits fall in each category, separately",
+        "propose_a_fix": "the right context is 0.04 of the line length against 0.16 on the left; a symmetric or widened right context is the candidate fix, measured but not applied in this phase"
+      },
+      "item_3_mark_the_2m_e_conclusions_as_instrument_dependent": {
+        "affected": [
+          "image quality excluded",
+          "GLYPHS_LEGIBLE"
+        ],
+        "why": "both came from the sheet design withdrawn in amendment 2, which could not show a clipped digit. With a design that shows it, the same reviewer returned 35 percent unreadable or neither where the old design returned zero.",
+        "action": "mark them in the Phase 2M-E report; do not re-review",
+        "what_tests_the_glyph_hypothesis_instead": "item 3 training, directly"
+      },
+      "item_4_training_labels": {
+        "apply": "every label correction from every review, including the record from the 20-sheet batch that the control model now reproduces wrongly",
+        "exclude_from_training": "every record a review judged unreadable or neither",
+        "why_exclude": "training a model to emit digits for ink that is not in the image teaches it to guess",
+        "slot_masking": "proxy-based slot masking may be proposed after item 1 validates the proxy, and is not applied in this run"
+      },
+      "item_5_no_futility_declaration_on_an_extrapolation": {
+        "forbidden": "declaring PHASE2M_G_FUTILE from the extrapolated interval",
+        "record_instead": "99 percent exact on all records of this archive sits at or above the estimated readable ceiling, interval 636 to 642 of 647, so it is not a well-posed target on this data",
+        "report_alongside": [
+          "accuracy on the records the proxy marks fully visible",
+          "an accept/retake curve, exact on accepted at declared coverage levels, for the control model and for every item-3 candidate"
+        ],
+        "coverage_levels": [
+          1.0,
+          0.99,
+          0.98,
+          0.95,
+          0.9
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "utc": "2026-09-21",
+      "section": "item 4 skipped; the A-versus-BC comparison is declared confounded; item 6 is specified in full before BC-final trains",
+      "item_4_capacity_skipped": {
+        "why": "BC leaves 8 wrong cards of 241. A capacity change would need 6 concordant wins with zero regressions to reach p below 0.05, out of 8 available. It cannot be established on this sample."
+      },
+      "protocol_defect_in_item_3": {
+        "what_happened": "recipes A and BC were both initialized from the control model, and the control model trained on all 2673 external-train records, including the 241 cards later carved out as inner validation. Step 0 of every run reads 237 of 241, which is memorization and not a baseline.",
+        "why_it_confounds_the_comparison": "cosine decay to zero and weight EMA at 0.999 both hold the weights nearer their initialization than constant-rate A does, so BC retains more of that memorized inner-validation content by construction",
+        "consequence": "the inner-validation difference, 233.5 for BC against 229.5 for A, is confounded with how fast each recipe forgets its initialization. It is evidence neither for nor against BC as a recipe.",
+        "quantification": "the weight distance from initialization is reported per checkpoint for both recipes",
+        "what_a_clean_comparison_would_need": "restarting both recipes from frozen v2, which never saw external data",
+        "not_run_now": true,
+        "effect_on_the_advancement_decision": "BC still satisfies the declared advancement rule, improving in both seeds, and is carried into item 6 on that basis. The report must state that the rule was satisfied on a confounded metric."
+      },
+      "item_6_step_count_amended": {
+        "was": "fixed from inner validation",
+        "why_that_fails": "the inner-validation curves decline monotonically from step 0 because the initialization had memorized those cards, so their best step is step 0, which is not a training budget",
+        "is": 2664,
+        "source": "the Phase 2M-E control run budget, the same figure item 3 used"
+      },
+      "item_6_declared_before_training": {
+        "recipe": "BC: cosine decay to zero over 2664 steps, weight EMA 0.999, shear plus or minus 5 degrees",
+        "training_pool": "the full external train minus the 13 excluded unreadable records, plus the internal replay pool, with the corrected labels",
+        "seeds": [
+          3101,
+          3202
+        ],
+        "primary_seed": 3101,
+        "why_3101": "the lower seed, following the Phase 2M-C convention. The inner-validation result is confounded, so it is not used to choose the seed.",
+        "four_phase_tta": {
+          "applied_to_the_primary_reading": false,
+          "reported_as_a_secondary_line": true,
+          "why": "the item 1 probe showed a consistent gain with zero regressions in both cross-fitted halves but did not reach significance. Keeping the primary reading single-view makes it directly comparable with the control model reading, which was single-view."
+        },
+        "two_seed_ensemble": {
+          "reported": true,
+          "status": "secondary only, never the primary candidate"
+        },
+        "checkpoint_policy": "the final checkpoint is used. No checkpoint is selected on any metric.",
+        "reads": {
+          "external_validation": 1,
+          "internal_controls_168": 1
+        }
+      },
+      "item_6_the_comparison_that_counts": {
+        "against": "the control model's existing external-validation reading, 626 records and 276 cards",
+        "not_against": "recipe A, whose comparison with BC is confounded as recorded above",
+        "test": "paired card-level two-sided sign test on discordant cards",
+        "why_it_is_clean": "neither the control model nor BC-final trained on external validation"
+      },
+      "item_5_reporting_with_a_failed_proxy": {
+        "proxy_status": "FAILED its declared bar: out-of-fold sensitivity 1.000, specificity 0.000, balanced accuracy 0.500, against the required 0.60, 0.70 and 0.70",
+        "consequence": "accuracy on records the proxy marks fully visible cannot be reported, because the proxy does not identify them",
+        "substitute_permitted": "accuracy on records whose geometric flag score is exactly zero may be reported as a descriptive split, explicitly labelled as not a validated visibility measure",
+        "still_required_for_both_models": [
+          "accuracy on all records",
+          "the accept/retake curve at the declared coverage levels"
+        ],
+        "coverage_levels": [
+          1.0,
+          0.99,
+          0.98,
+          0.95,
+          0.9
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "utc": "2026-09-21",
+      "section": "coverage levels for the accept/retake curve, and the freeze",
+      "coverage_levels": [
+        1.0,
+        0.98,
+        0.95,
+        0.9,
+        0.85
+      ],
+      "declared_before_computing_the_curve": true,
+      "ranking_statistic": "per record, the minimum over the 14 slots of top-1 probability minus top-2, the same statistic Phase 2M-E used",
+      "reported_at_each_level": [
+        "accepted",
+        "exact on accepted",
+        "exact rate on accepted",
+        "wrong records caught"
+      ],
+      "models": [
+        "the Phase 2M-E control model",
+        "BC-final seed 3101"
+      ],
+      "status": "external validation, exploratory; no operating point is frozen",
+      "freeze": {
+        "candidate": "BC-final seed 3101",
+        "condition": "it passes the 168-control gate",
+        "no_switching_after_reading": "the control model and BC-final are statistically indistinguishable on external validation, 4 wins against 2 losses at p = 0.6875. The candidate was declared before the read and does not change because the result came back flat.",
+        "primary_reading_is_single_view": "the four-phase TTA line stays secondary, as amendment 5 declared, even though it scored highest"
+      },
+      "proxy_status_restated": "the geometric visibility proxy was built and reported: it FAILED its declared bar with out-of-fold sensitivity 1.000, specificity 0.000 and balanced accuracy 0.500 against the required 0.60/0.70/0.70. Accuracy on proxy-fully-visible records therefore cannot be reported. The permitted substitute, accuracy on records whose geometric flag score is exactly zero, is reported and labelled as not a validated visibility measure."
+    }
+  ],
+  "starting_point": {
+    "frozen_v3": {
+      "validation_records": 607,
+      "validation_cards": 269,
+      "of": [
+        647,
+        293
+      ]
+    },
+    "control_model": {
+      "weights": "artifacts/phase2m_e/control_run/control.weights.h5",
+      "sha256": "2b3dabdf5504bfbc5ef49f08127bb46d0b8000ec2fdf9edfb5772290eb3532ae",
+      "train_exact": 2631,
+      "of_train": 2673,
+      "validation_records": 626,
+      "validation_cards": 276,
+      "card_sign_test_vs_v3": {
+        "wins": 11,
+        "losses": 4,
+        "p": 0.1185,
+        "established": false
+      }
+    },
+    "remaining_errors": {
+      "records": 21,
+      "glyph_only": 17,
+      "alignment_only": 4,
+      "mixed": 0
+    },
+    "glyph_ceiling": "the 30-cell blinded review returned 26 of 28 backing the annotation and zero unreadable, so the glyph ceiling is in the model and not in the images",
+    "memorization_observed": "1 of the 4 known label-error training records now reproduces the wrong label",
+    "target": 641,
+    "gap": "15 of the 21 remaining wrong records"
+  },
+  "governance": {
+    "branch": "phase2m-g-fixed14-99, from phase2m-e-error-anatomy; main untouched",
+    "backup_ref": "backup/phase2m-g-entry-20260921",
+    "hash_checks": "fixed14_v3_shadow.verify_shadow_candidates at entry and at exit, as in 2M-D",
+    "access": "the Phase 2M-E Access class: external train and external validation only; the external test is refused at every level and the locked audit is never opened",
+    "ledger": "artifacts/phase2m_g/access_ledger.json",
+    "privacy": "no national ID is printed to any file, any log or any chat output, ever",
+    "no_production_or_demo_change": true
+  },
+  "evaluation_protocol": {
+    "external_validation_is_spent": "647 records. From this phase onward it is read once per final candidate as confirmation only, and never to choose anything",
+    "inner_validation": {
+      "carved_from": "external train",
+      "unit": "identity group (card)",
+      "share_of_cards": 0.2,
+      "cards_expected": 241,
+      "stratified_by": "Roboflow origin: multi-copy train-folder cards against single originals",
+      "population": {
+        "cards": 1204,
+        "multi_copy_train_folder": 854,
+        "single_original": 350
+      },
+      "expected_split": {
+        "multi_copy_train_folder": 171,
+        "single_original": 70
+      },
+      "seed": 20260921,
+      "identity_isolation": "no identity group may appear in both inner train and inner validation, and the split is deterministic for the seed",
+      "every_choice_in_this_phase_is_made_here": true,
+      "unit_of_decision": "card exact (all copies), with a paired two-sided sign test on discordant cards"
+    },
+    "internal_controls": {
+      "population": "the 168 phase2l_a inner-holdout cards",
+      "cap": {
+        "max_regressed_exact": 3,
+        "min_net_exact_change": -1,
+        "reference": "frozen v2, as in the Phase 2M-C rule"
+      },
+      "rule": "any candidate that breaches the cap is rejected regardless of any external gain"
+    },
+    "reporting": "records, cards (all copies) and end-to-end everywhere, each with a cluster bootstrap CI by identity group, 2000 reps, seed 20260921"
+  },
+  "instrumentation": {
+    "checkpoint_every_evaluation": true,
+    "memorization_monitor": "at every evaluation, log the model's prediction on each of the 4 known label-error training records and each of the 15 verified-correct-label records from the Phase 2M-E blinded review, so memorization is visible as it happens",
+    "monitor_reading": "any of the 4 flipping to reproduce its wrong label is memorization and is reported whatever the aggregate does; the two counts are never netted"
+  },
+  "item_0_rebaseline": {
+    "on": "the control model, before anything else",
+    "measures": [
+      "record-level family anatomy on external train and on external validation",
+      "zero-attraction: errors predicting 0 against errors on true 0, and the share of wrong positions predicting 0, which was 27.1 percent on v3",
+      "the 168-control regression check"
+    ],
+    "gate": "if the control model breaches the control cap, report it and stop before item 3"
+  },
+  "item_1_zero_training_probes": {
+    "why_cross_fit": "external validation is the only set the control model has not trained on, so a probe tuned and read on the same records would be selection, not measurement",
+    "cross_fit": {
+      "halves": 2,
+      "split_by": "identity group",
+      "seed": 20260921,
+      "procedure": "choose on half A, read on half B, then swap; report both halves"
+    },
+    "probe_a_phase_tta": {
+      "views": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "units": "pixels of horizontal translation, cv2.warpAffine with BORDER_REPLICATE",
+      "why_these": "the stride is 4, so 0 to 3 covers every sub-stride sampling phase exactly once; Phase 2M-E showed the gain follows sampling phase and not direction",
+      "combination": "arithmetic mean of the four softmax outputs",
+      "parameters_added": 0
+    },
+    "probe_b_logit_adjustment": {
+      "form": "logits[k, c] minus tau times log p_k(c), where p_k(c) is the training frequency of class c at slot k",
+      "tau_grid": [
+        0.0,
+        0.125,
+        0.25,
+        0.5,
+        0.75,
+        1.0
+      ],
+      "caveat_to_state_in_the_report": "logit adjustment targets balanced error, while the metric here is plain exact match on the same distribution the priors come from, so it may well hurt. This probe decides the question; a gain is not presumed.",
+      "parameters_added": 0
+    },
+    "reporting": "card-level paired results for each half, never pooled into one number"
+  },
+  "item_2_label_cleaning": {
+    "sheets": "the training records the control model still gets wrong, same blinded design as the Phase 2M-E batches",
+    "plus": "the 4 label errors already identified in the 20-sheet review",
+    "ledger": "artifacts/phase2m_g/label_corrections.json; the original label files are never edited",
+    "validation_labels": {
+      "primary": "metrics on the original labels",
+      "if_corrected_labels_are_also_reported": "state that only disagreements were reviewed, which biases the corrected number upward and makes it not comparable with any earlier figure"
+    }
+  },
+  "item_3_recipes": {
+    "seeds": [
+      3101,
+      3202
+    ],
+    "step_budget": 2664,
+    "step_budget_source": "the same budget as the Phase 2M-E control run",
+    "training_pool": "external train minus inner validation, plus the internal replay pool, with the Phase 2M-C batch mix",
+    "labels": "the corrected training labels from item 2",
+    "recipes": {
+      "A": "the control recipe retrained on train minus inner validation; the reference",
+      "B": "A plus cosine learning-rate decay to zero over the budget and weight EMA with decay 0.999",
+      "C": "B plus shear augmentation. The current Phase 2M-C augmentation has no shear at all; the archive README declares plus or minus 5 degrees horizontally and vertically, and shear was the only monotone distortion in Phase 2M-E at 3.3 times across its quartiles.",
+      "D": "the better of B and C plus class reweighting, only if item 0 still shows zero-attraction and item 1b showed it is prior-driven"
+    },
+    "order": "sequential: A and B first, then C, then D, each on top of the current best",
+    "advancement": "a recipe advances only if it improves inner-validation card exact in both seeds and passes the control cap",
+    "shear_range_deg": [
+      -5,
+      5
+    ]
+  },
+  "item_4_capacity": {
+    "precondition": "glyph_only is still at least half of the remaining inner-validation errors after item 3",
+    "step_1": "widen the classification head, currently pooled 128 to Dense 96 to Dense 10",
+    "step_2": "if still needed, widen the encoder channels",
+    "invariants": [
+      "the [B,14,10] output contract",
+      "the ConditionedOrderedSlots layer"
+    ],
+    "advancement": "the same rule as item 3"
+  },
+  "item_5_futility": {
+    "when": "after items 1 and 3",
+    "compute": "the upper bound on external-validation records if every remaining error in the families the unused levers can still touch were fixed",
+    "rule": "if that bound is below 641, report that 99 percent on this set is out of reach for the remaining plan and stop",
+    "token_if_triggered": "PHASE2M_G_FUTILE"
+  },
+  "item_6_final_candidate": {
+    "retrain_on": "the full external train plus replay",
+    "step_count": "fixed from inner validation, not re-tuned",
+    "seeds": 2,
+    "two_seed_ensemble": {
+      "permitted": true,
+      "declared_now": true,
+      "condition": "a probability-mean ensemble of the two seeds may be the final candidate only if it beats the better single seed on inner-validation card exact with a paired two-sided sign test at p below 0.05"
+    },
+    "reads": {
+      "external_validation": 1,
+      "internal_controls": 1
+    },
+    "label_on_the_external_validation_number": "EXPLORATORY: it was used for selection in Phase 2M-C and analysed in Phase 2M-E"
+  },
+  "item_7_no_held_out_claim": {
+    "forbidden": "any claim of a held-out 99 percent",
+    "what_a_claimable_number_would_need": [
+      "the locked 377-card audit",
+      "newly labelled cards",
+      "a hidden test set supplied by the supervisor"
+    ],
+    "whose_decision": "the owner's; this phase does not act on it"
+  },
+  "decision_tokens": {
+    "complete": "PHASE2M_G_COMPLETE:<outcome>",
+    "futile": "PHASE2M_G_FUTILE:<reason>",
+    "blocked": "PHASE2M_G_BLOCKED:<reason>"
+  },
+  "frozen_state_hashes": {
+    "v2_config_sha256": "93a783f022f025f54903ebeafe6293c4dfe432dd222208923daf3b2202103267",
+    "v2_weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b",
+    "v3_weights_sha256": "27cbcf9f93890d85a91f63c3c1a07ed1f8a7a4e85803ad3d90b60394ffdc492a",
+    "checked": "at entry and again at exit"
+  }
+}

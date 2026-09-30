@@ -1,0 +1,12 @@
+{
+  "agreement_iou": 0.68,
+  "allow_single_method_selection": false,
+  "minimum_candidate_score": 0.48,
+  "minimum_projection_agreement_score": 0.95,
+  "minimum_score_gain_over_fixed": 0.035,
+  "selection_policy": "projection_requires_independent_detector_agreement",
+  "uses_card_id": false,
+  "uses_filename_identity": false,
+  "uses_ground_truth": false,
+  "uses_ocr_length_as_selection_gate": false
+}

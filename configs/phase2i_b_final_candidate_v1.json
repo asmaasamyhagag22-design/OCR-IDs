@@ -1,0 +1,64 @@
+{
+  "schema_version": "phase2i_b_final_candidate_v1",
+  "frozen_before_internal_validation_evaluation": true,
+  "internal_validation_outcomes_seen": false,
+  "benchmark_plan_sha256": "b8da8ba20edaaf1a9a526197755e0efd786b1e74a0f8db3671a786cf811f329f",
+  "nested_split_logical_sha256": "7dc84da8a20e522b72832599b9ecd9384f622dc1113fe86c3310d7d2313a3971",
+  "calibration_metrics_sha256": "7b5c82439e3b4e522a2f784402d3eafe990fd32fc4831119cb06a18ad3e73510",
+  "calibration_candidate_file_sha256": "541d81c8047f459ea8ef558c7d4de8a0b3f00551c68883e137746a65592b5d03",
+  "calibration_ocr_reaching_cards": 888,
+  "internal_validation_ocr_reaching_cards": 618,
+  "current_configuration": {
+    "model": "arabic_PP-OCRv5_mobile_rec",
+    "view": "original_rgb"
+  },
+  "final_challenger_configuration": {
+    "model": "arabic_PP-OCRv5_mobile_rec",
+    "view": "gamma_0_85_rgb"
+  },
+  "three_way_support_configuration": {
+    "model": "arabic_PP-OCRv5_mobile_rec",
+    "view": "upscale_2x_lanczos_rgb"
+  },
+  "selection_rationale": {
+    "calibration_exact_current": 701,
+    "calibration_exact_challenger": 706,
+    "newly_exact": 11,
+    "previously_exact_regressions": 6,
+    "net_exact_gain": 5,
+    "bootstrap_ci95_net_exact": [-3.0, 13.0],
+    "mcnemar_exact_p": 0.3323059082,
+    "interpretation": "best fixed calibration result but unstable and not safe for replacement"
+  },
+  "policies": {
+    "fixed_challenger": {
+      "selection": "always return gamma challenger",
+      "uses_confidence": false,
+      "uses_output_length_for_selection": false
+    },
+    "preserve_current_on_disagreement": {
+      "selection": "return the current result when full normalized strings differ",
+      "uses_confidence": false,
+      "uses_output_length_for_selection": false
+    },
+    "exact_agreement_review_disagreement": {
+      "selection": "accept only when current and gamma full normalized strings are identical; otherwise NEEDS_REVIEW",
+      "uses_confidence": false,
+      "uses_output_length_for_selection": false
+    },
+    "three_way_exact_agreement": {
+      "selection": "accept only when current, gamma and upscale full normalized strings are identical; otherwise NEEDS_REVIEW",
+      "uses_confidence": false,
+      "uses_output_length_for_selection": false
+    }
+  },
+  "runtime_inputs_forbidden": [
+    "expected digits",
+    "filename",
+    "card ID",
+    "identity lookup",
+    "dataset position"
+  ],
+  "confidence_threshold": null,
+  "digit_repair": false
+}

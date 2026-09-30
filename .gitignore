@@ -1,0 +1,42 @@
+data/private_eval/
+artifacts/
+*ground_truth*.json
+*.jpg
+*.jpeg
+*.png
+__pycache__/
+.pytest_cache/
+.venv/
+*.egg-info/
+third_party/
+reports/
+reports/recovery_manifest.json
+reports/orientation_layout_audit.md
+reports/pytest_final.txt
+reports/pytest_final.xml
+reports/pip_check.txt
+
+# Official labelled evaluation set: every folder name is a real national ID.
+# Nothing from it - images, listings, lookup, salt - may ever be committed.
+data/
+*.zip
+Anoteted_data*/
+local/
+*.heic
+*.webp
+*.bmp
+*.tif
+*.tiff
+
+# Phase 2F work from a concurrent session. Not this session's to commit.
+scripts/phase2f_*
+
+# Third-party supplied model bundle. Not ours, not licensed by us, and its
+# README carries a real national ID from the official labelled set.
+paddleocr_fixed_crop_bundle/
+
+# 7h: under WSL these are symlinks into OCR_ID_working, which the directory-only
+# patterns above do not match. Root-anchored, no trailing slash, so both match.
+/.venv
+/data
+/third_party

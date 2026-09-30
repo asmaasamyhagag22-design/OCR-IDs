@@ -1,0 +1,12 @@
+tensorflow==2.16.1
+keras==3.13.0
+numpy==1.26.4
+pillow==10.4.0
+# container decoders for the 52 files delivered with a .jpg name that are not JPEGs
+# (42 PDF, 10 HEIC/AVIF). pillow-heif is pinned below 1.0 because 1.x requires
+# pillow>=11 and the pillow pin above is part of the model contract.
+pillow-heif==0.18.0
+pypdfium2==5.13.0
+opencv-python-headless==4.10.0.84
+h5py==3.15.1
+pytest==8.3.5

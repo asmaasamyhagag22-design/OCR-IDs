@@ -1,0 +1,518 @@
+{
+  "schema_version": "phase2m_h_rule_v1",
+  "phase": "2M-H",
+  "goal": "Decide whether BC-final seed 3101 is ready to ship behind the typed-ID comparison, and produce everything the locked 377 audit will judge, frozen, before the audit is opened once. This phase does not open the audit.",
+  "committed_before": [
+    "any margin threshold value exists",
+    "any latency measurement exists",
+    "any transfer-check number exists",
+    "any typo is generated",
+    "the audit acceptance protocol is written"
+  ],
+  "production_changed": false,
+  "amendments": [
+    {
+      "id": 1,
+      "utc": "2026-09-22",
+      "section": "the operating point is taken from a spent set, deliberately and on the record",
+      "committed_before": "any threshold value exists",
+      "what_the_standing_rule_says": "CLAUDE.md: external validation 'is a spent selection set. Nothing is tuned, selected or thresholded on it.'",
+      "what_this_phase_does": "takes the two margin values from the BC-final accept/retake curve on the 647, which is thresholding on it",
+      "why_there_is_no_alternative": "the 168 internal controls have been read as a gate at least 13 times across 7 phases, the internal 618 and the external 321 are consumed, and the locked 377 is the one clean test left. There is no unspent set to choose an operating point on.",
+      "why_this_is_nevertheless_sound": "a value chosen on exploratory data and then tested once, unchanged, on a clean set is the correct shape for this decision: the audit supplies the clean read. What would not be sound is doing it silently, or choosing the value again after seeing the audit.",
+      "binding_consequences": [
+        "the two values are frozen as numbers and versioned with the model before the audit is opened",
+        "they are not re-chosen, re-fit or re-tuned after the audit is read, for any reason",
+        "every number computed on the 647 in this phase carries the EXPLORATORY status string",
+        "the provenance is repeated in the report and in the metrics JSON, not only here"
+      ]
+    },
+    {
+      "id": 2,
+      "utc": "2026-09-22",
+      "section": "the accept/retake coverage curve is not the instrument this release design turns on",
+      "committed_before": "any decision-bearing number exists",
+      "what_phase_2m_g_measured": "scripts/phase2m_e.py reject_curve ranks records by the weakest-position margin, rejects the lowest fraction BEFORE any comparison, and reports exact match on what survives. At 90 percent coverage BC-final reached 581/582 = 99.83 percent on accepted.",
+      "why_that_does_not_describe_this_system": "the release design compares first. A reading that matches the typed ID is accepted at any confidence, and only a mismatch is routed by margin. For an honest user, accepted implies matched implies correct, so exact-match-on-accepted is 100 percent by construction and measures nothing. The margin never gates acceptance; it only chooses which message a mismatched user sees.",
+      "the_instrument_this_phase_uses_instead": "two conditional rates at a fixed threshold T, defined in evaluation_protocol.decision_instrument",
+      "disposition": "the coverage curve is reported as the reference it is, and the operating point is justified by the conditional rates. The coverage levels are still how T is derived, because they are the levels Phase 2M-G declared before computing the curve."
+    },
+    {
+      "id": 3,
+      "utc": "2026-09-22",
+      "section": "the TTA decision comes before the margin freeze, not after",
+      "committed_before": "any threshold value exists",
+      "why": "four-phase TTA averages four softmax outputs (scripts/phase2m_g.py:502-505), which changes every margin. A margin frozen on a non-TTA configuration is not valid for a system that ships with TTA.",
+      "ordering": "item_2 (TTA) is settled first; item_3 freezes the margins of whichever inference configuration item_2 selects",
+      "if_tta_is_adopted": [
+        "it needs its own 168-control gate read",
+        "it needs its own entry in the frozen candidate config and its own self-test prediction hash",
+        "the Phase 2M-G TTA result was cross-fitted on the spent external validation and carries the same EXPLORATORY status"
+      ]
+    },
+    {
+      "id": 4,
+      "utc": "2026-09-22",
+      "section": "the primary and reference values are swapped, because the 90 percent value does not transfer",
+      "committed_before": "the locked audit is opened, and before the acceptance protocol is written",
+      "what_the_rule_originally_declared": "primary = the 90-percent-coverage value, reference = the 95-percent value",
+      "what_the_transfer_check_found": {
+        "population": "the 168 internal controls",
+        "margins_of_the_nine_wrong_controls": [
+          0.0018,
+          0.0019,
+          0.0149,
+          0.017,
+          0.1078,
+          0.158,
+          0.21,
+          0.992,
+          0.9989
+        ],
+        "the_structure": "seven errors below 0.21, then a gap, then two confidently wrong at 0.992 and 0.9989. Both frozen values sit inside that gap, so both catch exactly seven of nine.",
+        "cost_of_the_stricter_value": {
+          "share_of_all_captures_rejected": {
+            "0.816601": 0.0476,
+            "0.966875": 0.1012
+          },
+          "typo_users_uselessly_told_to_retake_per_1000": {
+            "0.816601": 47.6,
+            "0.966875": 101.2
+          },
+          "D_correct": {
+            "0.816601": 0.006289,
+            "0.966875": 0.062893
+          }
+        },
+        "for_honest_users": "indistinguishable: identical buckets at both values, because D_wrong is 7/9 at both",
+        "what_it_would_take_to_catch_an_eighth": "a threshold above 0.992, which rejects 31 percent of all captures"
+      },
+      "decision": {
+        "primary": 0.816601,
+        "reference": 0.966875,
+        "decided_by": "the owner, on the evidence above, before the audit was opened",
+        "trigger": "the spec's standing instruction to stop and ask whether to keep 90 percent as primary if it does not transfer"
+      },
+      "what_this_costs_in_rigour": "this is a second selection event, on a population that has been read as a gate at least 13 times. It is not a clean choice and is not presented as one. Two things limit it: both candidates were declared before either was computed, so the choice is between two pre-registered values and not over a free parameter; and the evidence is a structural gap in the margin distribution, not a fitted boundary.",
+      "binding": [
+        "the choice is not revised again",
+        "the audit reports both values, as it always would",
+        "amendment 1's prohibition on re-choosing after the audit is read still stands"
+      ]
+    },
+    {
+      "id": 5,
+      "utc": "2026-09-22",
+      "section": "amendment 4 is reversed, and two audit criteria are re-grounded",
+      "committed_before": "the locked audit is opened",
+      "raised_by": "the stats-reviewer subagent, in a fresh context, before the audit was opened",
+      "part_a_the_swap_is_reversed": {
+        "decision": {
+          "primary": 0.966875,
+          "reference": 0.816601,
+          "decided_by": "the owner, on the corrected evidence below"
+        },
+        "what_was_wrong_with_amendment_4": [
+          {
+            "error": "the cost was measured in a unit this phase had already retired",
+            "detail": "amendment 4 justified the swap partly on 'share of all captures rejected', 0.1012 against 0.0476. That is a coverage-curve quantity. Amendment 2 established that the release design compares first, so a correct reading below the threshold still matches the typed ID and is accepted. No capture is rejected by margin. The retired unit was reimported as the cost side of the decision it had been retired from.",
+            "the_correct_cost": "borne only by typo users: 28 of 628 correctly-read records lie between the two values, so 4.46 percent more typo users receive a useless retake, scaled by the unknown typo rate."
+          },
+          {
+            "error": "the benefit was assessed on a population that cannot measure it",
+            "detail": "the 168 controls have nine errors and ZERO discordant pairs between the two thresholds - the same seven are caught at both. A paired comparison with no discordant pairs carries no information about the difference. 'Catches no more errors' was read as evidence of equivalence; it was an absence of evidence.",
+            "what_the_larger_sample_says": "external validation has 19 errors and FOUR discordant pairs, 18 caught against 14, and all four favour 0.966875 - the value amendment 4 demoted."
+          }
+        ],
+        "the_trade_as_it_actually_stands": "0.966875 catches 4 more of 19 honest-user errors and sends 4.46 percent more correctly-read typo users to a useless retake. Neither difference is established: 4 discordant pairs give a two-sided sign-test p of 0.125, and Phase 2M-G put card-level resolution on this set at about 7 cards.",
+        "what_is_still_not_claimed": "that 0.966875 is better. It is the value the only discriminating evidence favours, chosen under an assumed typo rate that this project has never measured.",
+        "binding": [
+          "this is the final choice; it is not revised again",
+          "amendment 1's prohibition on re-choosing after the audit is read still stands",
+          "the audit reports both values, as it always would"
+        ]
+      },
+      "part_b_the_retake_criterion_is_re_grounded": {
+        "what_was_wrong": "the bound of 0.80 was grounded on 18/19 = 94.7 percent, which is D_wrong at 0.966875. Amendment 4 had made 0.816601 the shipped value, where the estimates are 73.7 percent and 77.8 percent - both below the bound. The criterion would have failed by construction, on the one clean read, for a reason that is an artifact of the bound rather than a property of the model. Its unit was also undeclared, and record level and card level disagree.",
+        "re_grounded": {
+          "bound": 0.7,
+          "unit": "record",
+          "at_the_shipped_threshold": 0.966875,
+          "grounded_in": "the controls' 7/9 = 77.8 percent, which is the out-of-sample estimate for this threshold. The 647's 18/19 = 94.7 percent is NOT used to ground it: that threshold is the 10th percentile of those same 647 records, so the rate is in-sample at a self-chosen quantile.",
+          "why_below_the_point_estimate": "a floor, not a target. The controls' interval is [0.444, 1.0] on nine errors."
+        }
+      },
+      "part_c_the_false_mismatch_criterion_excludes_admission_failures": {
+        "what_was_wrong": "the bound of 0.10 was grounded on the 168 controls, which are pre-materialized bands where admission cannot fail. The audit reads images through the full pipeline, and the protocol counted every admission failure as an honest-user false mismatch. 5.4 percent OCR error plus 7.4 percent admission failure is 12.8 percent, so the criterion could fail on admission alone - contradicting this phase's own finding that the border-clipped are retakes and not errors.",
+        "re_stated": {
+          "bound": 0.1,
+          "population": "admitted captures only",
+          "definition": "the share of admitted captures whose reading differs from the true ID",
+          "admission_failure_rate": "reported separately against the full 377, with no bound. It is a capture-quality property, not a model property, and bounding it here would conflate the two."
+        }
+      },
+      "part_d_the_typo_detection_grounding_was_overstated": {
+        "what_was_wrong": "the bound of 0.995 was justified by 'silent acceptance needs a 14-digit coincidence'. It does not. It needs the OCR's error to coincide with the injected typo, and half the injected typos are single-digit substitutions, as most OCR errors are. The coincidence is on the order of 1 in 126 per wrongly-read record, not 1 in 10^14 - about twelve orders of magnitude of overstatement.",
+        "re_stated": {
+          "bound": 0.995,
+          "what_the_bound_tolerates": "one silent acceptance in 377; two would fail it",
+          "grounded_in": "with roughly 19 wrongly-read records in 377 and a per-record coincidence near 1/126, the expected count is about 0.15."
+        },
+        "structural_validity_now_reported": "the rule already required the structurally invalid share to be reported separately and not counted as a detection. It was not computed. It is now, and those typos are excluded from the detection numerator."
+      },
+      "part_e_claims_narrowed_without_changing_a_decision": [
+        "D_wrong and D_correct on the 647 are in-sample at a threshold chosen from those same records; their intervals are conditional on it, and they are labelled so wherever they appear.",
+        "cluster counts are reported beside every interval: the 647's D_wrong bootstrap resamples 15 wrong cards, not 19 independent records.",
+        "a bootstrap endpoint of exactly 1.0 on 18 of 19 successes is a saturation artifact and is marked as one.",
+        "the TTA comparison is of exact-match counts, not per-record agreement; 159 both ways does not exclude offsetting changes. The not-adopt decision rests on the rule's declared default and on the 4.08x cost, not on that count."
+      ]
+    },
+    {
+      "id": 6,
+      "utc": "2026-09-22",
+      "section": "the instrument validation result, and the interval it failed",
+      "committed_before": "the locked audit is opened",
+      "raised_by": "the instrument-validator subagent, as CLAUDE.md requires before a decision is computed from a derived measure",
+      "instrument_1_the_conditional_rate_estimator": {
+        "point_estimator": "PASS",
+        "what_was_checked": [
+          "weakest_margin on constructed tensors with known per-slot gaps; two plausible wrong implementations were excluded",
+          "threshold_at_coverage against an independent recomputation at 13 coverage levels on the real 647 - zero disagreements, both frozen values reproduced",
+          "ties at the boundary are reported rather than hidden, including a tie block spanning the boundary and an all-identical input",
+          "conditional_rates recovers known rates exactly, and a margin exactly equal to T is not counted below - the same comparison route() uses, so the rate and the message agree on the boundary record",
+          "order preservation on real content: across 91734 strictly-ordered threshold pairs, zero inversions between the rate order and the count order",
+          "end-to-end tie-back: routing the real controls through route() in both arms reproduces D_wrong and D_correct exactly, so the reported number is the quantity the release design acts on"
+        ],
+        "ci95_percentile_bootstrap": "FAIL",
+        "what_failed": "the percentile bootstrap does not have 95 percent coverage at four of the seven configurations this phase publishes. Measured coverage: 0.637 for D_wrong 18/19, 0.918 for 14/19, 0.876 for 7/9, 0.660 for D_correct 1/159. For 18/19 it returns a zero-width interval 36 percent of the time, because every resample lands on the same side.",
+        "why_it_matters": "it fails precisely in the thin-denominator regime the intervals were introduced for. An interval offered as the correction to 'eighteen of nineteen is not a precise 94.7 percent' was itself over-confident.",
+        "the_fix": {
+          "method": "Clopper-Pearson, reported as ci95_exact and implemented without scipy",
+          "verified": "by its defining property rather than against remembered constants: at every endpoint the binomial tail equals alpha/2 to within 1e-7, checked at nine shapes including both boundaries",
+          "what_it_still_does_not_do": "adjust for clustering. The 19 wrong records sit in 15 cards, so the true interval is wider. Both intervals are floors on the width and are labelled as such.",
+          "the_bootstrap_is_kept": "it is correct about clustering - measured coverage stays near nominal as intra-cluster correlation rises, where resampling records collapses to 0.588. It is the small-n boundary behaviour that fails."
+        },
+        "no_decision_changes": "the operating point was chosen on counts and on a structural gap in the margin distribution, both of which the validator reproduced exactly. No interval bore weight on it.",
+        "a_property_of_the_ranking_the_report_now_states": "on the 168 controls the weakest-position margin ranks wrong above right with AUC 0.874, and 100 percent of the inversions come from the two confidently-wrong records at 0.992 and 0.9989. One of those has its weakest slot at position 1 while its error is at position 13 - the statistic is not looking where the error is. This is reported faithfully inside D_wrong = 7/9 rather than corrupting it."
+      },
+      "instrument_2_the_typo_generator": {
+        "result": "PASS",
+        "what_was_checked": [
+          "120000 draws over six adversarial structures plus 3000 random synthetic ids: zero results equal to the true id",
+          "the rejection tally matches the analytic rate k/(26-k) at seven values of k over 200000 draws each",
+          "reproducible from its seed; a different seed changes the population",
+          "detection_rate fails only on exact coincidence, checked by forcing 0, 1, 7 and 40 coincidences",
+          "detection_rate is invariant in T while the two messages trade off, which is right: it is a coincidence rate, not a routing rate"
+        ],
+        "a_declaration_that_was_jointly_unsatisfiable": {
+          "what_the_rule_said": "kind_probability [0.5, 0.5] and pair uniform over the 13 adjacent pairs",
+          "why_both_cannot_hold": "the no-op rejection conditions on the draw changing something, and only a transposition can fail to. In the accepted sample P(substitution) = 13/(26-k) for an id with k adjacent equal pairs, and those k pairs have probability zero rather than 1/13.",
+          "which_one_the_code_implements": "the rejection, which the rule justifies at length",
+          "corrected_declaration": "the 50/50 and the uniform pair apply to the DRAW. The accepted sample is conditioned on the draw changing the value, and the conditional shape is P(substitution) = 13/(26-k).",
+          "direction": "conservative. More substitutions means a slightly higher chance the OCR's own single-digit error coincides with the typo, so the measured detection rate is if anything pessimistic.",
+          "reporting_correction": "on the real controls the honest expectation for kind_counts is 88.6 / 79.4, not 84 / 84. The observed 86 / 82 must not be presented as evidence of a 50/50 split."
+        },
+        "a_naming_caveat_for_the_report": "a typo user routed to retake counts as detected, although retaking cannot fix a typo. That matches the declared definition - not silently accepted - but the word 'detection' is doing more work than the number supports."
+      },
+      "binding": [
+        "ci95_exact is the interval to read at these denominators; the bootstrap is reported beside it and labelled",
+        "no interval in this phase is cluster-adjusted, and every one of them is a floor on the true width",
+        "the audit pass criteria are point bounds and are unaffected; an interval must not be compared to a bound as though it were one"
+      ]
+    }
+  ],
+  "starting_point": {
+    "candidate": {
+      "name": "BC-final seed 3101",
+      "weights_path": "artifacts/phase2m_g/runs/BCFINAL_seed3101/final.weights.h5",
+      "weights_sha256": "00e23a14b3e9cf976864241f3e494ce383cdc52c8bbd2e52e54b53d03657d4df",
+      "weights_size_bytes": 538296,
+      "seed": 3101,
+      "architecture": "phase2l_b.build_v2 conditioned 160x576, unchanged",
+      "output_shape": [
+        null,
+        14,
+        10
+      ],
+      "declared_research_candidate_only_by_2m_g": true,
+      "note": "configs/phase2m_g_frozen_candidate.json sets research_candidate_only to true. Phase 2M-H is the phase that asks whether that should change."
+    },
+    "external_validation": {
+      "records_total": 699,
+      "excluded_border_clipped_at_materialization": 52,
+      "records_usable": 647,
+      "cards": 293,
+      "bc_final_records": 628,
+      "bc_final_cards": 278,
+      "bc_final_end_to_end_on_699": 0.8984,
+      "status": "EXPLORATORY_OPENED_SELECTION_DATA_NOT_A_HELD_OUT_RESULT",
+      "wrong_records": 19,
+      "card_level_resolution": "about 7 cards (reports/phase2m_g.md:221-225). A gap of 2 or 3 cards cannot be measured on this set at all."
+    },
+    "internal_controls_168": {
+      "frozen_v2": 152,
+      "frozen_v3": 158,
+      "phase_2m_e_control_model": 160,
+      "bc_final": 159,
+      "bc_final_vs_v2": {
+        "newly_exact": 8,
+        "regressed_exact": 1,
+        "net": 7,
+        "two_sided_sign_test_p": 0.0390625
+      },
+      "bc_final_vs_control_model": {
+        "net": -1,
+        "regressed_exact": 1
+      },
+      "reads_so_far": "at least 13 evaluation events across 7 phases",
+      "status": "a regression gate that has been read many times, not a pristine hold-out. It is the cleanest real-photo evidence available and is reported as such."
+    },
+    "margin_ranking_caveat": "reports/phase2m_g.md:105-107 - at 98 percent coverage the Phase 2M-E control model catches ten wrong records to BC-final's six, so BC-final's confidence ranking is the weaker of the two. The release design depends on exactly that ranking, and the report must say so."
+  },
+  "release_design": {
+    "decided_by": "the owner, before this phase",
+    "recorded_verbatim": [
+      "the OCR reading is compared with the national ID the user types by hand",
+      "reading matches the typed ID -> accept, at any confidence",
+      "mismatch, margin at or above the frozen value -> 'check the number you typed'",
+      "mismatch, margin below it -> 'retake the photo'",
+      "after a maximum number of retakes -> human review",
+      "the OCR never sees the typed value, and the reading is never shown to the user"
+    ],
+    "maximum_retakes": {
+      "value": 2,
+      "capture_attempts_total": 3,
+      "decided_by": "the owner at plan review",
+      "reason": "the dominant recoverable failure is admission and geometry - 52 of 699 external-validation records, 7.4 percent, were border-clipped - and a second attempt usually fixes framing. Recognition errors on the same physical card are correlated across attempts, so a third retake yields little while costing the honest user time.",
+      "status": "a product decision, not a measured one. This project holds no repeat-capture data, so retake success cannot be estimated from anything it has. The report must say so rather than implying the number was derived."
+    },
+    "friction_identity": {
+      "claim": "for honest users, total friction equals the model's error rate at any threshold; the threshold only chooses which message they see",
+      "verified": "true for the usable records, because a mismatch occurs exactly when the reading is wrong",
+      "correction": "incomplete as stated. Total friction = OCR error rate + admission-failure rate. A border-clipped capture never reaches the comparison; it fails materialization and routes to retake. The 52 are a friction bucket of their own and are not errors."
+    }
+  },
+  "governance": {
+    "branch": "phase2m-h-release-readiness",
+    "backup_ref": "backup/phase2m-h-entry-20260922",
+    "main_untouched": true,
+    "hash_checks": "at entry and again at exit, by a committed command",
+    "the_audit_is_not_opened": "no command in this phase reads the locked 377. The acceptance protocol is written and skipped unless a dated owner override is present in the environment.",
+    "runtime_guard": "src/governance/guard.py is live in the loaders (Phase 2M-H item 0.3). Any read of a blocklisted card raises GovernanceViolation inside the process.",
+    "privacy": "no real national ID in any file, commit, log or chat output. Card-level material stays under the ignored artifacts/ tree.",
+    "no_production_or_demo_change": "BC-final is integrated in shadow mode only. Production output is unchanged and asserted three ways."
+  },
+  "evaluation_protocol": {
+    "external_validation_is_spent": "every number on the 647 is exploratory and carries the status string. See amendment 1.",
+    "unit_of_decision": "record and card. Never digit position.",
+    "uncertainty": "cluster bootstrap by identity group for rates, card-level paired sign tests for model comparisons. 10000 resamples, seed declared per computation.",
+    "thin_denominators": {
+      "external_validation_errors": 19,
+      "control_errors": 9,
+      "requirement": "every rate derived from these carries its interval, and the report states the denominator next to the rate. 18 of 19 is not a precise 94.7 percent."
+    },
+    "decision_instrument": {
+      "name": "conditional margin rates at a fixed threshold",
+      "declared_before_computing": true,
+      "ranking_statistic": "per record, the minimum over the 14 slots of top-1 probability minus top-2 (scripts/phase2m_e.py:342 weakest_margin), the same statistic Phase 2M-E and 2M-G used",
+      "definitions": {
+        "t": "the true national ID",
+        "r": "the OCR reading",
+        "y": "the value the user typed",
+        "m": "the weakest-position margin of r",
+        "T": "the frozen threshold"
+      },
+      "routing": {
+        "accept": "r == y",
+        "check_the_number_you_typed": "r != y and m >= T",
+        "retake_the_photo": "r != y and m < T",
+        "admission_failure": "the capture never produced a band; routes to retake without a comparison"
+      },
+      "the_two_rates": {
+        "D_wrong": "P(m < T | r != t) - an honest user whose reading is wrong, correctly routed to retake, which is actionable",
+        "D_correct": "P(m < T | r == t) - a typo user whose reading is right, uselessly routed to retake, because retaking cannot fix a typo"
+      },
+      "why_these_two": "they run in opposite directions in the two populations, so the threshold is a router between them, not a quality dial. A lower T helps typo users and hurts honest users; a higher T does the reverse.",
+      "must_be_validated_before_use": "yes, by the instrument-validator subagent, on synthetic ground truth with known answers and for order preservation on real content"
+    },
+    "reported_buckets_per_1000": {
+      "honest_users": [
+        "accepted",
+        "told_to_retake",
+        "wrongly_told_to_check_their_number",
+        "admission_failure"
+      ],
+      "typo_users": [
+        "correctly_told_to_check_their_number",
+        "uselessly_told_to_retake",
+        "silently_accepted"
+      ],
+      "silent_error_definition": "reading == typed != truth. For an honest user this is impossible by construction, because typed == truth. It is reported only in the typo population, and reporting a non-zero silent-error rate for honest users would be a defect in the measurement, not a finding.",
+      "denominators": "reported against both 647 usable records and 699 total, with the 52 border-clipped shown as admission failures rather than errors"
+    },
+    "typo_generator": {
+      "declared_before_any_typo_exists": true,
+      "seed": 20260922,
+      "typos_per_user": 1,
+      "kinds": [
+        "single_digit_substitution",
+        "adjacent_transposition"
+      ],
+      "kind_probability": [
+        0.5,
+        0.5
+      ],
+      "substitution": "position uniform over the 14 slots; replacement digit uniform over the 9 digits other than the one present",
+      "adjacent_transposition": "pair uniform over the 13 adjacent pairs",
+      "no_op_rejection": {
+        "rule": "any draw whose result equals the original string is rejected and redrawn",
+        "why": "an adjacent transposition of two equal digits, and a substitution to the same digit, both leave the typed value equal to the true ID. Those are honest users mislabelled as typo users, and they deflate the measured detection rate. Egyptian national IDs carry repeated digits by construction - the century digit and the governorate code - so this is not a rare edge.",
+        "reported": "the number of draws rejected, per position and in total"
+      },
+      "structural_validity": "a typo may produce a structurally invalid ID that a form would reject before the OCR comparison. Detection is measured on the OCR comparison alone; the structurally-invalid share is reported separately and not counted as a detection.",
+      "kind_probability_applies_to": "the draw, before the no-op rejection",
+      "conditional_shape_of_the_accepted_sample": "P(substitution) = 13/(26-k) for an id with k adjacent equal pairs; the k equal pairs have probability zero. See amendment 6."
+    },
+    "transfer_check": {
+      "both_values_unchanged": true,
+      "populations": [
+        {
+          "name": "internal controls 168",
+          "note": "BC-final 159/168. Nine errors is a thin denominator and the interval is reported."
+        },
+        {
+          "name": "labelled real-photo challenge set from Phase 2M-A / 2M-C",
+          "expected": "none exists",
+          "evidence": "Phase 2M-A produced two owner demo photos (challenge_A, challenge_B) and 417 readability verdicts, which are crop judgements and not recognition targets. reports/phase2m_a_demo_failure_and_external_data_audit.md:127-137."
+        }
+      ],
+      "stop_and_ask": "if the 90 percent value does not transfer to real photos, stop and ask the owner before changing which value is primary"
+    }
+  },
+  "instrumentation": {
+    "checkpoint_every_evaluation": "not applicable: this phase trains nothing",
+    "memorization_monitor": "not applicable: this phase trains nothing",
+    "derived_measures_requiring_validation": [
+      "the conditional-rate estimator",
+      "the typo generator"
+    ]
+  },
+  "item_0_entry": {
+    "checks": [
+      "branch and backup ref",
+      "main unchanged",
+      "frozen v2 and v3 hash checks",
+      "BC-final weights sha256 and size",
+      "rule committed",
+      "blocklist fresh"
+    ],
+    "blocks_on": "PHASE2M_H_BLOCKED:entry_state_mismatch"
+  },
+  "item_1_release_design_recorded": {
+    "what": "the design above, recorded as the owner stated it, with the maximum retakes and its reason",
+    "produces": "a section of the report and a block of the metrics JSON"
+  },
+  "item_2_tta_decision": {
+    "runs_before": "item_3",
+    "measure": "end-to-end latency on this CPU with and without the four-phase TTA, split into preprocessing and inference, over the 168 controls",
+    "pattern": "the three-field split already used by src/extraction/fixed14_v3_shadow.py:210-212",
+    "reported": [
+      "median",
+      "p95",
+      "mean"
+    ],
+    "decision_rule_declared_in_advance": "TTA is adopted only if the p95 end-to-end latency with TTA stays within the budget the owner sets for a capture-to-answer round trip, AND the accuracy gain is not merely the cross-fitted exploratory gain Phase 2M-G already reported as not reaching significance. Absent an owner latency budget, the default is to report the cost and NOT adopt, because the gain was not established and adopting would require a fresh 168-control gate read and new frozen hashes.",
+    "records": "the decision and its reason, either way"
+  },
+  "item_3_freeze_two_margin_values": {
+    "source": "the BC-final weakest-position margins on the 647, from artifacts/phase2m_g/bcfinal_validation_prob.npy",
+    "inference_configuration": "whichever item_2 selects",
+    "coverage_levels": {
+      "primary": 0.9,
+      "reference": 0.95
+    },
+    "declared_before_computing": true,
+    "what_is_frozen": "the two margin values themselves, as numbers, which Phase 2M-G recorded nowhere - it published counts only",
+    "versioned_with": "configs/phase2m_h_frozen_candidate.json, alongside the model weights sha256",
+    "also_reported": [
+      "the full coverage curve, persisted as JSON rather than markdown only",
+      "D_wrong and D_correct at both values, with intervals"
+    ]
+  },
+  "item_4_transfer_check": {
+    "see": "evaluation_protocol.transfer_check"
+  },
+  "item_5_shadow_integration": {
+    "pattern": "Phase 2M-D",
+    "same_localizer_and_materialization": true,
+    "cloned_not_edited": "the 2M-D demo and verifier are cloned. Their printed output and their check count are pinned by their own tests, and several of the files they touch are on two phases' protected lists.",
+    "production_output_unchanged_asserted": [
+      "a git-diff guard over the protected file list",
+      "behavioural equality against the unchanged adapter",
+      "reproduction of a frozen control record"
+    ],
+    "controls_pred_npy": "artifacts/phase2m_g/runs/BCFINAL_seed3101/controls_pred.npy does not exist and is regenerated. This is a deterministic reproduction of the published 159, declared as such, not a fourteenth gate read."
+  },
+  "item_6_audit_acceptance_protocol": {
+    "written_not_run": true,
+    "the_audit_is_not_opened_in_this_phase": true,
+    "single_read": "one pass produces BOTH v2 and BC-final predictions. 'No worse than v2 on the same cards' is a pass criterion, and a second pass would be a second read of a set that may be read once.",
+    "arms": {
+      "honest": "typed = true ID",
+      "typo": "typed = one injected typo per evaluation_protocol.typo_generator"
+    },
+    "pass_criteria_declared_in_advance": {
+      "false_mismatch_rate_honest_users": {
+        "bound": 0.1,
+        "unit": "record",
+        "population": "admitted captures only",
+        "grounded_in": "BC-final reads 159 of the 168 internal controls, a 5.4 percent error rate",
+        "re_grounded_by": "amendment 5 part C"
+      },
+      "typo_detection_rate": {
+        "bound": 0.995,
+        "definition": "1 minus the share of typo users silently accepted, structurally invalid typos excluded",
+        "tolerates": "one silent acceptance in 377",
+        "grounded_in": "a per-wrong-record coincidence near 1/126 gives an expected count near 0.15",
+        "re_grounded_by": "amendment 5 part D"
+      },
+      "share_of_non_accepted_honest_users_routed_to_retake": {
+        "bound": 0.7,
+        "unit": "record",
+        "at_threshold": 0.966875,
+        "grounded_in": "the controls' 7/9 = 77.8 percent, the out-of-sample estimate at this threshold",
+        "re_grounded_by": "amendment 5 part B"
+      },
+      "no_worse_than_v2_on_the_same_cards": {
+        "rule": "card-level net exact change >= 0, with at most 3 regressed cards",
+        "shape_taken_from": "the standing 168-control cap in configs/phase2m_g_rule_v1.json:348-356"
+      },
+      "admission_failure_rate": {
+        "bound": null,
+        "reported_against": "the full 377",
+        "why_unbounded": "a capture-quality property, not a model property"
+      }
+    },
+    "failing_any_criterion": "PHASE2M_H_NOT_READY:<which criterion>, recorded without re-choosing the threshold"
+  },
+  "item_7_correct_the_2m_g_next_action_note": {
+    "what_2m_g_said": "reports/phase2m_g.md:269-270 lists symmetrising the band context among 'the cheaper moves', described as costing nothing",
+    "the_correction": "it needs a retrain and a new evaluation, and Phase 2M-G found zero band-clipped digits, so its precondition is absent. It moves to post-release research.",
+    "additional_scope_finding": "the demo adapter does not use band_quad. It crops a fixed canonical bbox from configs/phase2l_b_fixed14_v2.json, which is hash-protected in ten places and on two phases' protected lists, so symmetrising would also create a train/serve mismatch.",
+    "how": "appended as a dated correction block. Amendments are append-only; a committed report is not rewritten."
+  },
+  "decision_tokens": {
+    "ready": "PHASE2M_H_READY",
+    "not_ready": "PHASE2M_H_NOT_READY:<reason>",
+    "blocked": "PHASE2M_H_BLOCKED:<reason>",
+    "note": "these are the owner's tokens for this phase and differ from the repository's usual COMPLETE/FUTILE/BLOCKED shape. Declared here so the difference is deliberate."
+  },
+  "frozen_state_hashes": {
+    "v2_config_sha256": "93a783f0",
+    "v2_weights_sha256": "d8c6614dd4fcb02ecf1690145aa6ed5bdc15be6c9984f9516ba9078111e3da1b",
+    "v3_weights_sha256": "27cbcf9f",
+    "bc_final_weights_sha256": "00e23a14b3e9cf976864241f3e494ce383cdc52c8bbd2e52e54b53d03657d4df",
+    "checked": "at entry and again at exit",
+    "note": "the v2 config and v3 weights are recorded here by prefix only; the full values are constants in src/extraction/fixed14_v3_shadow.py:26-40 and are what the checks compare against."
+  }
+}

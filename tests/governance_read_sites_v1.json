@@ -1,0 +1,274 @@
+{
+  "schema_version": "governance_read_sites_v1",
+  "generated_for": "Phase 2M-H item 0.3",
+  "what_this_is": "Image decodes and array loads in scripts/ and src/ whose enclosing function does not call src/governance/guard.py. This is the residual surface, recorded so that growing it is a deliberate act with a diff. It is an inventory, not an approval.",
+  "classes": {
+    "in_memory_roundtrip": "cv2.imdecode on bytes already in memory - augmentation round-trips, no file is opened.",
+    "materialized_array": "np.load of a private materialized array under a phase artifacts tree. A path naming a derivative of the consumed external test is refused by guard.check_derivative_read in load_split; these call sites load prediction and label arrays directly and are the largest remaining gap.",
+    "pre_split_census": "the Phase 2M-A census that walked the external archive and produced the split in the first place. It predates the split it would be checked against.",
+    "caller_supplied_or_derived": "a path supplied by a CLI caller, a demo upload, or a derived artifact such as a contact sheet. Not a card store read.",
+    "derived_artifact": "a read of an artifact this repository generated, not of a card store.",
+    "in_memory_decode": "Image.open on bytes already in memory (D-031). The only file-reading entry point, image_decode.decode_file, calls guard.check_card_read before reading the file."
+  },
+  "n": 43,
+  "sites": [
+    {
+      "file": "scripts/build_phase2b_audit.py",
+      "function": "build",
+      "call": "Image.open",
+      "class": "derived_artifact"
+    },
+    {
+      "file": "scripts/phase2i_a_residual_audit.py",
+      "function": "contact_sheets",
+      "call": "Image.open",
+      "class": "derived_artifact"
+    },
+    {
+      "file": "scripts/phase2i_a_residual_audit.py",
+      "function": "exif_measurements",
+      "call": "Image.open",
+      "class": "derived_artifact"
+    },
+    {
+      "file": "scripts/phase2i_b_generate.py",
+      "function": "generate",
+      "call": "Image.open",
+      "class": "derived_artifact"
+    },
+    {
+      "file": "scripts/phase2l_a.py",
+      "function": "_render",
+      "call": "cv2.imdecode",
+      "class": "in_memory_roundtrip"
+    },
+    {
+      "file": "scripts/phase2l_b.py",
+      "function": "render_broad_synthetic",
+      "call": "cv2.imdecode",
+      "class": "in_memory_roundtrip"
+    },
+    {
+      "file": "scripts/phase2m_a.py",
+      "function": "_image_metadata",
+      "call": "Image.open",
+      "class": "pre_split_census"
+    },
+    {
+      "file": "scripts/phase2m_a.py",
+      "function": "audit_external_extracted",
+      "call": "Image.open",
+      "class": "pre_split_census"
+    },
+    {
+      "file": "scripts/phase2m_a_diagnostics.py",
+      "function": "_external_truth_match",
+      "call": "Image.open",
+      "class": "pre_split_census"
+    },
+    {
+      "file": "scripts/phase2m_a_provenance_addendum.py",
+      "function": "audit_external_authorization_and_readiness",
+      "call": "Image.open",
+      "class": "pre_split_census"
+    },
+    {
+      "file": "scripts/phase2m_b.py",
+      "function": "_photometric",
+      "call": "cv2.imdecode",
+      "class": "in_memory_roundtrip"
+    },
+    {
+      "file": "scripts/phase2m_c.py",
+      "function": "augment_batch",
+      "call": "cv2.imdecode",
+      "class": "in_memory_roundtrip"
+    },
+    {
+      "file": "scripts/phase2m_c.py",
+      "function": "cmd_materialize",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_c.py",
+      "function": "cmd_metrics",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_c.py",
+      "function": "evaluate_runs",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_d_verify.py",
+      "function": "reproduce",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_e.py",
+      "function": "cmd_augmentation_geometry",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_e.py",
+      "function": "cmd_digit_identity",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_e.py",
+      "function": "cmd_fixability",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_e.py",
+      "function": "cmd_owner_verdicts",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_e.py",
+      "function": "cmd_review_sheets",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_e.py",
+      "function": "cmd_substitution_sheets",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_e.py",
+      "function": "cmd_train_anatomy",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_e.py",
+      "function": "cmd_train_review_sheets",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_e.py",
+      "function": "load_run_predictions",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_g.py",
+      "function": "cmd_label_sheets",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_g.py",
+      "function": "cmd_label_sheets_v2",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_g.py",
+      "function": "cmd_rebaseline",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "scripts/phase2m_g.py",
+      "function": "cmd_train",
+      "call": "np.load",
+      "class": "materialized_array"
+    },
+    {
+      "file": "src/extraction/baseline.py",
+      "function": "build_masked_contact_sheet",
+      "call": "Image.open",
+      "class": "caller_supplied_or_derived"
+    },
+    {
+      "file": "src/extraction/baseline.py",
+      "function": "evaluate_run",
+      "call": "Image.open",
+      "class": "caller_supplied_or_derived"
+    },
+    {
+      "file": "src/extraction/calibrate.py",
+      "function": "propose_regions",
+      "call": "Image.open",
+      "class": "caller_supplied_or_derived"
+    },
+    {
+      "file": "src/extraction/cli.py",
+      "function": "cmd_extract",
+      "call": "Image.open",
+      "class": "caller_supplied_or_derived"
+    },
+    {
+      "file": "src/extraction/demo_national_id.py",
+      "function": "decode_input",
+      "call": "Image.open",
+      "class": "caller_supplied_or_derived"
+    },
+    {
+      "file": "src/extraction/fixed14_demo_adapter.py",
+      "function": "decode_image",
+      "call": "Image.open",
+      "class": "caller_supplied_or_derived"
+    },
+    {
+      "file": "src/extraction/hybrid.py",
+      "function": "run_hybrid",
+      "call": "Image.open",
+      "class": "caller_supplied_or_derived"
+    },
+    {
+      "file": "src/extraction/official_eval.py",
+      "function": "_decodable",
+      "call": "Image.open",
+      "class": "caller_supplied_or_derived"
+    },
+    {
+      "file": "src/extraction/official_eval.py",
+      "function": "transcode",
+      "call": "Image.open",
+      "class": "caller_supplied_or_derived"
+    },
+    {
+      "file": "src/extraction/report.py",
+      "function": "build_contact_sheet",
+      "call": "Image.open",
+      "class": "caller_supplied_or_derived"
+    },
+    {
+      "file": "src/extraction/runner.py",
+      "function": "analyse_card",
+      "call": "Image.open",
+      "class": "caller_supplied_or_derived"
+    },
+    {
+      "file": "src/extraction/image_decode.py",
+      "function": "decode_bytes",
+      "call": "Image.open",
+      "class": "in_memory_decode"
+    },
+    {
+      "file": "src/service/recognizer.py",
+      "function": "decoded_megapixels",
+      "call": "Image.open",
+      "class": "in_memory_decode"
+    },
+    {
+      "file": "scripts/phase4_service_image_scan.py",
+      "function": "npy_numeric_sequences",
+      "call": "np.load",
+      "class": "in_memory_decode"
+    }
+  ]
+}

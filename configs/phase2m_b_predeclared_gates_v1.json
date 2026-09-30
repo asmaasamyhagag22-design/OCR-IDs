@@ -1,0 +1,95 @@
+{
+  "schema_version": "phase2m_b_predeclared_gates_v1",
+  "phase": "2M-B",
+  "declared_before": [
+    "locator configuration selection",
+    "any development evaluation of a trained locator",
+    "any external-validation access",
+    "any development-residual fallback evaluation"
+  ],
+  "fallback_family": {
+    "name": "fpn_heatmap_line_locator_line_head_tail",
+    "count": 1,
+    "input": "EXIF-normalized full source image, aspect-preserving letterbox to a square",
+    "output": "stride-4 heatmaps: national-ID line mask, first-two-digit head, last-two-digit tail",
+    "geometry": "rotated rectangle from the highest-mass line component; reading direction from head/tail centroids",
+    "training_data": "external_train inner-fit records only, synthetic scene augmentation",
+    "recognizer_training_or_modification": false
+  },
+  "search_space": {
+    "input_sizes": [256, 320],
+    "seeds": [20260916, 20260917],
+    "second_seed_policy": "trained only if both first-seed sizes fail the selection constraints",
+    "contexts": {
+      "C1_broad_band_parity": {"left_fraction_of_line_length": 0.16, "right_fraction_of_line_length": 0.04},
+      "C2_symmetric": {"left_fraction_of_line_length": 0.10, "right_fraction_of_line_length": 0.10}
+    },
+    "context_derivation": "canonical 1000x630 broad band [350,430,1000,610] around the median calibration digit extent (~437..978): left 87/541=0.16, right 22/541=0.04; both contexts give band width 1.2 x line length and the frozen 650:180 aspect",
+    "threshold_grid": {
+      "localization_score": [0.5, 0.6, 0.7],
+      "end_probability": [0.3, 0.5],
+      "in_frame_margin_fraction_of_line_height": [0.0, 0.25],
+      "minimum_complete_length_to_height": [4.0, 5.5]
+    },
+    "fixed_thresholds": {
+      "mask_probability": 0.5,
+      "minimum_component_cells": 4,
+      "minimum_length_to_height": 3.0,
+      "maximum_length_to_height": 20.0,
+      "minimum_source_pixels_per_digit": 8.0
+    }
+  },
+  "selection_rule": {
+    "data": "external_train inner holdout only (15% of duplicate groups); seeded native, tight, embedded, off_frame scenes plus line_absent and no_card negatives",
+    "constraints": {
+      "false_complete_rate_on_digit_clipped_scenes_max": 0.01,
+      "false_localization_rate_on_negative_scenes_max": 0.02
+    },
+    "objective": "maximize the rate of COMPLETE bands containing all 14 digit quads on scenes whose 14 digits are all visible",
+    "tie_break": ["smaller input size", "C1_broad_band_parity", "higher localization_score", "higher end_probability", "larger in-frame margin", "larger minimum_complete_length_to_height"]
+  },
+  "definitions": {
+    "localization_success": "localized AND rotated IoU(predicted line rectangle, true 14-digit line rectangle) >= 0.5 AND reading-direction cosine >= 0.9",
+    "full_line_containment": "every corner of all 14 true digit quadrilaterals lies inside the final band quadrilateral with at most 1 source pixel tolerance",
+    "complete_band": "band_state == complete_band (localized, head and tail evidence, line inside source frame, length/height and resolution minima)",
+    "false_complete_on_clipped": "complete_band on a scene where at least one digit quadrilateral is not fully inside the source frame",
+    "false_localization": "localized on a scene with no visible national-ID line"
+  },
+  "acceptance_rule": {
+    "primary_preservation": {
+      "fallback_calls_on_primary_success": 0,
+      "byte_identical_primary_fields_required": ["detector", "orientation", "tensor_sha256", "logits_sha256", "public"],
+      "production_routing_changes": 0
+    },
+    "external_validation_native": {
+      "localization_success_rate_min_on_fully_visible": 0.95,
+      "full_line_containment_rate_min_on_fully_visible": 0.95
+    },
+    "external_validation_synthetic_scenes": {
+      "scene_modes_per_record": ["tight", "embedded", "off_frame"],
+      "negative_modes_per_record": ["line_absent", "no_card"],
+      "full_line_containment_rate_min_on_fully_visible": 0.85,
+      "direction_agreement_rate_min_on_localized_fully_visible": 0.95
+    },
+    "safety": {
+      "false_complete_rate_on_digit_clipped_max": 0.02,
+      "false_localization_rate_on_negatives_max": 0.05,
+      "false_complete_rate_on_negatives_max": 0.01,
+      "fallback_auto_accept_count": 0,
+      "fallback_status_required": "SHADOW_NEEDS_REVIEW",
+      "wrong_side_false_complete_count_max": 0
+    },
+    "coverage_material_recovery": {
+      "external_validation_off_frame_complete_line_complete_and_contained_min": 0.60,
+      "internal_synthetic_off_frame_line_visible_complete_and_contained_min": 0.60,
+      "readable_development_residuals_complete_band_min": 0.50
+    }
+  },
+  "decision_mapping": {
+    "PRIMARY_PATH_REGRESSION": "any primary-preservation difference",
+    "FIXED14_V2_PRESERVATION_FAILURE": "frozen Fixed14-v2 config/weights/result not preserved",
+    "PREPROCESSING_REPAIR_NOT_VALIDATED": "any localization, containment, or safety gate fails",
+    "DIRECT_FIELD_FALLBACK_SHADOW_ONLY": "localization, containment, and safety pass but a coverage gate fails",
+    "PREPROCESSING_V2_FROZEN": "all gates pass"
+  }
+}

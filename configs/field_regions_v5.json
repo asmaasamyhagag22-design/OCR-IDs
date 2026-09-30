@@ -1,0 +1,287 @@
+{
+  "config_version": "field_regions_v5",
+  "canonical_size": [
+    1000,
+    630
+  ],
+  "coordinate_space": "Relative to an upright 1000x630 canonical card. rect is [x, y, w, h].",
+  "calibration_status": "phase2c_semantic_correction_of_audited_v4",
+  "supersedes": "field_regions_v4",
+  "calibration_note": "All v4 boxes are carried over unchanged. The interrupted draft's birth_date_printed region was removed because the audited layout does not independently confirm that semantic. The only retained v5 change is correcting card_serial_number from digits to latin_serial; its box is unchanged.",
+  "orientation_contract": {
+    "size": [
+      1000,
+      630
+    ],
+    "reading_orientation": "upright_landscape",
+    "decision": "external_to_transformation",
+    "transformation_input": "quarter_turns_ccw"
+  },
+  "semantic_policy": {
+    "full_name": "Compose later from name_line_1 and name_line_2.",
+    "date_of_birth": "The front prints the birth date at YEAR/MONTH precision beside the eagle emblem. Two ordered candidate boxes are declared because rectification registers that print to about +/-20 px; the first whose text parses as a real date is used, and the comparison precision is recorded on the check. A date decoded from national-ID digits is still labelled derived - the printed field is a second observation, not a replacement.",
+    "gender": "The back prints gender independently. Digit 13 of the national ID encodes the same fact, so the two are cross-checkable.",
+    "national_id_number": "The same 14-digit number is printed on both the front and the back. When both sides of one physical card are supplied, the two readings are cross-checkable.",
+    "validation": "Format and structural checks may produce structurally_valid. Agreement between readings from the same card is card_internal_consensus evidence, not verification. externally_verified requires independent applicant data. No checksum is implemented or claimed."
+  },
+  "layouts": {
+    "front": {
+      "description": "Upright front: portrait at left, two name lines and two address lines at right, national ID across the lower-right band, serial at lower left.",
+      "regions": [
+        {
+          "name": "portrait",
+          "label_en": "Portrait",
+          "rect": [
+            0.025,
+            0.055,
+            0.25,
+            0.55
+          ],
+          "content": "none",
+          "role": "none",
+          "psm": 6,
+          "calibration": "visual_v4",
+          "semantics": "confirmed"
+        },
+        {
+          "name": "name_line_1",
+          "label_en": "Name line 1",
+          "rect": [
+            0.805,
+            0.27,
+            0.165,
+            0.1
+          ],
+          "content": "arabic_text",
+          "role": "name",
+          "psm": 6,
+          "calibration": "visual_v4",
+          "semantics": "confirmed"
+        },
+        {
+          "name": "name_line_2",
+          "label_en": "Name line 2",
+          "rect": [
+            0.53,
+            0.365,
+            0.44,
+            0.105
+          ],
+          "content": "arabic_text",
+          "role": "name",
+          "psm": 6,
+          "calibration": "visual_v4",
+          "semantics": "confirmed"
+        },
+        {
+          "name": "address_line_1",
+          "label_en": "Address line 1",
+          "rect": [
+            0.805,
+            0.48,
+            0.165,
+            0.1
+          ],
+          "content": "arabic_text",
+          "role": "address",
+          "psm": 6,
+          "calibration": "visual_v4",
+          "semantics": "confirmed"
+        },
+        {
+          "name": "address_line_2",
+          "label_en": "Address line 2",
+          "rect": [
+            0.505,
+            0.565,
+            0.465,
+            0.11
+          ],
+          "content": "arabic_text",
+          "role": "address",
+          "psm": 6,
+          "calibration": "visual_v4",
+          "semantics": "confirmed"
+        },
+        {
+          "name": "birth_date_printed_a",
+          "label_en": "Printed birth date (left-registered candidate)",
+          "label_ar": "تاريخ الميلاد",
+          "rect": [0.074, 0.746, 0.188, 0.0825],
+          "content": "date_digits",
+          "role": "printed_birth_date",
+          "psm": 7,
+          "printed_precision": "year_month",
+          "calibration": "visual_v6_ink_profile",
+          "semantics": "visually_confirmed",
+          "priority": 10,
+          "note": "Printed YYYY/MM immediately left of the eagle emblem, above the serial. Left-registered of two candidate boxes: the rectification registers this print to about +/-20 px, and no single box holds the full date on every card while excluding the emblem. Audited on all five accepted front crops; see reports/phase2d_b_birth_date_region_audit.md."
+        },
+        {
+          "name": "birth_date_printed_b",
+          "label_en": "Printed birth date (right-registered candidate)",
+          "label_ar": "تاريخ الميلاد",
+          "rect": [0.094, 0.746, 0.184, 0.0825],
+          "content": "date_digits",
+          "role": "printed_birth_date",
+          "psm": 7,
+          "printed_precision": "year_month",
+          "calibration": "visual_v6_ink_profile",
+          "semantics": "visually_confirmed",
+          "priority": 20,
+          "note": "Same print as birth_date_printed_a, shifted right for cards whose rectification sits further right. The first candidate whose text parses as a real date is the one the birth-date cross-check uses."
+        },
+        {
+          "name": "national_id_number",
+          "label_en": "National ID number",
+          "rect": [
+            0.42,
+            0.76,
+            0.56,
+            0.125
+          ],
+          "content": "digits",
+          "role": "id_number",
+          "psm": 6,
+          "expected_length": 14,
+          "calibration": "visual_v4",
+          "semantics": "confirmed",
+          "note": "Covers the full lower-right number and excludes the left security panel."
+        },
+        {
+          "name": "card_serial_number",
+          "label_en": "Card serial number",
+          "rect": [
+            0.055,
+            0.895,
+            0.27,
+            0.1
+          ],
+          "content": "latin_serial",
+          "role": "serial",
+          "psm": 6,
+          "min_length": 6,
+          "max_length": 20,
+          "calibration": "visual_v4",
+          "semantics": "confirmed",
+          "note": "The serial is printed in Latin capitals and Western digits, not in Arabic-Indic numerals like every other numeric field on this card. v4 declared it `digits`, which routed it to the `ara` model and to Arabic-Indic folding; measured on the five accepted fronts, that returned one or two stray digits on all five, while `eng` under the Latin charset returned the complete serial on four of five. The content type is corrected here to `latin_serial`."
+        }
+      ]
+    },
+    "back": {
+      "description": "Upright back: numeric identifier in the top band, a two-line occupation/qualification field, three distinct status values, expiry value, and a separate non-OCR barcode area.",
+      "regions": [
+        {
+          "name": "national_id_number",
+          "label_en": "National ID number",
+          "rect": [
+            0.47,
+            0.055,
+            0.355,
+            0.095
+          ],
+          "content": "digits",
+          "role": "id_number",
+          "psm": 6,
+          "expected_length": 14,
+          "calibration": "visual_v4",
+          "semantics": "confirmed",
+          "note": "Top numeric identifier band."
+        },
+        {
+          "name": "occupation",
+          "label_en": "Occupation or qualification",
+          "rect": [
+            0.47,
+            0.155,
+            0.355,
+            0.18
+          ],
+          "content": "arabic_text",
+          "role": "other",
+          "psm": 6,
+          "calibration": "visual_v4",
+          "semantics": "confirmed",
+          "note": "One semantic field printed across two lines."
+        },
+        {
+          "name": "gender_printed",
+          "label_en": "Printed gender",
+          "rect": [
+            0.71,
+            0.305,
+            0.12,
+            0.09
+          ],
+          "content": "arabic_text",
+          "role": "printed_gender",
+          "psm": 6,
+          "calibration": "visual_v4",
+          "semantics": "confirmed"
+        },
+        {
+          "name": "religion",
+          "label_en": "Religion",
+          "rect": [
+            0.535,
+            0.305,
+            0.125,
+            0.09
+          ],
+          "content": "arabic_text",
+          "role": "other",
+          "psm": 6,
+          "calibration": "visual_v4",
+          "semantics": "confirmed"
+        },
+        {
+          "name": "marital_status",
+          "label_en": "Marital status",
+          "rect": [
+            0.35,
+            0.305,
+            0.135,
+            0.09
+          ],
+          "content": "arabic_text",
+          "role": "other",
+          "psm": 6,
+          "calibration": "visual_v4",
+          "semantics": "confirmed"
+        },
+        {
+          "name": "expiry_date",
+          "label_en": "Expiry date",
+          "rect": [
+            0.3,
+            0.485,
+            0.245,
+            0.105
+          ],
+          "content": "date_digits",
+          "role": "other",
+          "psm": 6,
+          "calibration": "visual_v4",
+          "semantics": "confirmed",
+          "note": "Date value next to the visually distinct validity label. No issue-date region is declared because no separate label/value pair was confirmed."
+        },
+        {
+          "name": "barcode_area",
+          "label_en": "Barcode area",
+          "rect": [
+            0.045,
+            0.61,
+            0.9,
+            0.35
+          ],
+          "content": "none",
+          "role": "none",
+          "psm": 6,
+          "calibration": "visual_v4",
+          "semantics": "confirmed",
+          "note": "Explicitly excluded from OCR regions."
+        }
+      ]
+    }
+  }
+}

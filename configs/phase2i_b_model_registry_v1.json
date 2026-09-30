@@ -1,0 +1,134 @@
+{
+  "schema_version": "phase2i_b_model_registry_v1",
+  "license_context": "Apache-2.0 permits commercial and government use, subject to legal review and notice obligations",
+  "runtime": {
+    "python": "3.11.9",
+    "paddleocr": "3.3.2",
+    "paddlepaddle": "3.3.0",
+    "pytesseract": "0.3.13",
+    "tesseract": "5.4.0.20240606"
+  },
+  "models": [
+    {
+      "name": "arabic_PP-OCRv5_mobile_rec",
+      "family": "PP-OCRv5 multilingual mobile recognition",
+      "status": "INSTALLED_CONTROL",
+      "dictionary": "embedded PP-OCRv5 Arabic dictionary; ASCII, Arabic-Indic and Persian digits 0-9 supported",
+      "input": "3x48x320 nominal with valid-ratio padding and dynamic width through 3200",
+      "framework": "PaddleOCR 3.3.2 / PaddlePaddle 3.3.0",
+      "source": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/arabic_PP-OCRv5_mobile_rec_infer.tar",
+      "weight_sha256": "4b4271fd1dd89a40b2056e1a42e58de7c0df2fdcf1a97ca9a8916d7ec45f9143",
+      "weight_bytes": 7922839,
+      "files_sha256": {
+        "inference.json": "d43832804d89c0e18d59f8446a3babd0ef60c44bc335efddac3176caf71d50af",
+        "inference.pdiparams": "4b4271fd1dd89a40b2056e1a42e58de7c0df2fdcf1a97ca9a8916d7ec45f9143",
+        "inference.yml": "21368419e6c016c31db55d316d59e11c128e1913e6e6fe10287084710043d3a6"
+      },
+      "license": "Apache-2.0",
+      "cpu": true,
+      "gpu": true,
+      "dependency_change": false
+    },
+    {
+      "name": "PP-OCRv5_server_rec",
+      "family": "PP-OCRv5 server recognition",
+      "status": "DOWNLOADED_AND_SMOKE_TESTED",
+      "dictionary": "embedded multilingual server dictionary; all ASCII digits 0-9 verified present; Arabic letters not claimed",
+      "input": "3x48x320 nominal with valid-ratio padding and dynamic width through 3200",
+      "framework": "PaddleOCR 3.3.2 / PaddlePaddle 3.3.0",
+      "source": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv5_server_rec_infer.tar",
+      "archive_sha256": "d99be2ffd348943ab52876179168be4fb5b14f5f0812f2ae4c76d89ec2ea750a",
+      "weight_sha256": "63853f062a5f4089befc16f565a68277618e0da5cb45468b49d11079de0ada77",
+      "weight_bytes": 84390117,
+      "files_sha256": {
+        "inference.json": "8e6e12e5d42531840310977fffb58165bf889fc5061408c5a8afdb6985f47fcb",
+        "inference.pdiparams": "63853f062a5f4089befc16f565a68277618e0da5cb45468b49d11079de0ada77",
+        "inference.yml": "2c719dba044c4e2228aef8ff92f5f575394d75d24c16de096a33b7cfd902f66d"
+      },
+      "license": "Apache-2.0",
+      "cpu": true,
+      "gpu": true,
+      "dependency_change": false
+    },
+    {
+      "name": "en_PP-OCRv5_mobile_rec",
+      "family": "PP-OCRv5 English mobile recognition",
+      "status": "DOWNLOADED_AND_SMOKE_TESTED",
+      "dictionary": "embedded English dictionary; ASCII digits 0-9 supported",
+      "input": "3x48x320 nominal with valid-ratio padding and dynamic width through 3200",
+      "framework": "PaddleOCR 3.3.2 / PaddlePaddle 3.3.0",
+      "source": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/en_PP-OCRv5_mobile_rec_infer.tar",
+      "archive_sha256": "e595b4cf2ffad19fbb5a61ba345d63939577a3ab8717b6e5995642590c9101b4",
+      "weight_sha256": "3ec8a97ed6cefe8568d3e2ee90bb193299b566a7661aa4fd52d224b96b59f66b",
+      "weight_bytes": 7772315,
+      "files_sha256": {
+        "inference.json": "fd1b6ec722ea841a72d3ba43e527df1d1066d5d7808e0503ee3eec7265188753",
+        "inference.pdiparams": "3ec8a97ed6cefe8568d3e2ee90bb193299b566a7661aa4fd52d224b96b59f66b",
+        "inference.yml": "27e91d0582f40168aa218303c76e184bc78fa7a5d105aad0cfbad8458b441067"
+      },
+      "license": "Apache-2.0",
+      "cpu": true,
+      "gpu": true,
+      "dependency_change": false
+    },
+    {
+      "name": "latin_PP-OCRv3_mobile_rec",
+      "family": "PP-OCRv3 Latin mobile recognition",
+      "status": "INSTALLED",
+      "dictionary": "embedded Latin dictionary; ASCII digits 0-9 supported",
+      "input": "3x48x320 nominal with valid-ratio padding and dynamic width through 3200",
+      "framework": "PaddleOCR 3.3.2 / PaddlePaddle 3.3.0",
+      "source": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/latin_PP-OCRv3_mobile_rec_infer.tar",
+      "weight_sha256": "fa6f22a8b2a669c7d5b4dfd2607491abd4cd2467adf7077c9cc70ce8c47b61d9",
+      "weight_bytes": 8940218,
+      "files_sha256": {
+        "inference.json": "022b9fd837182ee83bb699d3d1cee7d05811997c887cae179a8c128ea29da3fa",
+        "inference.pdiparams": "fa6f22a8b2a669c7d5b4dfd2607491abd4cd2467adf7077c9cc70ce8c47b61d9",
+        "inference.yml": "f193ba660245a417090b757722f955930a2af750ac9258166cc006fe147e6794"
+      },
+      "license": "Apache-2.0",
+      "cpu": true,
+      "gpu": true,
+      "dependency_change": false
+    },
+    {
+      "name": "arabic_PP-OCRv3_mobile_rec",
+      "family": "PP-OCRv3 Arabic mobile recognition",
+      "status": "INSTALLED_LEGACY_CONTROL",
+      "dictionary": "embedded Arabic dictionary; ASCII and Arabic-Indic digits supported (zero absent in legacy Arabic-Indic list)",
+      "input": "3x48x320 nominal with valid-ratio padding and dynamic width through 3200",
+      "framework": "PaddleOCR 3.3.2 / PaddlePaddle 3.3.0",
+      "source": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/arabic_PP-OCRv3_mobile_rec_infer.tar",
+      "weight_sha256": "ab7a01be7e76cac4b25f52a81a9079856f1b9aa7e4b48370b7efeb77dff63ee7",
+      "weight_bytes": 8933978,
+      "files_sha256": {
+        "inference.json": "adab27210eae2b26c76e90abb8240d33cdf962b50f693e4a0bb3e4836db71f90",
+        "inference.pdiparams": "ab7a01be7e76cac4b25f52a81a9079856f1b9aa7e4b48370b7efeb77dff63ee7",
+        "inference.yml": "fd801db0002ff29e8f5908c72a2635eb88d5e744c1aebe0e8d857695a74ae159"
+      },
+      "license": "Apache-2.0",
+      "cpu": true,
+      "gpu": true,
+      "dependency_change": false
+    },
+    {
+      "name": "tesseract_5_4_0_eng_psm7_digits",
+      "family": "Tesseract LSTM line recognition",
+      "status": "INSTALLED_BASELINE",
+      "dictionary": "English traineddata with fixed ASCII digit whitelist 0-9",
+      "input": "dynamic image size; PSM 7 single text line",
+      "framework": "Tesseract 5.4.0.20240606 / pytesseract 0.3.13",
+      "source": "local Tesseract installation; eng and osd traineddata present",
+      "weight_sha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+      "weight_bytes": 4113088,
+      "files_sha256": {
+        "eng.traineddata": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+        "osd.traineddata": "9cf5d576fcc47564f11265841e5ca839001e7e6f38ff7f7aacf46d15a96b00ff"
+      },
+      "license": "Apache-2.0 engine and official tessdata",
+      "cpu": true,
+      "gpu": false,
+      "dependency_change": false
+    }
+  ]
+}

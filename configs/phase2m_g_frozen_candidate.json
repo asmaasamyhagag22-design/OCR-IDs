@@ -1,0 +1,62 @@
+{
+  "architecture": "phase2l_b.build_v2 conditioned 160x576, unchanged",
+  "candidate": "BC-final seed 3101",
+  "control_gate_168": {
+    "vs_control_model": {
+      "candidate": 159,
+      "net": -1,
+      "ref": 160,
+      "regressed": 1
+    },
+    "vs_v2": {
+      "candidate": 159,
+      "net": 7,
+      "ref": 152,
+      "regressed": 1,
+      "within_cap": true
+    },
+    "vs_v3": {
+      "candidate": 159,
+      "net": 1,
+      "ref": 158,
+      "regressed": 1
+    }
+  },
+  "declared_before_the_read": true,
+  "external_validation_single_read": {
+    "cards": 278,
+    "of": 647,
+    "of_cards": 293,
+    "records": 628,
+    "status": "EXPLORATORY: spent selection set, used for selection in 2M-C and analysed in 2M-E"
+  },
+  "output_shape": [
+    null,
+    14,
+    10
+  ],
+  "phase": "2M-G",
+  "production_changed": false,
+  "recipe": {
+    "cosine_decay_to_zero": true,
+    "init": "the Phase 2M-E control model",
+    "labels": "8 owner-verified corrections applied",
+    "pool": "full external train minus 13 excluded unreadable records, plus internal replay",
+    "shear_deg": [
+      -5,
+      5
+    ],
+    "steps": 2664,
+    "weight_ema": 0.999
+  },
+  "research_candidate_only": true,
+  "schema_version": "phase2m_g_frozen_candidate_v1",
+  "vs_control_model_paired_cards": {
+    "established": false,
+    "losses": 2,
+    "p": 0.6875,
+    "wins": 4
+  },
+  "weights_path": "artifacts/phase2m_g/runs/BCFINAL_seed3101/final.weights.h5",
+  "weights_sha256": "00e23a14b3e9cf976864241f3e494ce383cdc52c8bbd2e52e54b53d03657d4df"
+}

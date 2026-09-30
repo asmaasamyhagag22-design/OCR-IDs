@@ -1,0 +1,39 @@
+{
+  "K2_no_box": 0,
+  "admitted": 720,
+  "chosen": "K2",
+  "code_sha256": "3c1a8ebd92567194a26271be4406284d1026502f9c37e47b3928cc7e6e9be687",
+  "exact": {
+    "K1": 0,
+    "K2": 348
+  },
+  "interval": {
+    "K1": [
+      0.0,
+      0.005110341234774119
+    ],
+    "K2": [
+      0.44626998929471384,
+      0.5205337443973277
+    ]
+  },
+  "k2_allowed": true,
+  "label": "possibly contaminated (D-008): the second model's training data are unverified",
+  "labelled": 720,
+  "not_14_digits": {
+    "K1": 716,
+    "K2": 358
+  },
+  "only_K1_exact": 0,
+  "only_K2_exact": 348,
+  "pass_through_check_pass": true,
+  "pool": 771,
+  "replay_training_cards_in_pool": 664,
+  "rule": "more exact cards wins; a tie goes to K1 (step_0_crop.selection)",
+  "schema_version": "phase4_step0_result_v1",
+  "scored_cards": 720,
+  "sign_test_two_sided_p": 3.488120700934677e-105,
+  "unlabelled_excluded": 51,
+  "utc": "2026-09-27T18:07:27+00:00",
+  "worker_paddle": "3.3.1"
+}
