@@ -193,3 +193,57 @@ Use `/ready` for container health checks and load-balancer routing. Use
   - The upload limit rose from 10 MB to 25 MB and is configurable with
     `OCR_MAX_UPLOAD_MB` (Phase 4 final pass). Every upload that was accepted
     before is still accepted; some that got 413 are now answered.
+# Additive batch engine (2026-10-06)
+
+This section adds `POST /engine` without changing any existing `/v1` response,
+decision, authentication or error contract. The default listening port is now
+8081, configurable with `OCR_PORT`. No key header is required for `/engine`
+unless `OCR_ENGINE_REQUIRE_KEY=1`; all other routes keep their existing key
+requirement. Bind this unauthenticated engine to localhost or an isolated
+internal network only.
+
+Request content type is `application/json`:
+
+```json
+{"request_id":"batch-1","items":[{"item_id":"item-1","front_b64":"<base64 image>","back_b64":null}]}
+```
+
+`request_id` and `item_id` are nonempty strings of at most 256 characters. The
+batch contains 1–10 items with unique item IDs. `front_b64` is a string;
+`back_b64` is optional, a string or null, and is ignored. Unknown request fields
+are rejected. Items are returned in request order, with their original IDs:
+
+```json
+{"items":[{"item_id":"item-1","front":{"finding":null,"error_codes":["UNREADABLE_IMAGE"],"confidence":null,"model_version":"fixed14-bcfinal-3101","decision_rule_version":"phase4-engine-v2"}}]}
+```
+
+A present structurally valid reading has no errors at any margin by default.
+The owner cites the team's confirmation that every success is compared with
+the applicant's typed ID downstream. `ENGINE_SUCCESS_MIN_MARGIN` defaults to
+0.0; raising it enables `LOW_CONFIDENCE` for valid readings below it or without
+a finite margin. Invalid readings receive exactly `INVALID_READING`. Confidence
+is returned for every item. The `/v1` decider and its 0.966875 remain unchanged.
+No-reading outcomes have null `finding` and exactly one
+of `CARD_NOT_FOUND`, `UNREADABLE_IMAGE`, `UPLOAD_IS_VIDEO`, `IMAGE_TOO_LARGE`,
+`PROCESSING_TIMEOUT`. Missing number lines, image decoder errors and individual
+pipeline failures map to `UNREADABLE_IMAGE`. Timeout overrides the ordinary
+confidence rule: the best available completed reading is returned, if any,
+with exactly `PROCESSING_TIMEOUT`. Optional confidence and version fields may
+be ignored by clients.
+
+All per-image problems return HTTP 200 with item error codes, including bad
+base64. HTTP 422 is reserved for malformed envelopes, schema violations,
+duplicate IDs or an invalid batch count. HTTP 413 enforces the configurable
+total request limit. HTTP 503 means busy/unavailable, with `Retry-After: 1`.
+Opt-in key enforcement may also return the existing 401 body.
+
+The default decoded base64 item limit is 25 MiB and total JSON limit 350 MiB.
+The unchanged pipeline's decoded pixel cap remains 60 MP. One batch is
+admitted at a time, across two configurable persistent process workers. Items
+share a 45-second inference deadline, including waiting for a worker. Body
+reading allows 4 seconds; the server bounds a warm request at approximately
+49 seconds. On first use, warm-up may add up to 130 seconds, keeping the target
+below the client's 180-second allowance. Timed-out workers are terminated and
+replaced. Readiness keeps its original authenticated v1-runtime meaning; an
+engine request may return 503 while its own pool loads or recovers. Settings
+and operational details are in `README_SERVICE.md`.

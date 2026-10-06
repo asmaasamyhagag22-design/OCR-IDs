@@ -530,22 +530,42 @@ async def _verify(
     return response
 
 
-def create_app(settings: Settings | None = None, state: ServiceState | None = None, load: bool = True) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    state: ServiceState | None = None,
+    load: bool = True,
+    engine_pool: Any = None,
+) -> FastAPI:
     """The FastAPI app: the API-key middleware, the fixed error bodies, and the four endpoints.
 
     `load=False` leaves the models unloaded (tests drive `state` themselves).
     """
     settings = settings or Settings.from_env()
     state = state or ServiceState()
+    start_engine = state.recognizer is None
     expected_key = _key_digest(settings.api_key)
     body_limit = settings.max_image_bytes + MULTIPART_ALLOWANCE
+    from .engine import EngineSettings, install_engine
+    from .engine_pool import EnginePool
+
+    engine_settings = EngineSettings.from_env()
+    engine_pool = engine_pool or EnginePool(
+        workers=engine_settings.workers,
+        threads=engine_settings.threads,
+        budget_s=engine_settings.budget_s,
+        warmup_s=engine_settings.warmup_s,
+        success_min_margin=engine_settings.success_min_margin,
+    )
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         state.lock = asyncio.Lock()
         if load and state.status == "loading" and state._loader is None:
             state.start_loading()
+        if load and start_engine:
+            engine_pool.start()
         yield
+        engine_pool.close()
         state.executor.shutdown(wait=False, cancel_futures=True)
 
     app = FastAPI(
@@ -559,12 +579,14 @@ def create_app(settings: Settings | None = None, state: ServiceState | None = No
     )
     app.state.service = state
     app.state.settings = settings
+    app.state.engine_pool = engine_pool
 
     @app.middleware("http")
     async def api_key(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         provided = request.headers.get(API_KEY_HEADER)
         # constant time: both sides hashed to equal length, then compare_digest
-        if provided is None or not hmac.compare_digest(_key_digest(provided), expected_key):
+        public_engine = request.url.path == "/engine" and not engine_settings.require_key
+        if not public_engine and (provided is None or not hmac.compare_digest(_key_digest(provided), expected_key)):
             return _error(401, DETAIL_UNAUTHORISED)
         try:
             return await call_next(request)
@@ -605,6 +627,8 @@ def create_app(settings: Settings | None = None, state: ServiceState | None = No
     )
     async def verify(request: Request) -> JSONResponse | VerifyResponse:
         return await _verify(request, state, settings, body_limit)
+
+    install_engine(app, engine_settings, engine_pool)
 
     def openapi() -> dict[str, Any]:
         if app.openapi_schema:

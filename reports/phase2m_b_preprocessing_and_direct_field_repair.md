@@ -35,7 +35,7 @@ routing and the Phase 2L-D demo are unchanged.
 
 | Item | Value |
 |---|---|
-| Worktree | the `OCR_ID_parallel` worktree (the starting commit lives here; the `OCR_ID_working` worktree is on `main` and was not used) |
+| Worktree | `C:\Users\asmaa\Documents\OCR_ID_parallel` (the starting commit lives here; the `OCR_ID_working` worktree is on `main` and was not used) |
 | Starting commit / backup ref | `87fc2cc0274674f2c1d8e7dccda2726ee789b6c8` / `backup/phase2m-b-entry-20260915` |
 | Branch | `phase2m-b-preprocessing` |
 | `main` | `e9a2d31` (unchanged) |
@@ -240,7 +240,7 @@ preprocessing.
 ## Reproduction commands
 
 ```powershell
-# run from the repository root
+cd C:\Users\asmaa\Documents\OCR_ID_parallel
 $env:PYTHONDONTWRITEBYTECODE='1'
 .\.venv\Scripts\python.exe scripts\phase2m_b.py entry-state
 .\.venv\Scripts\python.exe scripts\phase2m_b.py audit-boxes

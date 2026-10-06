@@ -589,7 +589,7 @@ def build_comparison_report(
         "the retained/corrected Phase 2C tests.",
         "- Dependency integrity: `No broken requirements found`.",
         "- Import resolution: `src` resolves to this working copy under "
-        "`..\\OCR_ID_working\\src`.",
+        "`C:\\Users\\asmaa\\Documents\\OCR_ID_working\\src`.",
         "- Phase 1/2B regression: none observed; all complete tests pass and their "
         "implementation files remain unchanged from `a96ad77`.",
         "",

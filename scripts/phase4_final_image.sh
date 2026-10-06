@@ -4,7 +4,7 @@
 # Layers 1-15 (base, system libraries, pip, the model files and their check) must be identical
 # to ce10649's; the changed layers are scanned by the validated scripts/phase4_final_layer_scan.py.
 set -euo pipefail
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT=/mnt/c/Users/asmaa/Documents/OCR_ID_parallel
 WORK="$HOME/build/final"
 REFERENCE=fixed14-ocr-service:fixed14-bcfinal-3101-ce10649
 cd "$ROOT"

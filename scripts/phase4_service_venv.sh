@@ -4,7 +4,7 @@
 # Proves the lock installs, and compares the result with the stage-1 venv it was
 # taken from: the package set, and every file of the cv2 package (D-046).
 set -euo pipefail
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT=/mnt/c/Users/asmaa/Documents/OCR_ID_parallel
 FROZEN="$HOME/venvs/ocrid-py3119"
 SERVICE="$HOME/venvs/ocrid-service-py3119"
 BASE="$("$FROZEN/bin/python" -c 'import sys; print(sys._base_executable)')"

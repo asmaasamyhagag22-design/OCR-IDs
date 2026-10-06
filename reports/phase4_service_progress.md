@@ -178,11 +178,11 @@ Not pushed. Rule: `configs/phase4_service_rule_v1.json`.
 ## Next
 
 - Nothing. The phase is complete. The owner's actions are in the report's
-  "Waiting for the owner".
+  "Waiting for Asmaa".
 
-## Waiting for the owner
+## Waiting for Asmaa
 
-- See `reports/phase4_service.md`, "Waiting for the owner": rebuild and verify
+- See `reports/phase4_service.md`, "Waiting for Asmaa": rebuild and verify
   commands, the 10 MB limit, the pixel cap, thread settings, amendment 9's
   post-hoc exceptions, old image tags, and push/registry.
 

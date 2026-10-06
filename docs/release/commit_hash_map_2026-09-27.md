@@ -6,7 +6,7 @@ instruction, and both times leaving every tree, message byte and date unchanged:
 - **D-010:** the `Co-Authored-By: Claude` trailer was removed from the commit
   messages after `5b01d9a`;
 - **D-011:** the author and committer `Codex Local <codex-local@localhost>` became
-  the owner's GitHub identity on
+  `asmaasamyhagag22-design <asmaasamyhagag22-design@users.noreply.github.com>` on
   the same commits. Only the name and email fields changed.
 
 Documents written before a rewrite cite the hashes of their time and are not

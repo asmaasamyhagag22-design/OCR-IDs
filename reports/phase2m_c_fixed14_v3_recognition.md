@@ -196,7 +196,7 @@ the ignored `artifacts/phase2m_c/`. Tracked outputs pass the aggregate privacy s
 ## Reproduction
 
 ```powershell
-# run from the repository root
+cd C:\Users\asmaa\Documents\OCR_ID_parallel
 $env:PYTHONDONTWRITEBYTECODE='1'
 .\.venv\Scripts\python.exe scripts\phase2m_c.py entry
 .\.venv\Scripts\python.exe scripts\phase2m_c.py materialize

@@ -6,14 +6,14 @@
 #                    lock, model-file manifest) plus the model files copied with every
 #                    symlink and junction resolved; verify every hash; refuse any symlink
 #   build            context, then docker build; tag fixed14-ocr-service:fixed14-bcfinal-3101-<sha>
-#   serve            run the service detached on 127.0.0.1:8010 (read-only root, no capabilities)
+#   serve            run the service detached on 127.0.0.1:8081 (read-only root, no capabilities)
 #   wait-healthy     wait until the container's HEALTHCHECK (/ready) is healthy
 #   stop             stop and remove the service container
 #   cli N [CYCLE]    run the CLI in a fresh container on the staged images, N workers,
 #                    no network; CYCLE repeats the list to that many images (timing)
 #   image            print the image reference for HEAD
 set -euo pipefail
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CTX="$HOME/build/fixed14-ocr-context"
 OUT="$ROOT/artifacts/phase4_service"
 # the key lives on WSL's own filesystem, mode 600, never under /mnt/c (NTFS ignores the mode)
@@ -22,8 +22,10 @@ NAME=fixed14-ocr
 # The worktree's .git points at a Windows path, which WSL's git cannot follow; the
 # Windows git is called through WSL interop instead (same repository, same HEAD).
 cd "$ROOT"
-git() { git.exe "$@" | tr -d $'\r'; }
-git_raw() { git.exe "$@"; }
+GIT_BIN="$(command -v git)"
+if [ -f .git ] && command -v git.exe >/dev/null 2>&1; then GIT_BIN="$(command -v git.exe)"; fi
+git() { "$GIT_BIN" "$@" | tr -d $'\r'; }
+git_raw() { "$GIT_BIN" "$@"; }
 SHA="$(git rev-parse --short HEAD)"
 FULL_SHA="$(git rev-parse HEAD)"
 IMAGE="fixed14-ocr-service:fixed14-bcfinal-3101-$SHA"
@@ -73,10 +75,10 @@ cmd_build() {
 cmd_serve() {
   ensure_key
   docker rm -f "$NAME" >/dev/null 2>&1 || true
-  docker run -d --name "$NAME" -p 127.0.0.1:8010:8010 --env-file "$SECRETS/ocr.env" \
+  docker run -d --name "$NAME" -p 127.0.0.1:8081:8081 --env-file "$SECRETS/ocr.env" \
     --read-only --tmpfs /tmp --tmpfs /home/ocr:uid=10001,gid=10001 \
     --cap-drop ALL --security-opt no-new-privileges --ulimit core=0 \
-    --memory 3g --pids-limit 256 "$IMAGE"
+    --memory 6g --pids-limit 512 "$IMAGE"
 }
 
 cmd_wait_healthy() {

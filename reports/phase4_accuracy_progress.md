@@ -111,10 +111,10 @@ Not pushed. Rule: `configs/phase4_accuracy_stage1_rule_v1.json` (amendment 1).
 - If she wants more: build F2 or F3 (small projected gain), or fix the
   orientation chooser's missed upright turn, which F8 exposed.
 
-## Waiting for the owner
+## Waiting for Asmaa
 
 - The audit diagnostic, in her own WSL terminal with the override:
-  `cd the repository root`, then
+  `cd /mnt/c/Users/asmaa/Documents/OCR_ID_parallel`, then
   `export OCRID_GOVERNANCE_OVERRIDE=OPEN-377-AUDIT-$(date +%F)`, then
   `bash scripts/phase4_accuracy_wsl.sh audit-diagnostic`.
 - Decisions: F1v and F8 for the competition package; the meaning of UNSURE.

@@ -13,7 +13,7 @@ import urllib.request
 
 def main() -> int:
     """0 when /ready answers 200 on the loopback port, else 1. Prints nothing."""
-    port = os.environ.get("OCR_PORT", "8010")
+    port = os.environ.get("OCR_PORT", "8081")
     request = urllib.request.Request(
         f"http://127.0.0.1:{port}/ready", headers={"X-API-Key": os.environ.get("OCR_API_KEY", "")}
     )

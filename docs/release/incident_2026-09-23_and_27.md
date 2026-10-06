@@ -43,9 +43,9 @@ $ ls -la --time-style=full-iso artifacts/governance/override_ledger.json
 $ ls ../OCR_ID_working/artifacts/governance/
   blocklist.json                                       # no ledger in the sibling worktree
 
-$ find ~ -maxdepth 7 -name read_started.json -o -name verdict.json \
+$ find /c/Users/asmaa -maxdepth 7 -name read_started.json -o -name verdict.json \
        -o -name "override_ledger*.json"
-  two read_started.json, both under AppData/Local/Temp/pytest-of-<user>/
+  two read_started.json, both under AppData/Local/Temp/pytest-of-asmaa/
       (test_a_second_read_is_refused - synthetic tests)
   artifacts/governance/override_ledger.json            # the one above
 

@@ -66,7 +66,7 @@ decision logic stays `bcfinal_only` at margin 0.966875.
    The 95% target is projected to be reached only with both measured fixes,
    and not at the low end of the range. The ranges cover only the binomial uncertainty of two
    development rates, not the move to the audit's mix of failures.
-5. **Waiting for the owner:** the audit diagnostic (one WSL command with her
+5. **Waiting for Asmaa:** the audit diagnostic (one WSL command with her
    override), and three decisions (see the last section).
 
 ## Stage 0
@@ -319,7 +319,7 @@ all 8 configurations together, under load from the validators.
 This is a ready-to-run command. It refuses to run without her override, and its
 result is labelled **diagnostic, not held out** (D-016).
 
-The command, and what it reads, are in "Waiting for the owner" below.
+The command, and what it reads, are in "Waiting for Asmaa" below.
 
 **It was rehearsed on development cards through the identical code path**
 (`audit-diagnostic-rehearsal`, WSL). The rehearsal covered the pool's 51
@@ -471,7 +471,7 @@ $ python -m pytest -q tests/test_no_real_values_in_source.py tests/test_official
   - External validation was read only as the descriptive S3 bucket, through
     `Access` and its ledger.
 
-## Waiting for the owner
+## Waiting for Asmaa
 
 ### 1. The audit diagnostic: one command, with your override
 
@@ -479,7 +479,7 @@ Run it in your own WSL (Ubuntu) terminal, not through Claude, from the
 worktree:
 
 ```bash
-cd the repository root
+cd /mnt/c/Users/asmaa/Documents/OCR_ID_parallel
 export OCRID_GOVERNANCE_OVERRIDE=OPEN-377-AUDIT-$(date +%F)
 bash scripts/phase4_accuracy_wsl.sh audit-diagnostic
 ```

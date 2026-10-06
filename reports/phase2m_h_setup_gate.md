@@ -10,7 +10,7 @@ this gate.
 
 ```
 $ pwd ; git branch --show-current
-~/Documents/OCR_ID_parallel
+/c/Users/asmaa/Documents/OCR_ID_parallel
 setup/harness-governance
 ```
 

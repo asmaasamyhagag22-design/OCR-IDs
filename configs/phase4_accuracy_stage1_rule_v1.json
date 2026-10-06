@@ -253,7 +253,7 @@
     {
       "amendment": 7,
       "utc": "2026-09-28",
-      "decided_by": "the owner, project owner",
+      "decided_by": "Asmaa, project owner",
       "why": "Train/serve consistency. Every PDF card BC-final was trained, validated and audited on reached it as ingest's 300-DPI render of page 1 (official_eval.transcode). Native extraction would feed it images of a different scale. The 21-card result (amendment 6: native extraction lost 2 exact reads, gained 0) is consistent with this choice but was not the basis for it.",
       "Q1_pdf_rule": "the competition decoder renders page 1 of every PDF at 300 DPI with pypdfium2 5.13.0, exactly as ingest does. This supersedes amendment 6 P3 (first non-blank page) and P4 (native extraction). A test asserts pixel identity with official_eval.transcode on synthetic PDFs, and pdf-read checks it on the 21 permitted PDF cards against the ingest images.",
       "Q2_video_uploads": "an upload whose magic bytes are an ISO BMFF video (for example an MP4 named Nid_Front.jpg, D-031) routes to decision UNREADABLE with reason_code UPLOAD_IS_VIDEO, so the backend can ask for an image instead. Other undecodable uploads keep the contract's HTTP errors. The product's decision logic for images (bcfinal_only, 0.966875) is unchanged."

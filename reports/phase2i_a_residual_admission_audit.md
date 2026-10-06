@@ -8,7 +8,7 @@ This phase diagnosed the final Phase 2H admission failures. No production fallba
 
 ## Repository and baseline
 
-Work was performed in the `OCR_ID_parallel` worktree on `parallel-session`, starting at `77675b5510a5cd5427749b2a646cde75375191f8`. Phase 2G head `ff5fceeb63d8d8e3bd00c9f0b819d7911e8101f8` is an ancestor through merge `b95839a`. The protected main worktree stayed clean at `ff5fcee`.
+Work was performed in `C:\Users\asmaa\Documents\OCR_ID_parallel` on `parallel-session`, starting at `77675b5510a5cd5427749b2a646cde75375191f8`. Phase 2G head `ff5fceeb63d8d8e3bd00c9f0b819d7911e8101f8` is an ancestor through merge `b95839a`. The protected main worktree stayed clean at `ff5fcee`.
 
 The environment was Python 3.11.9, Pillow 10.4.0, pillow-heif 0.18.0, NumPy 1.26.4, OpenCV 4.10.0, and pytest 8.3.5. No Python process was active before evaluation. Win32 command-line enumeration was denied, so the permitted `Get-Process` fallback was used. Evaluation artifact hashes were stable before and after reproduction.
 
@@ -157,7 +157,7 @@ The production goal is that no valid, sufficiently readable front image is silen
 ## Reproducible commands
 
 ```powershell
-# run from the repository root
+cd "C:\Users\asmaa\Documents\OCR_ID_parallel"
 
 .\.venv\Scripts\python.exe scripts\phase2h_evaluate.py summarize `
   --input artifacts\phase2h\frozen_v1_development.jsonl `
@@ -175,7 +175,7 @@ The production goal is that no valid, sufficiently readable front image is silen
 .\.venv\Scripts\python.exe -m pytest tests\test_phase2i_a_residual_audit.py -q
 .\.venv\Scripts\python.exe -m pytest -q
 git status --short --branch
-git -C "..\OCR_ID_working" status --short --branch
+git -C "C:\Users\asmaa\Documents\OCR_ID_working" status --short --branch
 ```
 
 ## Changed files and verification

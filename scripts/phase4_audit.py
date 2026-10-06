@@ -627,7 +627,7 @@ def cmd_manifest(_args) -> None:
                                                 "estimated_seconds_for_377",
                                                 "sealed_predictions_sha256", "status_counts")},
         "command": {
-            "shell": "the owner's own WSL terminal (Ubuntu), from the repository root (amendment 7h)",
+            "shell": "the owner's own WSL terminal (Ubuntu), from /mnt/c/Users/asmaa/Documents/OCR_ID_parallel (amendment 7h)",
             "environment": {
                 "OCRID_GOVERNANCE_OVERRIDE": "OPEN-377-AUDIT-<WSL local date of the read, date +%F>",
                 "PHASE2M_H_OPEN_THE_AUDIT": "yes-open-the-locked-377-once",

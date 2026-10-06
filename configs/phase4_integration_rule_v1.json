@@ -190,7 +190,7 @@
   },
   "amendment_1": {
     "utc_date": "2026-09-27",
-    "status": "ADOPTED by the owner (the owner, project owner) in chat on 2026-09-27. Decision log D-009.",
+    "status": "ADOPTED by the owner (Asmaa, project owner) in chat on 2026-09-27. Decision log D-009.",
     "committed_before": "any routing, criterion-2 or friction number. No number of any kind exists in this phase.",
     "why": "the owner corrected her wording: V_bc, 'BC-final matches, or both match', reduces to 'BC-final matches'. Three variants are declared instead.",
     "supersedes": "step_3_routing.variants, step_3_routing.V_bc_note, step_3_routing.selection.first, .second, .tie and .if_neither_passes, step_3_routing.stated_in_advance, and the V_bc item of pending_before_measurement; the names V_either and V_bc in step_3_routing.selection.validation and criterion_2_at_audit_scale.caveat, which now read V1 and V2",

@@ -7,12 +7,94 @@ contract for every field; this page covers running and calling it.
 
 The same Docker image also holds the competition CLI (last section).
 
+## Batch engine on port 8081
+
+`POST /engine` is additive; all `/v1` endpoints and their decision rules remain.
+The engine takes no API key header by default. Startup still requires
+`OCR_API_KEY` for the existing authenticated endpoints, including `/ready`.
+Generate the private `ocr.env` as described below, then run in Linux or WSL:
+
+```bash
+docker run -d --name fixed14-engine --restart unless-stopped -p 127.0.0.1:8081:8081 --env-file ocr.env --read-only --tmpfs /tmp --tmpfs /home/ocr:uid=10001,gid=10001 --cap-drop ALL --security-opt no-new-privileges --ulimit core=0 --memory 6g --pids-limit 512 fixed14-ocr-service:fixed14-bcfinal-3101-<git sha>
+```
+
+The `-p 8081:8081` form publishes on every host interface. Use it only on an
+isolated internal host. With default unauthenticated `/engine`, bind the host
+port to localhost or an internal interface only; never expose it publicly.
+`OCR_HOST` defaults to localhost outside Docker; the image binds `0.0.0.0`.
+`OCR_PORT` is configurable and defaults to 8081.
+
+```json
+{"request_id":"batch-1","items":[{"item_id":"item-1","front_b64":"<base64 image bytes>","back_b64":null}]}
+```
+
+The 200 response contains `items` in input order, each with `item_id` and
+`front`: `finding` (string or null), `error_codes` (array), `confidence` (the
+unrounded margin or null), `model_version` and `decision_rule_version`.
+`back_b64` may be a string or null and is accepted and ignored. The engine
+uses the same decoder, F1v, F8, F9 and BC-final. It never receives a typed ID.
+By default, every structurally valid reading has empty `error_codes`, at any
+margin. This default assumes the team's confirmed downstream comparison of
+every success reading with the national ID typed by the applicant; a wrong
+reading fails that comparison. If that comparison stops, the team can raise
+`ENGINE_SUCCESS_MIN_MARGIN`. With a positive configured margin, a valid reading
+below it (or without a finite margin) receives `LOW_CONFIDENCE`. Structurally
+invalid readings receive `INVALID_READING`. Confidence remains in every item.
+Timeout overrides this policy, retaining any checkpoint with `PROCESSING_TIMEOUT`.
+This policy applies only to `/engine`; the `/v1` decider remains at 0.966875.
+
+| Code | Meaning |
+|---|---|
+| `LOW_CONFIDENCE` | Structurally valid reading below a positive configured success margin, or missing a finite margin when that gate is enabled. |
+| `INVALID_READING` | Reading present but structurally invalid. |
+| `CARD_NOT_FOUND` | The unchanged pipeline could not find the card. |
+| `UNREADABLE_IMAGE` | Bad base64, empty/corrupt/unsupported image, missing number line, or an individual processing failure. |
+| `UPLOAD_IS_VIDEO` | Uploaded bytes are a video. |
+| `IMAGE_TOO_LARGE` | Decoded base64 bytes exceed the item limit, or the existing 60 MP pixel cap is exceeded. |
+| `PROCESSING_TIMEOUT` | The shared batch deadline expired, including waiting for a process; the best completed reading is retained if available. |
+
+No-reading outcomes have null `finding` and exactly one of the five non-confidence
+codes. Per-image failures retain HTTP 200. Malformed JSON/schema, wrong content
+type, duplicate item IDs or a batch outside 1–10 items get 422. A total request
+over the configured cap gets 413, before processing. Saturation, failed
+warm-up or slow body upload get 503 with `Retry-After: 1`; retry with backoff.
+Payload validation errors never echo images, IDs or request values.
+
+One batch is admitted at a time. Its items run across two persistent spawn
+processes with four native threads each. Workers initialise and run sealed and
+golden checks once. The first request allows up to 130 seconds for warming,
+plus the inference budget, with a target below 180 seconds. Warm batches share
+a 45-second inference deadline and a 49-second overall server deadline; items
+waiting for workers share it. A timed-out process is terminated and replaced;
+new batches get 503 until the replacement is warm. Every completed BC-final
+prediction can provide a private timeout checkpoint, ranked by structural
+validity and then margin. Neither logging nor exceptions expose readings.
+`/ready` retains its original authenticated v1-runtime meaning; the engine can
+still answer 503 while its own processes initialise or recover.
+
+| Variable | Default | Range/purpose |
+|---|---|---|
+| `OCR_ENGINE_WORKERS` | 2 | 1–10; provision memory for each worker and the additional v1 runtime. Use one uvicorn worker to retain a single global admission bound. |
+| `OCR_ENGINE_THREADS` | 4 | 1–32 native threads per engine worker. |
+| `OCR_ENGINE_ITEM_MB` | 25 | Decoded base64 bytes, configurable up to 100 MiB; the unchanged decoder itself accepts at most 25 MiB. Raising this does not raise the decoder limit. |
+| `OCR_ENGINE_REQUEST_MB` | 350 | Total JSON bytes, configurable up to 1024 MiB, including base64 and ignored back input. |
+| `OCR_ENGINE_BUDGET_S` | 45 | Positive, at most 45; includes queued items. |
+| `OCR_ENGINE_WARMUP_S` | 130 | Positive, at most 130. |
+| `OCR_ENGINE_BODY_S` | 4 | Positive, at most 4; longest body read. |
+| `OCR_ENGINE_REQUIRE_KEY` | 0 | Set 1 to require the existing `X-API-Key` on `/engine`. |
+| `ENGINE_SUCCESS_MIN_MARGIN` | 0.0 | Finite 0–1; zero disables the margin gate, assuming the downstream typed-ID comparison described above. |
+
+Limits called MB are MiB (1024 × 1024 bytes). The recommended container memory
+is 6 GiB for two measured workers, the v1 runtime and request/inference headroom.
+The rule is `configs/phase4_engine_rule_v1.json`; evidence and limitations are
+in `reports/phase4_engine.md`.
+
 ## 1. Image
 
 | | |
 |---|---|
 | Image | `fixed14-ocr-service:fixed14-bcfinal-3101-<git sha>` |
-| Port | `8010` |
+| Port | `8081` |
 | User | non-root (uid 10001) |
 | Health | Docker `HEALTHCHECK` on `/ready` (every 30 s, 240 s start period) |
 | Contents | code, configs and model weights only; no data and no secret |
@@ -48,7 +130,7 @@ Neither can hide data.
 | Variable | Required | Default | Meaning |
 |---|---|---|---|
 | `OCR_API_KEY` | **yes** | none | The shared key: at least 32 URL-safe characters (`A-Z a-z 0-9 _ -`). The service refuses to start without it. |
-| `OCR_PORT` | no | `8010` | Listening port inside the container. |
+| `OCR_PORT` | no | `8081` | Listening port inside the container. |
 | `OCR_WORKERS` | no | `1` | uvicorn worker processes. Each loads its own models (about 1.2 GB resident) and runs one inference at a time. |
 | `OCR_QUEUE_TIMEOUT_S` | no | `30` | Longest wait for a busy worker, then `503 {"detail": "Service busy"}` with `Retry-After: 1`. |
 | `OCR_REQUEST_TIMEOUT_S` | no | `120` | Longest inference, then `500 {"detail": "Internal error"}`. It was 60 up to image `d9f6301`: run that image with `-e OCR_REQUEST_TIMEOUT_S=120`. |
@@ -77,10 +159,10 @@ chmod 600 ocr.env
 ## 4. Run
 
 ```bash
-docker run -d --name fixed14-ocr --restart unless-stopped -p 127.0.0.1:8010:8010 --env-file ocr.env --read-only --tmpfs /tmp --tmpfs /home/ocr:uid=10001,gid=10001 --cap-drop ALL --security-opt no-new-privileges --ulimit core=0 --memory 3g --pids-limit 256 fixed14-ocr-service:fixed14-bcfinal-3101-<git sha>
+docker run -d --name fixed14-ocr --restart unless-stopped -p 127.0.0.1:8081:8081 --env-file ocr.env --read-only --tmpfs /tmp --tmpfs /home/ocr:uid=10001,gid=10001 --cap-drop ALL --security-opt no-new-privileges --ulimit core=0 --memory 6g --pids-limit 512 fixed14-ocr-service:fixed14-bcfinal-3101-<git sha>
 ```
 
-- `-p 127.0.0.1:8010:8010` keeps the port on the host's loopback. On the
+- `-p 127.0.0.1:8081:8081` keeps the port on the host's loopback. On the
   internal network, bind it to the internal interface, and attach the container
   to an internal-only Docker network: the service needs no outbound access.
   Never expose it publicly. Traffic is plain HTTP, so the network must be
@@ -111,7 +193,7 @@ docker run -d --name fixed14-ocr --restart unless-stopped -p 127.0.0.1:8010:8010
 Every request carries the key, the health endpoints included.
 
 ```bash
-export OCR=http://127.0.0.1:8010
+export OCR=http://127.0.0.1:8081
 export KEY="<the key>"
 ```
 
@@ -276,7 +358,7 @@ action.
 
    ```bash
    docker rm -f fixed14-ocr
-   docker run -d --name fixed14-ocr --restart unless-stopped -p 127.0.0.1:8010:8010 --env-file ocr.env --read-only --tmpfs /tmp --tmpfs /home/ocr:uid=10001,gid=10001 --cap-drop ALL --security-opt no-new-privileges --ulimit core=0 --memory 3g --pids-limit 256 fixed14-ocr-service:<previous tag>
+   docker run -d --name fixed14-ocr --restart unless-stopped -p 127.0.0.1:8081:8081 --env-file ocr.env --read-only --tmpfs /tmp --tmpfs /home/ocr:uid=10001,gid=10001 --cap-drop ALL --security-opt no-new-privileges --ulimit core=0 --memory 6g --pids-limit 512 fixed14-ocr-service:<previous tag>
    ```
 
 3. Wait for `/ready`, then check `/version` against the version recorded for

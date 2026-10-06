@@ -70,7 +70,7 @@ is in the ignored `artifacts/phase2m_d/verification.json`.
 ## Launch
 
 ```powershell
-# run from the repository root
+cd C:\Users\asmaa\Documents\OCR_ID_parallel
 .\.venv\Scripts\python.exe scripts\phase2m_d_local_v3_shadow_demo.py
 ```
 

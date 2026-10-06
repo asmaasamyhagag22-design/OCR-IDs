@@ -7,7 +7,7 @@
 # No hashes are written: sha256 hex text collides with the repository privacy
 # scan's short-token rule, and that scan is not worked around (D-047).
 set -euo pipefail
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT=/mnt/c/Users/asmaa/Documents/OCR_ID_parallel
 UV="$HOME/.local/bin/uv"
 WORK="$(mktemp -d)"
 "$HOME/venvs/ocrid-py3119/bin/pip" freeze --all | grep -v -i '^pip==' > "$WORK/frozen.txt"

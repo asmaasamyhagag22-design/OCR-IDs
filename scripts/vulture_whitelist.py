@@ -27,3 +27,6 @@ decider.DECISIONS  # the contract's four decision values: the service's public v
 dates.PRECISIONS  # the vocabulary of printed-date precisions, documenting the module
 diagnose.CAUSES  # the vocabulary of failure causes, documenting the module
 cross_checks.Observations.printed_birth_date_precision  # a field of a public record
+# Pydantic consumes these engine schema attributes; back_b64 is deliberately ignored.
+model_config
+back_b64

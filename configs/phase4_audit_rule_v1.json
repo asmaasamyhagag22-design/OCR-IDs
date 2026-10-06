@@ -105,7 +105,7 @@
   },
 
   "approval_and_consequence": {
-    "approver": "the owner, project owner, 2026-09-23, recorded in docs/release/decision_log.md",
+    "approver": "Asmaa, project owner, 2026-09-23, recorded in docs/release/decision_log.md",
     "on_fail": "v2 stays in production and nothing is re-tuned, re-thresholded or re-selected on the 377",
     "ratification": "ministry ratification is pending. The verdict binds under these criteria only; there is no clean set left to test different ones."
   },
@@ -212,7 +212,7 @@
 
   "amendment_7e_part_A": {
     "utc_date": "2026-09-23",
-    "status": "ADOPTED by the owner (the owner, project owner) in chat on 2026-09-23. Decision log D-003, D-004. Not a proposal.",
+    "status": "ADOPTED by the owner (Asmaa, project owner) in chat on 2026-09-23. Decision log D-003, D-004. Not a proposal.",
     "committed_before": "any audit image is opened or any audit label is read, and before any false-fail or power number for the new criteria exists",
     "owner_reason": "under the current criteria a BC-final that performs as it did on the 168 controls would fail by chance about 40 percent of the time, so a fail would carry no meaning",
     "append_only": "the sections above are not edited; where this block contradicts them, it governs",
@@ -327,7 +327,7 @@
 
   "amendment_7g": {
     "utc_date": "2026-09-27",
-    "status": "ADOPTED by the owner (the owner, project owner) in chat on 2026-09-27. Decision log D-005, D-007, D-008. Not a proposal.",
+    "status": "ADOPTED by the owner (Asmaa, project owner) in chat on 2026-09-27. Decision log D-005, D-007, D-008. Not a proposal.",
     "committed_before": "any audit image is opened or any audit label is read. The audit has not been opened. Two earlier read attempts failed before the guard step (docs/release/incident_2026-09-23_and_27.md).",
     "append_only": "the sections above are not edited; where this block contradicts them, it governs, and it names what it supersedes",
     "review": "a stats-reviewer read drafts of this block before commit: FAIL (B-1 process isolation, B-3 labels before the seal), then FAIL (the worker restart was unbounded), then FAIL (the worst-case bound, and the raw-score call could raise), then PASS with one hardening adopted (two_seals); all are resolved below",
@@ -374,12 +374,12 @@
 
   "amendment_7h": {
     "utc_date": "2026-09-27",
-    "status": "ADOPTED by the owner (the owner, project owner) in chat on 2026-09-27. Decision log D-013, D-014. Not a proposal.",
+    "status": "ADOPTED by the owner (Asmaa, project owner) in chat on 2026-09-27. Decision log D-013, D-014. Not a proposal.",
     "committed_before": "the manifest is regenerated and before any audit image is opened or any audit label is read. The audit has not been opened.",
     "append_only": "the sections above are not edited; where this block contradicts them, it governs, and it names what it supersedes",
     "the_integration_stopped": "D-013: INTEGRATION_NOT_WORTH_IT. As 7g A declared for that case, nothing fused is sealed. 7g A (fused sealing), C and D (the worker) do not apply. The read is BC-final alone and v2, as frozen in 7 to 7f, with 7g B (the gate is BC-final alone) and 7g E (the missing card) in force.",
     "F_decided_where_the_read_runs": {
-      "environment": "WSL2 Ubuntu 26.04.1, the uv-built venv ~/venvs/ocrid-py3119 (Python 3.11.9, the project pins, paddlepaddle 3.3.0), run from the worktree mounted at the repository root, in the owner's own WSL terminal",
+      "environment": "WSL2 Ubuntu 26.04.1, the uv-built venv ~/venvs/ocrid-py3119 (Python 3.11.9, the project pins, paddlepaddle 3.3.0), run from the worktree mounted at /mnt/c/Users/asmaa/Documents/OCR_ID_parallel, in the owner's own WSL terminal",
       "why": "Windows Application Control blocks Paddle at model load on the owner's machine (2026-09-27). Amendment 2's parity justifies WSL: BC-final on the 168 control bands matched on 2352/2352 slots with max difference 0.0, and the full pipeline on the 20 rehearsal photos gave identical sealed fields on 20/20 with margin difference 0.0 (reports/phase4_integration_parity_linux.json)",
       "supersedes": "7g F, which left the environment to be decided"
     },

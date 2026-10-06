@@ -52,14 +52,15 @@ USER 10001:10001
 # OpenMP threads sleep instead of spinning, and the service caps its threads at 4 (D-053):
 # spinning threads made inferences several times slower when the host was busy
 ENV HOME=/home/ocr \
-    OCR_PORT=8010 \
+    OCR_PORT=8081 \
+    OCR_HOST=0.0.0.0 \
     OMP_WAIT_POLICY=PASSIVE \
     OCR_CPU_THREADS=4 \
     OCR_PADDLE_CACHE_DIR=/tmp/ocr_paddlex_cache \
     DISABLE_MODEL_SOURCE_CHECK=True \
     PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True \
     TF_CPP_MIN_LOG_LEVEL=3
-EXPOSE 8010
+EXPOSE 8081
 HEALTHCHECK --interval=30s --timeout=10s --start-period=240s --retries=3 \
   CMD ["python", "-m", "src.service.healthcheck"]
 CMD ["python", "-m", "src.service"]

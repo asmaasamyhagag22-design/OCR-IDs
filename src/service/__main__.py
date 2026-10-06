@@ -1,9 +1,9 @@
-"""`python -m src.service`: the OCR service under uvicorn, on port 8010 by default.
+"""`python -m src.service`: the OCR service under uvicorn, on port 8081 by default.
 
 Environment:
   OCR_API_KEY            required, at least 32 characters
-  OCR_PORT               default 8010
-  OCR_HOST               default 0.0.0.0
+  OCR_PORT               default 8081
+  OCR_HOST               default 127.0.0.1 (image: 0.0.0.0; publish only localhost)
   OCR_WORKERS            default 1 (each worker loads its own models)
   OCR_QUEUE_TIMEOUT_S    default 30: longest wait for the worker's inference slot (then 503)
   OCR_REQUEST_TIMEOUT_S  default 120: longest inference (then 500; D-073)
@@ -44,8 +44,8 @@ def main() -> None:
     uvicorn.run(
         "src.service.__main__:app_factory",
         factory=True,
-        host=os.environ.get("OCR_HOST", "0.0.0.0"),
-        port=int(os.environ.get("OCR_PORT", "8010")),
+        host=os.environ.get("OCR_HOST", "127.0.0.1"),
+        port=int(os.environ.get("OCR_PORT", "8081")),
         workers=int(os.environ.get("OCR_WORKERS", "1")),
         log_config=UVICORN_LOG_CONFIG,
         access_log=False,

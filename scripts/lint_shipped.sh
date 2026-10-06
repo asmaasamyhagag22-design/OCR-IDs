@@ -4,7 +4,7 @@
 # Tools: requirements-lint.txt in ~/venvs/lint-py311. mypy resolves third-party packages through the
 # service venv's interpreter. Sealed modules are checked by ruff for the record, never edited.
 set -uo pipefail
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT=/mnt/c/Users/asmaa/Documents/OCR_ID_parallel
 cd "$ROOT"
 TOOLS="$HOME/venvs/lint-py311/bin"
 PY="$HOME/venvs/ocrid-service-py3119/bin/python"

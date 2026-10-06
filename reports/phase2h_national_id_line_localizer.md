@@ -8,7 +8,7 @@ The shipped selector does not use an identity, card ID, filename, lookup table, 
 
 ## Repository and baseline
 
-Work was performed only in the `OCR_ID_parallel` worktree on branch `parallel-session`, starting at `9265eb7`. The final Phase 2G commits are ancestors of that commit. The main worktree was read-only.
+Work was performed only in `C:\Users\asmaa\Documents\OCR_ID_parallel` on branch `parallel-session`, starting at `9265eb7`. The final Phase 2G commits are ancestors of that commit. The main worktree was read-only.
 
 The integrated Phase 2G baseline was rerun before implementation and matched its archived output card-for-card with zero mismatches:
 
@@ -99,7 +99,7 @@ The front-card `document.analyse` path now reads the selected bbox and records f
 Demo command:
 
 ```powershell
-# run from the repository root
+cd "C:\Users\asmaa\Documents\OCR_ID_parallel"
 .\.venv\Scripts\python.exe -m src.extraction.demo_national_id --image "C:\path with spaces\card.jpg"
 ```
 

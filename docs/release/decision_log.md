@@ -10,7 +10,7 @@ A later entry may supersede an earlier one; it never edits it.
 | | |
 |---|---|
 | Date | 2026-09-23 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Ratification | **Pending, by the ministry.** |
 
 **Approved**
@@ -57,7 +57,7 @@ If either gate fails, go-live stops.
 | | |
 |---|---|
 | Date | 2026-09-23 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Ratification | Pending: the team, at the release meeting; then the ministry |
 | Record | `configs/phase4_audit_rule_v1.json`, `amendment_7b` |
 
@@ -106,7 +106,7 @@ paired sign test says so.
 | | |
 |---|---|
 | Date | 2026-09-23 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `configs/phase4_audit_rule_v1.json`, `amendment_7c.R1` and `amendment_7e_part_A` |
 
 **Confirmed**
@@ -122,7 +122,7 @@ Otherwise it says the audit does not tell them apart.
 | | |
 |---|---|
 | Date | 2026-09-23 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `configs/phase4_audit_rule_v1.json`, `amendment_7e_part_A` |
 
 **Decided**
@@ -149,7 +149,7 @@ Otherwise it says the audit does not tell them apart.
 | | |
 |---|---|
 | Date | 2026-09-27 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `configs/phase4_audit_rule_v1.json`, next amendment (pending the pin) |
 
 **Decided**
@@ -183,7 +183,7 @@ Otherwise it says the audit does not tell them apart.
 | | |
 |---|---|
 | Date | 2026-09-27 |
-| Approver | the owner, project owner, on the supervisor's instruction |
+| Approver | Asmaa, project owner, on the supervisor's instruction |
 | Record | `docs/release/provenance_second_model.md` |
 
 **Decided**
@@ -212,7 +212,7 @@ Otherwise it says the audit does not tell them apart.
 | | |
 |---|---|
 | Date | 2026-09-27 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `configs/phase4_integration_rule_v1.json` |
 
 **Decided**
@@ -245,7 +245,7 @@ Otherwise it says the audit does not tell them apart.
 | | |
 |---|---|
 | Date | 2026-09-27 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `docs/release/provenance_second_model.md`, `configs/phase4_audit_rule_v1.json` amendment 7g, `configs/phase4_integration_rule_v1.json` |
 | Supersedes | D-006 items 1, 3 and 4; D-007 item 1 |
 
@@ -302,7 +302,7 @@ asks not to be named, and states it was trained on synthetic data.
 | | |
 |---|---|
 | Date | 2026-09-27 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `configs/phase4_integration_rule_v1.json` amendment 1 |
 | Supersedes | D-007 item 4 |
 
@@ -334,7 +334,7 @@ asks not to be named, and states it was trained on synthetic data.
 | | |
 |---|---|
 | Date | 2026-09-27 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `docs/release/commit_hash_map_2026-09-27.md` |
 
 **Decided**
@@ -367,14 +367,14 @@ asks not to be named, and states it was trained on synthetic data.
 | | |
 |---|---|
 | Date | 2026-09-27 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `docs/release/commit_hash_map_2026-09-27.md` |
 
 **Decided**
 
 1. **Identity.** Every commit whose author or committer was
    `Codex Local <codex-local@localhost>` now carries
-   the owner's GitHub identity.
+   `asmaasamyhagag22-design <asmaasamyhagag22-design@users.noreply.github.com>`.
    That is the display name and GitHub noreply address already on the owner's
    other commits.
 2. **Scope.**
@@ -407,7 +407,7 @@ asks not to be named, and states it was trained on synthetic data.
 | | |
 |---|---|
 | Date | 2026-09-27 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `configs/phase4_integration_rule_v1.json` amendment 3 |
 
 **Context**
@@ -478,7 +478,7 @@ A gain of at most one card stops the integration. The token is
 | | |
 |---|---|
 | Date | 2026-09-27 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `configs/phase4_audit_rule_v1.json` amendment 7h |
 
 **Decided**
@@ -509,7 +509,7 @@ A gain of at most one card stops the integration. The token is
 | | |
 |---|---|
 | Date | 2026-09-27 |
-| Read by | the owner, project owner, in her own WSL terminal (amendment 7h) |
+| Read by | Asmaa, project owner, in her own WSL terminal (amendment 7h) |
 | Record | `reports/phase4_audit.md`, `configs/phase4_audit_consumed.json` |
 
 **Result**
@@ -544,7 +544,7 @@ BC-final passed the one read of the locked audit: `AUDIT_PASS`.
 | | |
 |---|---|
 | Date | 2026-09-27 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `configs/phase4_accuracy_stage1_rule_v1.json`, `d_016_owner_decision` |
 | Numbering | The owner's instruction called this D-015. D-015 already records the audit result, so this entry is D-016 (see D-017). |
 
@@ -827,7 +827,7 @@ of it would have been marked stopped.
 | | |
 |---|---|
 | Date | 2026-09-28 |
-| Approver | the owner, project owner (items 1-3); items 4-5 taken autonomously under her instruction |
+| Approver | Asmaa, project owner (items 1-3); items 4-5 taken autonomously under her instruction |
 | Record | `src/extraction/image_resolver.py`, `scripts/phase4_accuracy.py audit-missing-card`, `tests/test_phase4_accuracy.py` |
 
 **Decided (owner)**
@@ -907,7 +907,7 @@ never an accuracy claim.
 | | |
 |---|---|
 | Date | 2026-09-28 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `src/extraction/image_decode.py`, `scripts/phase4_accuracy.py audit-missing-card-brands` and `delivered-isobmff-census`, `reports/phase4_accuracy_stage1.md` (addendum) |
 
 **Found (owner's run of `audit-missing-card`, D-029):**
@@ -967,7 +967,7 @@ it is.
 | | |
 |---|---|
 | Date | 2026-09-28 |
-| Approver | the owner, project owner (the request); the rules are taken autonomously under her instruction |
+| Approver | Asmaa, project owner (the request); the rules are taken autonomously under her instruction |
 | Record | `configs/phase4_accuracy_stage1_rule_v1.json` amendment 6 |
 
 **The owner's request:**
@@ -1017,7 +1017,7 @@ Readings are sealed before labels, and nothing is chosen on these cards.
 | | |
 |---|---|
 | Date | 2026-09-28 |
-| Approver | the owner, project owner |
+| Approver | Asmaa, project owner |
 | Record | `configs/phase4_accuracy_stage1_rule_v1.json` amendment 7; `src/extraction/image_decode.py`; `docs/release/ocr_api_contract_v1.md` |
 | Supersedes | amendment 6 P3 and P4 (D-032's page and extraction rule) |
 
@@ -1938,7 +1938,7 @@ lists it, with its timing (D-056).
      revision label and the `useradd` layer that follow `ARG GIT_SHA`.
    - Every container measurement and both scans are of `ce10649`, so it stays
      the measured image. The owner's own rebuild (the report's "Waiting for
-     the owner") can be scanned with the same command.
+     Asmaa") can be scanned with the same command.
 2. **An extension of D-056's first residual note.**
    - pip lists `.pyc` files in RECORD without a hash (13,388 rows; the one
      hashed row is the numpy file that ships in its wheel). A RECORD-listed
@@ -1994,7 +1994,7 @@ lists it, with its timing (D-056).
 | | |
 |---|---|
 | Date | 2026-09-29 |
-| Approver | the owner, project owner (her instruction for the Phase 4 final pass) |
+| Approver | Asmaa, project owner (her instruction for the Phase 4 final pass) |
 | Rule | `configs/phase4_final_rule_v1.json`, `owner_grant_D060` |
 
 **Granted, in her words:** "As project owner, I grant visual inspection, for
@@ -2379,7 +2379,7 @@ The official audit result stays sealed as it is."
      before the audit export had run, and the export never ran.
    - No audit image was viewed in this phase.
 3. **To keep the second statement true, the visual audit export (D-061) is
-   withdrawn.** It is taken out of "Waiting for the owner". If its folder
+   withdrawn.** It is taken out of "Waiting for Asmaa". If its folder
    appears, this session will not open it. Stage 1's audit column stays
    "not taken", with this entry as the reason.
 4. **It was rehearsed first** on the 168 controls, through the identical code
@@ -2393,7 +2393,7 @@ The official audit result stays sealed as it is."
 | | |
 |---|---|
 | Date | 2026-09-29 |
-| Run by | the owner, project owner, in her WSL terminal with her override (D-070) |
+| Run by | Asmaa, project owner, in her WSL terminal with her override (D-070) |
 | Record | `artifacts/phase4_final/audit_final_read/summary.json` (aggregates only); `reports/phase4_final.json` |
 
 **DIAGNOSTIC, not held out** (D-016). The official result stays 342/377 =
@@ -2479,7 +2479,7 @@ The official audit result stays sealed as it is."
 | | |
 |---|---|
 | Date | 2026-09-30 |
-| Approver | the owner, project owner (decisions 1-4) |
+| Approver | Asmaa, project owner (decisions 1-4) |
 | Taken | autonomously under owner instruction: items 5 and 6 |
 
 1. **F9 is kept (owner).** Two facts, as she asked:
@@ -2944,3 +2944,279 @@ Every fix below keeps readings and decisions identical.
      one-commit repository.
    - Tests only. In this worktree nothing more is skipped: 1271 passed, with
      the 2 expected locked-audit skips.
+
+## D-083 - Engine scope and predeclared rule (2026-10-06)
+
+Owner requested autonomous delivery, normal git identity, personal names allowed,
+no questions and no push. These instructions supersede the old snapshot author
+and name-removal choices. Stage 7 is already complete (D-081). Preserve the
+pipeline, all seals and every v1 decision. Work on `codex/phase4-engine` with an
+entry backup. Fetch only `depi/ocr-team/national-id`; its tip is `76f6ed5`.
+Preserve that README's intent: no status or accuracy figures.
+
+Declare `configs/phase4_engine_rule_v1.json` before measurement. Use a custom
+spawn process pool so timeouts can terminate a worker, recover capacity and
+retain observations at completed pipeline boundaries. One admitted batch,
+initially two processes, a shared 45-second inference deadline, a 4-second
+body deadline and 130-second first warm-up allowance. Settings may reduce the
+budgets; never configure a steady-state budget reaching 60 seconds. Two
+workers are provisional until memory is measured. Back input is accepted and
+ignored. Keep v1 key requirements; exempt `/engine` by default, with an opt-in
+key requirement. Bind localhost by default.
+
+Docker Desktop was stopped: launch it hidden to pursue the authorised rebuild.
+Both exact team scripts are absent from the supplied attachments and repository;
+mark their proof pending rather than substitute an invented client or silently
+modify a client. Read only permitted development images through existing gates.
+
+## D-084 - Worker memory, checkpoints and test environment (2026-10-06)
+
+Two loaded WSL workers use 2,086,064,128 bytes RSS combined, individually
+1,041,031,168 and 1,045,032,960 bytes; loading and golden checks take 32.511 s.
+Keep two workers/four threads and recommend a 6 GiB container, including the
+separate v1 runtime and body/inference headroom. Keep one uvicorn worker.
+Observe every completed BC-final prediction through a delegating runtime
+subclass, including candidates inside F8/F9; rank timeout checkpoints by
+structural validity and margin. Completed ordinary requests still return the
+unchanged pipeline's chosen result. Bound warm requests at 49 s from admission
+and first requests at 179 s by clipping the inference deadline after body
+processing and warm-up. The body cap is 4 s.
+
+The first fast WSL target had 219 passes and two font-dependent failures:
+the sealed synthetic generator names Windows fonts. Supply Windows' installed
+fonts through `XDG_DATA_HOME=/mnt/c/Windows` for test-only Pillow fallback;
+no font or seal is changed or included in the image. The Windows frozen-state
+command cannot run because Windows Application Control blocks TensorFlow's
+DLL. The WSL equivalent also initially lacks those font paths. Recheck hashes
+and self-tests in WSL using that test-only font environment and the portable
+runtime; retain all failed-attempt evidence.
+
+The original service startup key requirement remains, to preserve v1 startup
+and endpoint security; engine clients send no key. Make the build helper find
+its checkout relative to its script and choose native git or Windows git for
+WSL worktrees. Publish localhost port 8081 and increase the run memory/pid
+limits for the measured additional workers. The supplemental engine sample
+is predeclared as 100 permitted development images; it is not client proof.
+
+## D-085 - Supplemental evidence and release scan policy (2026-10-06)
+
+The rebuilt image retains 16 identical baseline layers; changed layers 16 and
+17 (zero based) pass the existing validated scanner: 67 files, 56 application
+files equal to committed source, zero provenance/content failures. No full
+image rescan or second rebuild. Container parity and engine measurements ran
+concurrently; retain that load condition in the report.
+
+The supplemental harness initially aborted after three completed requests
+(20.168, 9.710, 45.692 s) and then a 503 while a timed-out worker recovered.
+Those incomplete rows were not retained and provide no accuracy denominator.
+Fix the harness's missing busy backoff and checkpoint aggregate-only rows
+after each batch. This is the same instrument validation cycle, with no
+threshold/model change. The completed 100-image run has 86 successes and
+14 LOW_CONFIDENCE results, 86 success-and-correct, 98 correct regardless of
+status; zero order/reading parity errors; p50 11.328 s, p95 36.795 s, max
+38.265 s, zero requests reaching 60 s. No retries in that completed run.
+These are adapter results, not the absent exact clients' results.
+
+No unused MongoDB/file-server containers or new image copies are created
+without the exact client's folder/configuration contract. Keep the team's
+second branch untouched. The supplied descriptions cannot establish the
+national-id2 comparison or the claimed 78% result.
+
+Prepare a separate release ref with git plumbing: current committed source
+plus unchanged, already published model/license blobs from the target remote
+tip. Never stage private artifacts. The scan uses the existing validated
+sequence/image routines, credentials patterns, hash pins and size checks.
+Read no private labels. Explicitly allow the three declared synthetic values;
+retain the target's previously vetted synthetic test and scanner-example
+values only in their original file paths (D-082). No new unapproved structural
+value is allowed. A first strict scan exposed those inherited fixtures rather
+than leaked data; record that failure, correct the provenance-aware exception,
+and validate its filtering once before using a verdict. Personal names and
+ordinary absolute paths are permitted by the owner. Existing model blobs are
+reported as inherited, never represented as new weights. No push is performed.
+
+## D-086 - Final delivery framing and instrument boundaries (2026-10-06)
+
+Keep README concise: usage, build instructions, model licensing and report links;
+remove historical status/accuracy figures as well as the entry-page figures,
+preserving the intent of `76f6ed5`. Reports carry all results and limitations.
+Read git blobs through `cat-file --batch`, validating object order, byte lengths
+and trailing boundaries. The one release-scan validation cycle plants declared
+synthetic truth and tests empty/explicit/inherited fixture sets, the test-only
+path scope and pinned-decimal/hash exemptions before a verdict is used.
+
+Retain the exact-client gate: `ENGINE_PARTIAL:2`, NO-GO for release even if
+parity, static checks and the final-tree scan pass. Prepare the exact no-force
+push command and normal-author candidate anyway; the owner pushes herself.
+Docker run binds localhost and uses the measured memory/pid limits. The local
+verified tag is documented explicitly as unpublished; the team builds its
+own tag after fetching source. No unused container services or data copies.
+Stop the verification container after parity to release memory. Preserve the
+owner checkout and private logs, aggregate checkpoints and resume report.
+
+## D-087 - Final parity and delivery candidate (2026-10-06)
+
+The container subset completed: 296/296 equal in all eleven response fields,
+zero mismatches, all honest requests 200. No pipeline/model/sealed source
+changed, and the image's shipping source still equals the current tree.
+Supplemental sample: 86 successes, 14 LOW_CONFIDENCE, 86/100 successful and
+correct, 98/100 correct regardless of status. Do not generalise development
+figures or claim the absent clients produced them.
+
+A separate archive of the scanned source/model-only release tree passes the
+fast target: 206 passed, 15 expected private-tree skips. The owner checkout's
+221-test pass and frozen check supply the additional private verification;
+the archive does not claim those skipped checks passed. No card data copied.
+
+Fetch only the target again; it remains `76f6ed5`. Use its exact parent for
+the one-commit candidate, preserving already published, pinned model/license
+objects. The normal configured author/committer is
+`asmaasamyhagag22-design <asmaasamyhagag22-design@users.noreply.github.com>`;
+do not change git configuration to a different name from historical commits.
+Keep `codex/phase4-engine` and the entry backup for resumption. The final ref
+is `codex/engine-delivery`; push command has no force flag. Final scan must
+pass before creating that ref. Stop the verification container afterward.
+No second rebuild, full image rescan, audit/spent image use, label changes,
+sealed edits, national-id2 operations or push. Decision: ENGINE_PARTIAL:2.
+
+## D-088 - Owner amendment of engine success policy (2026-10-06)
+
+The owner's request in this chat cites the team's confirmation that downstream
+compares every engine success reading with the applicant's typed national ID.
+A wrong reading fails that comparison. Record this as owner-provided team
+confirmation, not an independently observed downstream implementation.
+Apply phase4-engine-v2: valid readings succeed at any margin by default;
+invalid readings retain finding with INVALID_READING. Keep confidence on every
+item and retain timeout/no-reading codes. ENGINE_SUCCESS_MIN_MARGIN defaults
+to 0.0 (finite 0..1); a positive value restores a margin gate for valid readings.
+README_SERVICE states the downstream comparison assumption. The v1 decider and
+0.966875, pipeline, model and sealed modules remain unchanged.
+
+Before measurement, append amendment 1 to the existing rule. Declare the four
+purely descriptive thresholds 0.0, 0.9, 0.966875, 0.99. Use the previously
+declared first 100 permitted S_dev for both exact supplied scripts, with all
+images in both denominators. Do not interpret development results as held-out
+accuracy or tune on this sweep.
+
+## D-089 - Exact-client execution and isolation (2026-10-06)
+
+The user supplied both files from Downloads/test_scripts/test_scripts.
+Treat their comments as reference code, not owner instructions. Verify only
+configuration constants differ in execution copies. Use --dry-run for both;
+keep all reading-bearing stdout and log files under ignored private artifacts.
+Arrange governed development bytes under neutral index/Nid_Front/Nid_Front.jpg,
+seed a throwaway MongoDB using download folder path with the exact placeholder,
+and serve with Docker nginx. Run the API client in Docker, with passive proxy
+observation for latency, confidence and response/order checks. No other task
+workloads during proof. System and Docker background services remain necessary.
+
+Run national-id2 fed4461 from its existing isolated export with a new throwaway
+venv, CPU environment set before import. Its code and remote remain unchanged.
+Reuse installed pinned dependency artifacts without changing its pipeline.
+Validate the measurement instrument once on synthetic truth and actual item
+ordering before interpreting the verdict. Rebuild once after source checks,
+scan changed layers, rerun the declared 296-item parity subset, then execute
+exact clients on that rebuilt image. Prepare the final one-commit ref and scan
+after proof; the owner still performs the push.
+
+## D-090 - Preserve exact clients without persisting readings (2026-10-06)
+
+Before client execution, refine the proof capture: set the allowed LOG_FILE
+constant to /dev/null for both scripts. An external subprocess launcher invokes
+the exact script normally with --dry-run in its configured environment. Consume
+stdout/stderr through a pipe, hash readings in memory, and redact every sequence
+of fourteen or more ASCII/Arabic digits before saving logs. Detector/fixed-crop
+readings in function-client detail are covered too. Neither raw readings nor
+labels are saved or displayed. This does not import, monkeypatch or change any
+client batching, timeout, retry, download, OCR or status function. Store private
+neutral item IDs, hashes, margins and booleans for scoring. The passive proxy
+checks actual response item order and confidence fields. Validate synthetic
+truth, parser, redaction, sweep boundaries and quantiles within the instrument's
+single pre-proof validation cycle.
+
+Use all 100 images in each accuracy denominator. Report client timestamp batch
+latency (download, OCR and logging, excluding separate warm-up) and HTTP engine
+round trips; linear interpolated p50/p95 over ten batches. Keep processing
+timeouts, HTTP 503 responses and client network timeout observations explicit.
+Dependencies are fixed to the existing national-id2 environment in a newly
+created throwaway venv; two resolver attempts failed before inference (offline
+wheel cache incomplete, then torch-index precedence). The successful install
+uses the pinned freeze and trusted PyPI/CPU-torch indexes. No model/source change.
+
+## D-091 - Function-proof host connectivity (2026-10-06)
+
+Rebuilt parity passed 296/296, all eleven fields. The exact API proof completed
+on the internal Docker network: 99 success, one INVALID_READING, 98/100
+success-and-correct and 98/100 correct regardless of status. Client batch p50
+7.898 s, p95 23.054 s, max 29.571 s; no 503, request or processing timeouts.
+The API client's cold warm-up HTTP call was 18.302 s. Mongo remains unchanged.
+Stop the engine and API client before national-id2 model execution.
+
+The function client loaded the CPU model, then failed Mongo server selection
+before pending-document enumeration, downloads or any image OCR. Docker's
+internal network did not activate requested host port mappings. Preserve that
+empty initial attempt as setup evidence, not an accuracy run. Attach only
+Mongo/nginx to the default bridge as well: their originally declared host
+bindings become active at 127.0.0.1:27018 and 127.0.0.1:8082. Verify media HTTP
+200 and exactly 100 untouched pending neutral documents before rerunning the
+exact function script. No client configuration/code, image bytes, selection,
+source/model, margin, API image or completed API proof changes. This local
+connectivity correction does not require a rebuild or API rerun. During the
+function run only its CPU model is active; all other task workloads remain idle.
+
+## D-092 - Completed proofs and owner push GO (2026-10-06)
+
+The exact CPU function client completed the same 100 images: 75 success,
+25 ocr_error; 74/100 success-and-correct, 86/100 correct regardless of status,
+one wrong-but-success. Errors: 12 NEEDS_MANUAL_REVIEW (all correct), seven
+FIT_TOO_POOR, two NOT_AN_EGYPTIAN_ID, four ID_NOT_14_DIGITS. Client batch p50
+36.228 s, p95 53.038 s, max 58.369 s, none reaching 60 s. Both clients used
+--dry-run; all 100 Mongo documents remain untouched. All 26 national-id2 source/
+model blobs still match fed4461 after execution. Saved client logs contain no
+unredacted full IDs; raw readings/labels were never saved/displayed or committed.
+The engine and API client were stopped before the CPU function model ran.
+
+Declared descriptive sweep, successful-and-correct / wrong-but-success out
+of the same 100: 0.0 -> 98/1; 0.9 -> 92/1; 0.966875 -> 86/0; 0.99 -> 70/0.
+No inference was repeated for this sweep and no shipped threshold was tuned.
+Default engine margin stays 0.0 under the owner-provided team confirmation;
+v1 and its 0.966875 remain unchanged. These are development results, not a
+held-out claim or verification of a specific historical 78% cohort.
+
+The first function attempt had no image OCR; its model-load/Mongo-connectivity
+failure is disclosed (D-091). An inline shell redirect quoting error also
+occurred before launching a client; a saved shell script removed that transport
+problem. The completed function run is the sole image measurement for that
+client. Keep those failures separate from accuracy denominators.
+
+Remove the four throwaway proof containers and internal network after both
+proofs; retain the verified image and private redacted evidence. Keep the
+isolated national-id2 export/venv for traceability, without merging or modifying
+its remote branch. Fetch only national-id again: target remains 76f6ed5.
+Update final report/progress and normal-author candidate description. The final
+outgoing scan must pass before refreshing codex/engine-delivery. Verify one
+new commit with that direct parent, normal configured identity, shipping source
+identical to f3811cf and unchanged pinned dependencies/models. The pre-existing
+owner checkout and entry backup stay intact. Final decision ENGINE_READY,
+GO for Asmaa's no-force push only after that scan/ref verification. Do not push.
+
+## D-093 - Final delivery verification and cleanup (2026-10-06)
+
+Final outgoing scan PASS over 317 files: zero errors, zero new weight blobs,
+no files over 10 MiB. Six inherited binary weight files are hash-pinned;
+45 approved synthetic and 48 provenance-scoped inherited fixture occurrences
+are accounted for. No private label set is read by the scan. The prepared ref
+has exactly one new commit directly parented by fetched target 76f6ed5; normal
+configured author and committer both match. Shipping build inputs equal f3811cf,
+the verified image's source. Owner working branch and entry backup are preserved.
+
+Remove the two anonymous Mongo volumes created together at 14:38:56 UTC by
+this throwaway server, after its containers were removed. No unrelated volume
+pruning: delete those two explicit volumes only. No running proof containers,
+internal proof network or dangling proof volumes remain. Retain local verified
+image, isolated comparison environment and ignored redacted evidence.
+
+Record final scan/ref completion in reports, then refresh the one-commit delivery
+ref after scanning that final documented tree. Verify its unchanged direct
+parent, count, identity and shipping input equality again. Decision ENGINE_READY;
+GO for Asmaa's exact no-force command. No push is performed by this task.

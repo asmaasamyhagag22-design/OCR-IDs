@@ -1,6 +1,6 @@
 # Code walkthrough
 
-Every file that ships in the image (`docker/app_code_files.txt`: 53 Python
+Every file that ships in the image (`docker/app_code_files.txt`: 56 Python
 files and 2 data files), in the order to read them. Each entry says what the
 file does, its key functions, and the design choices someone reviewing it
 would ask about. [ARCHITECTURE.md](ARCHITECTURE.md) is the one-page overview.
@@ -9,6 +9,22 @@ would ask about. [ARCHITECTURE.md](ARCHITECTURE.md) is the one-page overview.
 and is never edited. Its hash is checked at load or by the tests.
 
 ## Part 1. The service, request to response
+
+### Additive engine modules
+
+- `src/service/engine.py`: strict JSON envelope, base64 byte limits, optional
+  authentication, bounded body read and per-item responses in original order.
+- `src/service/engine_pool.py`: bounded batch admission, persistent spawn
+  processes, private pipe protocol, common deadline, timeout recovery and an
+  engine decider separate from v1. No task queue grows across batches.
+- `src/service/engine_worker.py`: loads the existing runtime and golden checks;
+  subclasses delegate every computation unchanged. BC-final prediction
+  observations retain the best available timeout reading. Worker stdout/stderr
+  are discarded and core dumps disabled.
+
+The engine modules add three Python files to the shipping list. `/ready` keeps
+its previous v1 meaning. Engine workers have their own warm-up and return 503
+until healthy; they do not affect the existing response schema or routing.
 
 ### `src/service/__init__.py`
 The package docstring: one pipeline, two entry points (the HTTP service and

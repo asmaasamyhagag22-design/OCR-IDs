@@ -335,7 +335,7 @@ now read only through code that prints aggregates.
 
 ---
 
-## Waiting for the owner
+## Waiting for Asmaa
 
 ### Your decisions, recorded (D-073)
 
@@ -421,13 +421,13 @@ to change them.
 To prove the changed layers hold no data (about 10 minutes):
 
 ```bash
-bash scripts/phase4_final_image.sh layer-scan fixed14-ocr-service:fixed14-bcfinal-3101-57d9115
+cd /mnt/c/Users/asmaa/Documents/OCR_ID_parallel && bash scripts/phase4_final_image.sh layer-scan fixed14-ocr-service:fixed14-bcfinal-3101-57d9115
 ```
 
 To rebuild from the branch yourself (it reuses every layer up to `COPY src/`):
 
 ```bash
-git checkout phase4-final && bash scripts/phase4_service_docker.sh build
+cd /mnt/c/Users/asmaa/Documents/OCR_ID_parallel && git checkout phase4-final && bash scripts/phase4_service_docker.sh build
 ```
 
 To stop:

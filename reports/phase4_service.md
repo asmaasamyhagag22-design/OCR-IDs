@@ -127,7 +127,7 @@ applicant), and once with the label's 12th digit changed (a typo).
   - The two PNGs are ingest renders. A backend would upload the original PDF,
     whose size this phase did not measure.
   - The two JPEGs are ingest images. If the delivered originals are that size,
-    the service refuses them; see "Waiting for the owner".
+    the service refuses them; see "Waiting for Asmaa".
 
 ### In the container
 
@@ -584,14 +584,14 @@ applications were running, and their load was not controlled.
   check passed at every commit, with no sealed module changed since entry.
 - No Microsoft font ships. The self-test probe is a stored array (D-038).
 
-## Waiting for the owner
+## Waiting for Asmaa
 
 ### Rebuild, run and verify the image yourself
 
 In your Ubuntu WSL terminal, with Docker Desktop running:
 
 ```bash
-cd the repository root
+cd /mnt/c/Users/asmaa/Documents/OCR_ID_parallel
 git checkout phase4-ocr-service
 bash scripts/phase4_service_docker.sh build
 ```

@@ -1,0 +1,40 @@
+{
+  "version": "phase4-engine-v1",
+  "declared_date": "2026-10-06",
+  "threshold": 0.966875,
+  "success": "A present, structurally valid reading with margin >= threshold; error_codes is empty.",
+  "low_confidence": "A present reading with invalid structure, missing/nonfinite margin or margin below threshold: LOW_CONFIDENCE.",
+  "no_reading_codes": ["CARD_NOT_FOUND", "UNREADABLE_IMAGE", "UPLOAD_IS_VIDEO", "IMAGE_TOO_LARGE", "PROCESSING_TIMEOUT"],
+  "timeout": "45 seconds shared batch inference deadline. Return the most recent pipeline checkpoint reading, if present, with exactly PROCESSING_TIMEOUT; terminate and replace a timed-out worker.",
+  "warmup": "130 seconds maximum before the shared 45-second inference budget; body deadline 4 seconds. First response target <180 seconds; subsequent response target <50 seconds.",
+  "limits": {"batch_items": 10, "decoded_item_mib": 25, "request_mib": 350, "active_batches": 1},
+  "workers": "Start with two spawn processes and four native threads each; confirm memory before delivery. The v1 runtime is additional.",
+  "measurement": "One instrument validation cycle on synthetic truth and permitted development content; all denominators include every selected image. No tuning or full rescan.",
+  "metrics": ["status_counts", "success_and_correct/all_images", "correct_regardless_of_status/all_images", "batch_seconds_p50", "batch_seconds_p95", "batch_seconds_max", "batches_ge_60_seconds"],
+  "supplemental_measurement_selection": "First 100 permitted S_dev in existing development_pool order, ten batches of ten. Separate adapter evidence; never claim it is exact-client proof. Compare reading equality with the existing final WSL reference. Validate synthetic metric truth and real response order in the same cycle.",
+  "data": "Development only, through existing Access and governance loaders; no audit or spent sets. Neutral folder indices only. Private findings and labels remain ignored.",
+  "client": "Exact supplied scripts only can establish team-client proof. If absent, report blocked rather than inventing a replacement as proof.",
+  "pipeline": "Recognizer, decoder, F1v, F8, F9, BC-final and sealed files remain unchanged. A subclass observes completed stage boundaries without replacing any pipeline result.",
+  "release": "One commit parented by the fetched depi/ocr-team/national-id tip; normal owner identity; README preserves 76f6ed5 intent. Scan outgoing commit and target tree. No push. No national-id2 changes.",
+  "amendments": [{
+    "number": 1,
+    "date": "2026-10-06",
+    "decision": "D-088; owner request in this chat citing the team's confirmation: every engine success is compared downstream with the applicant's typed national ID, so wrong readings fail comparison.",
+    "version": "phase4-engine-v2",
+    "success": "Structurally valid readings have finding and empty error_codes at any margin by default, including unknown margin. Confidence is always present, with nonfinite/unknown mapped to null.",
+    "invalid": "Structurally invalid present readings have finding and exactly INVALID_READING.",
+    "configuration": "ENGINE_SUCCESS_MIN_MARGIN defaults to 0.0; finite range 0..1. Positive values enable LOW_CONFIDENCE for valid readings below the configured threshold or without a finite margin. Timeout and no-reading codes remain unchanged.",
+    "scope": "Engine response policy only. The v1 decider and frozen 0.966875 are unchanged. National-id2 is executed read-only in an isolated throwaway venv; its remote and source are not changed.",
+    "selection": "Use the same first 100 permitted S_dev in development_pool order for both supplied exact scripts; no audit or spent data.",
+    "threshold_sweep": [0.0, 0.9, 0.966875, 0.99],
+    "sweep": "Descriptive only, from engine proof responses, no additional inference or threshold tuning. Hold structural and processing-error gates fixed. Count successful-and-correct and wrong-but-success at each declared threshold, all 100 in the denominator.",
+    "proof": "Verify source differences limited to permitted configuration constants, then execute both supplied files as scripts with --dry-run. MongoDB and static nginx run in Docker. No concurrent task workloads during either proof. Raw logs are private ignored card-level artifacts. Passive response observation and timestamps do not change client code or batch/retry logic.",
+    "order": "Tests and static checks, one rebuild, changed-layer scan, parity subset, then exact rebuilt-image client proof and national-id2 function proof. Final outgoing-tree scan and one-commit ref preparation afterward. No push."
+  }, {
+    "number": 2,
+    "date": "2026-10-06",
+    "decision": "D-090; privacy refinement before exact-client execution, no decision-policy or measurement-selection change.",
+    "capture": "Set each client's permitted LOG_FILE constant to /dev/null. Launch the exact script normally as a subprocess with --dry-run; externally consume stdout/stderr pipes, compute reading hashes in memory, and redact all 14-or-more digit sequences before saving logs. No raw readings or labels are persisted or displayed. Capture does not import, patch or replace any client function.",
+    "latency": "Report both client timestamp differences (download plus OCR plus logging for each batch, excluding warm-up) and passive engine HTTP round trips. Quantiles use linear interpolation across ten batches. Warm-up is separate."
+  }]
+}

@@ -43,6 +43,9 @@ src/service/__main__.py
 src/service/app.py
 src/service/cli.py
 src/service/decider.py
+src/service/engine.py
+src/service/engine_pool.py
+src/service/engine_worker.py
 src/service/golden.py
 src/service/golden/golden_expected.json
 src/service/golden/golden_fixtures.npz

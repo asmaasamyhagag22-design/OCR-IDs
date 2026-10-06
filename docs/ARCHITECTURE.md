@@ -8,6 +8,16 @@ operations are in [README_SERVICE.md](../README_SERVICE.md).
 
 ## The request path
 
+The additive `POST /engine` path accepts a JSON batch of up to ten front images.
+`engine.py` validates a bounded in-memory body; `engine_pool.py` admits one batch
+and dispatches its items across persistent spawn processes. `engine_worker.py`
+delegates to the unchanged recognizer and observes BC-final predictions for
+timeout checkpoints. The engine applies its independent confidence rule after
+recognition. A shared deadline bounds queued items too; a timed-out worker is
+replaced. Engine keys are optional, while every existing endpoint stays
+authenticated. The listening port now defaults to 8081. See README_SERVICE.md
+for memory, limits and localhost binding.
+
 ```
 POST /v1/national-id/verify  (image bytes, typed_national_id, request_id)
   app.py          API key → body read in memory (limit) → form → typed ID format check
@@ -76,7 +86,7 @@ These are environment variables. `README_SERVICE.md` §2 has the full table.
 | `OCR_QUEUE_TIMEOUT_S` | 30 | Longest wait for the worker's slot, then 503 with `Retry-After: 1`. |
 | `OCR_WORKERS`, `OCR_CPU_THREADS` | 1, 4 in the image | Workers each load their own models. The thread setting caps TF, Paddle, OpenCV and OpenMP per worker. |
 | `OCR_MAX_CONNECTIONS` | 16 | Concurrent connections per worker; beyond it, 503. |
-| `OCR_PORT`, `OCR_HOST` | 8010, 0.0.0.0 | Where the service listens. |
+| `OCR_PORT`, `OCR_HOST` | 8081, 127.0.0.1 outside Docker | Where the service listens; the image binds 0.0.0.0 and must publish only localhost/internal interfaces. |
 
 **Fixed in code, deliberately not configurable:**
 

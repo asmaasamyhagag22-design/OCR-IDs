@@ -8,7 +8,7 @@ card, and broad national-ID band pipeline.
 ## Launch on Windows PowerShell
 
 ```powershell
-# run from the repository root
+Set-Location C:\Users\asmaa\Documents\OCR_ID_parallel
 .\.venv\Scripts\Activate.ps1
 python scripts\phase2l_d_local_demo.py
 ```
