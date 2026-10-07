@@ -35,3 +35,7 @@ Windows/WSL development checkout, the legacy synthetic font tests need
 `XDG_DATA_HOME=/mnt/c/Windows`; fonts are not shipped in the image.
 
 Verification results and operational limitations belong in the linked reports.
+
+
+
+python3 -c 'import secrets; print("OCR_API_KEY=" + secrets.token_urlsafe(32))' > "$HOME/.config/fixed14/ocr.env"
