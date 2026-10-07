@@ -39,3 +39,5 @@ Verification results and operational limitations belong in the linked reports.
 
 
 python3 -c 'import secrets; print("OCR_API_KEY=" + secrets.token_urlsafe(32))' > "$HOME/.config/fixed14/ocr.env"
+
+ls -l "$HOME/.config/fixed14/ocr.env"
