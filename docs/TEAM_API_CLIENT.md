@@ -38,6 +38,8 @@ have that field set to `http://<IP_adress>/0000`; the client requests
 The unchanged client selects documents whose `Auto Id_Validation` field is
 missing, null or an empty string. It processes batches of ten. To test all
 eligible documents, omit `--limit`.
+Placeholder substitution is case-sensitive: configure the exact spelling used
+in the stored paths.
 
 The caller needs no model weights or private `artifacts/` folders. The OCR
 server needs the models listed in `docker/model_files.sha256` and must pass
@@ -100,3 +102,6 @@ Only `MONGO_URI`, `OCR_ENGINE_URL`, `MEDIA_SERVER_IP`,
 `MEDIA_SERVER_PLACEHOLDER` and `LOG_FILE` differ from it. Its query, batches,
 timeouts, retries, classification and write/dry-run behaviour are unchanged.
 This addition does not change the OCR image or either decision policy.
+
+The standalone package was tested in a fresh Python 3.11 environment, without
+private research files. See [verification and its limits](release/team_api_client_verification.md).

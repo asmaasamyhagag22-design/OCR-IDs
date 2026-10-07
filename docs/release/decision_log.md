@@ -3276,3 +3276,20 @@ it is not a new OCR accuracy proof and does not diagnose the work machine's
 GoldenMismatch. Data and reachable, healthy services remain external
 prerequisites; an environment alone cannot supply them. The earlier supplied
 client's query, configuration-only equivalence and engine policies remain.
+
+## D-096 - Fresh caller verification passed; work deployment remains pending (2026-10-07)
+
+D-095's declared check passed in a new Python 3.11.9 venv from only five
+caller-bundle files. Seven runtime packages were installed from PyPI; the
+requirements now pin their observed versions. No system-site-packages,
+repository modules, private artifacts or card data were needed by the caller.
+The existing verified engine became healthy, the preflight passed, the exact
+caller produced the two declared error statuses, and dry-run left Mongo output
+fields absent. The negative Mongo check failed as required. Test containers
+and network were removed. Preserve the aggregate result and record the limits
+in docs/release/team_api_client_verification.md.
+
+Package the client and helper with their guides/requirements for transfer.
+Scan the outgoing tree and preserve image inputs and original client behaviour.
+These checks establish caller completeness, not work-machine readiness: the
+reported GoldenMismatch still needs its failing-check details and resolution.
