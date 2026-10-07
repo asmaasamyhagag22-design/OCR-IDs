@@ -54,3 +54,6 @@ sudo docker inspect --format '{{.State.Status}} {{.State.Health.Status}}' fixed1
 
 sudo docker logs --tail 50 fixed14-engine
 
+
+sudo docker logs fixed14-engine 2>&1 | grep models_failed
+
