@@ -3220,3 +3220,32 @@ Record final scan/ref completion in reports, then refresh the one-commit deliver
 ref after scanning that final documented tree. Verify its unchanged direct
 parent, count, identity and shipping input equality again. Decision ENGINE_READY;
 GO for Asmaa's exact no-force command. No push is performed by this task.
+
+## D-094 - Include the supplied team API caller (2026-10-07)
+
+The owner reported that the API caller supplied in this chat was missing from
+the published repository and could not be run later on the work computer.
+Include it as `scripts/natid_ocr_pipeline_model_API_calling.py`, its two pinned
+dependencies in `requirements-api-client.txt`, and a standalone caller guide.
+Only the five already authorised configuration constants change: Mongo URI,
+engine URL, media host, media placeholder and file log destination. Defaults
+contain no credential; the file log goes to `/dev/null` for Linux. Preserve
+the original database/collection, pending query, batch sizes, retries, timeouts,
+classification, terminal logging and dry-run/write behaviour.
+
+Compare the supplied and included ASTs after masking just those constants;
+validate the command-line interface with `--help` using requests 2.34.2 and
+pymongo 4.18.2. Do not read images, connect to MongoDB or write results for this
+verification. Scan the outgoing tree before creating the owner's local commit.
+Keep a transferable caller-only ZIP with matching file hashes. No OCR image
+inputs, model files or success policies change; no rebuild or new image proof.
+
+The owner separately reported `GoldenMismatch` and `running unhealthy` on the
+work computer. This addition resolves the missing caller, not that outstanding
+runtime failure. Do not claim the work deployment is ready or run its data
+until the failing golden check is diagnosed and passes. The earlier local
+image proof remains historical evidence for its tested environment.
+
+Use an isolated worktree based on the latest published national-id tip 6cb2263;
+leave the owner's active `test` checkout untouched. Prepare a normal-author
+commit on `codex/team-api-client`. The owner retains responsibility for push.

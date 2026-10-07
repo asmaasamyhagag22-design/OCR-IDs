@@ -1,0 +1,3 @@
+# Dependencies of the supplied team API client; no OCR model libraries.
+requests==2.34.2
+pymongo==4.18.2

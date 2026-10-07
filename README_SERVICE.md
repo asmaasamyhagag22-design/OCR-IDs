@@ -7,6 +7,12 @@ contract for every field; this page covers running and calling it.
 
 The same Docker image also holds the competition CLI (last section).
 
+The team's caller script is included at
+`scripts/natid_ocr_pipeline_model_API_calling.py`. To run it against reachable
+MongoDB, media and OCR services, follow [the API client guide](docs/TEAM_API_CLIENT.md).
+Install only `requirements-api-client.txt` on the caller's computer; it does
+not need the OCR models or the private research artifacts.
+
 ## Batch engine on port 8081
 
 `POST /engine` is additive; all `/v1` endpoints and their decision rules remain.

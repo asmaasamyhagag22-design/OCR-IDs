@@ -8,6 +8,8 @@ The batch pipeline calls `POST /engine` on port 8081. The authenticated
 
 - [Run and configure the service](README_SERVICE.md): Docker build, localhost
   binding, keys for the existing endpoints, batch limits and timeout behaviour.
+- [Run the team's API caller](docs/TEAM_API_CLIENT.md): the supplied client,
+  connection settings, dependencies and dry-run of all eligible Mongo documents.
 - [API contract](docs/release/ocr_api_contract_v1.md): the existing v1 contract
   and additive engine request/response format.
 - [Architecture](docs/ARCHITECTURE.md) and [code walkthrough](docs/CODE_WALKTHROUGH.md).
