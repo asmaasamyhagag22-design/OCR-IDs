@@ -41,3 +41,19 @@ Verification results and operational limitations belong in the linked reports.
 python3 -c 'import secrets; print("OCR_API_KEY=" + secrets.token_urlsafe(32))' > "$HOME/.config/fixed14/ocr.env"
 
 ls -l "$HOME/.config/fixed14/ocr.env"
+
+
+sudo docker run -d \
+  --name fixed14-engine \
+  --restart unless-stopped \
+  -p 127.0.0.1:8081:8081 \
+  --env-file "$HOME/.config/fixed14/ocr.env" \
+  --read-only \
+  --tmpfs /tmp \
+  --tmpfs /home/ocr:uid=10001,gid=10001 \
+  --cap-drop ALL \
+  --security-opt no-new-privileges \
+  --ulimit core=0 \
+  --memory 6g \
+  --pids-limit 512 \
+  fixed14-engine:1.0
