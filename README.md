@@ -48,3 +48,9 @@ sudo docker run -d --name fixed14-engine --restart unless-stopped -p 127.0.0.1:8
 
 sudo docker inspect --format '{{.State.Status}} {{.State.Health.Status}}' fixed14-engine
 ر
+
+sudo docker inspect --format '{{.State.Status}} {{.State.Health.Status}}' fixed14-engine
+
+
+sudo docker logs --tail 50 fixed14-engine
+
