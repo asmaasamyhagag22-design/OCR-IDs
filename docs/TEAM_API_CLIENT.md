@@ -45,7 +45,24 @@ its startup checks. Resolve a reported `GoldenMismatch` before starting a
 data run. Docker's `/ready` health status is for the v1 runtime; the client
 also performs an engine warm-up and retries 503 responses.
 
-## 3. Run without changing MongoDB
+## 3. Check services before a data run
+
+```bash
+python scripts/check_team_api_client.py
+```
+
+This reads the client constants, tests MongoDB access and counts eligible
+records, checks one image URL's HTTP headers without decoding/storing its
+image, and sends synthetic empty input to `/engine`. It prints only check
+statuses and a count, never credentials or card values. Require `all_pass`
+to be true before proceeding. Zero eligible records is reported as a failure
+because no data would be processed. A 503 engine response is a failure, not
+evidence that an environment installation succeeded end to end.
+
+This is a connection/contract check, not an accuracy test or a check of every
+image. The actual client remains unchanged and is run separately.
+
+## 4. Run without changing MongoDB
 
 First check the command-line interface:
 

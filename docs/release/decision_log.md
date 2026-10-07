@@ -3249,3 +3249,30 @@ image proof remains historical evidence for its tested environment.
 Use an isolated worktree based on the latest published national-id tip 6cb2263;
 leave the owner's active `test` checkout untouched. Prepare a normal-author
 commit on `codex/team-api-client`. The owner retains responsibility for push.
+
+## D-095 - Fresh caller environment and service preflight (2026-10-07)
+
+The owner asked whether creating an environment and running the supplied
+caller is sufficient, expressing concern about further unpublished files.
+Audit the caller's imports and file references. Add its referenced pipeline
+plan as an explanation reconstructed from the supplied code, and add a
+separate preflight helper without changing the supplied client's behaviour.
+The helper reads configuration through AST, tests Mongo access/eligible count,
+checks a sample media URL's headers and submits empty synthetic engine input.
+Its output contains no credentials, record identifiers, URLs or readings.
+
+Before testing, declare: extract only the caller bundle into a new directory;
+create a fresh Python 3.11 environment without system-site-packages and install
+only requirements-api-client.txt. Run --help, the preflight and the actual
+supplied caller --dry-run. Use throwaway Mongo/nginx in Docker and the existing
+verified image, without a rebuild. Two synthetic Mongo records have no labels
+or real card images: one downloads deliberately invalid image bytes, the other
+returns 404. Expect one ocr_error and one download_error, and no Mongo output
+updates. Also require preflight failure when its Mongo endpoint is unreachable.
+Clean up only this test's containers/network. Save aggregate evidence locally.
+
+This proves caller packaging, dependencies and wiring on synthetic inputs;
+it is not a new OCR accuracy proof and does not diagnose the work machine's
+GoldenMismatch. Data and reachable, healthy services remain external
+prerequisites; an environment alone cannot supply them. The earlier supplied
+client's query, configuration-only equivalence and engine policies remain.
