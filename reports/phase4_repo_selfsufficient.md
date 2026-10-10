@@ -8,7 +8,7 @@ the exact command is under Waiting for Asmaa.
 Rule: `configs/phase4_repo_rule_v1.json`, committed in e31561b before any gate
 was measured. That history is kept on `backup/phase4-repo-selfsufficient-work-20261010`;
 the delivery squashes it into one commit. Amendment 1 was appended after the
-results were seen and is disclosed as such. Decisions D-097..D-104 are in
+results were seen and is disclosed as such. Decisions D-097..D-105 are in
 `docs/release/decision_log.md`.
 
 ## Step 0: forensics (the interrupted session)
@@ -96,6 +96,10 @@ What was missing or broken for the team:
    not been inspected.
 2. **No documented path from a new machine to a running service.** It is now
    README_SERVICE.md "Quick start for the team".
+   On request, README_SERVICE.md also documents "Run without Docker (Python
+   environment)". It was executed literally from a fresh clone: /ready 200, and
+   /engine 200 with the same answer as the container. The container remains the
+   recommended and the only parity-proven form (D-105).
 3. **Development-only inputs.** The DocCornerNet upstream git history (222 MB)
    is now fetched by `scripts/fetch_doccornernet_upstream.sh`, pinned to
    d877dc3 and refusing any upstream file that differs from the committed copy.
@@ -150,11 +154,14 @@ with 22/22 in-image hashes, /ready 200 and /engine 200 (D-104).
 
 ## Step 4: delivery
 
+- **Pushed by the owner:** 53e2423, the one-commit delivery, now the tip of
+  ocr-team/national-id. A follow-up commit on 53e2423 adds the no-Docker
+  section (D-105).
 - **Commit.** One commit directly on 7b3557f; `git rev-list --count
   7b3557f..` is 1. Author and committer are both `asmaasamyhagag22-design
   <asmaasamyhagag22-design@users.noreply.github.com>`.
 - **Pre-push scan** (`scripts/phase4_engine_release.py`'s validated scan,
-  base 7b3557f): **PASS**. 331 files, 25 changed or new, no new weight blob,
+  base 7b3557f): **PASS**. 331 files, 26 changed or new, no new weight blob,
   no file over 10 MiB, no tracked data, no secret, and no unapproved ID-shaped
   value. The 45 approved synthetic and 48 inherited fixture occurrences match
   D-093. The 6 weight files are all inherited and hash-pinned.
@@ -178,7 +185,7 @@ with 22/22 in-image hashes, /ready 200 and /engine 200 (D-104).
 
 ## Waiting for Asmaa
 
-1. **Push** (normal identity, no force, national-id2 untouched), from
+1. **Push the follow-up commit** (normal identity, no force, national-id2 untouched), from
    `/home/asmaa/project/OCR_ID_parallel`:
    `git push https://github.com/MCIT-DEPI/DEPI-OCR.git phase4-repo-selfsufficient:ocr-team/national-id`
 2. **The work machine.** Run `bash scripts/golden_diagnose.sh "$IMAGE"` there

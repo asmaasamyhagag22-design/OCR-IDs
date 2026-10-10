@@ -127,6 +127,82 @@ on a CPU with AVX-512 until that is resolved, and send the two lines the
 command printed to the model owner. They hold no image or ID. Do not route
 traffic to an unhealthy container.
 
+## Run without Docker (Python environment)
+
+The same service can run straight from a clone in a Python environment, with
+no container. Use Linux or WSL; Paddle is not run on native Windows. Use Python
+3.11 and the exact pinned packages, as the image does: other versions can
+change the numbers, and then the startup self-test refuses to serve.
+
+The container is still the recommended way. It is the form that was verified
+in full (container parity 296/296), and it runs read-only, as a non-root user,
+with a memory limit. This form was checked with the steps below: `/ready` 200
+and `/engine` 200. On a CPU without AVX-512 it has the same self-test
+behaviour as the container (see "If step 6 says `unhealthy`" above).
+
+1. Clone the repository, as in step 1 of the Quick start, and stay in the
+   `national-id` folder.
+
+2. Create a Python 3.11 environment. If the `uv` command is missing, install it
+   with `curl -LsSf https://astral.sh/uv/install.sh | sh` and open a new
+   terminal. uv gets Python 3.11 itself, without `sudo`.
+
+   ```bash
+   uv venv --python 3.11.9 .venv-ocr
+   ```
+
+3. Install the image's pinned packages, then its OpenCV build, exactly as the
+   Dockerfile does.
+
+   ```bash
+   uv pip install --python .venv-ocr/bin/python --no-deps -r requirements-linux.txt
+   ```
+   ```bash
+   uv pip install --python .venv-ocr/bin/python --no-deps --reinstall -r requirements-linux-opencv-headless.txt
+   ```
+
+4. Create the private `ocr.env`, as in step 4 of the Quick start. Skip this step
+   if you already have one.
+
+   ```bash
+   mkdir -p "$HOME/.config/fixed14"
+   ```
+   ```bash
+   (umask 077; python3 -c 'import secrets; print("OCR_API_KEY=" + secrets.token_urlsafe(32))' > "$HOME/.config/fixed14/ocr.env")
+   ```
+
+5. Load the key, and start the service on `127.0.0.1:8081`. It keeps this
+   terminal; stop it with Ctrl+C. The models are ready after about a minute.
+
+   ```bash
+   set -a; . "$HOME/.config/fixed14/ocr.env"; set +a
+   ```
+   ```bash
+   OMP_WAIT_POLICY=PASSIVE OCR_CPU_THREADS=4 DISABLE_MODEL_SOURCE_CHECK=True PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True TF_CPP_MIN_LOG_LEVEL=3 .venv-ocr/bin/python -m src.service
+   ```
+
+6. In a second terminal, in the same folder, test `/ready`. It must print
+   `HTTP 200`. `HTTP 503`, or `HTTP 000` while the service is still starting,
+   means it is not ready yet; wait and repeat.
+
+   ```bash
+   curl -s -w '\nHTTP %{http_code}\n' -H "X-API-Key: $(sed -n 's/^OCR_API_KEY=//p' "$HOME/.config/fixed14/ocr.env")" http://127.0.0.1:8081/ready
+   ```
+
+7. Test `/engine` with the synthetic grey image, made with this environment. The
+   expected answer is the same as in step 8 of the Quick start: `HTTP 200`, one
+   item `synthetic-1`, with `INVALID_READING`.
+
+   ```bash
+   .venv-ocr/bin/python -c "import base64, io, json; from PIL import Image; b = io.BytesIO(); Image.new('RGB', (640, 400), (200, 200, 200)).save(b, 'PNG'); print(json.dumps({'request_id': 'quickstart-1', 'items': [{'item_id': 'synthetic-1', 'front_b64': base64.b64encode(b.getvalue()).decode(), 'back_b64': None}]}))" > /tmp/fixed14_engine_request.json
+   ```
+   ```bash
+   curl -s -w '\nHTTP %{http_code}\n' -H 'Content-Type: application/json' --data @/tmp/fixed14_engine_request.json http://127.0.0.1:8081/engine
+   ```
+
+8. Point the team's API client at `http://127.0.0.1:8081/engine`, and start
+   with `--dry-run --limit 10` ([the API client guide](docs/TEAM_API_CLIENT.md)).
+
 ## Batch engine on port 8081
 
 `POST /engine` is additive; all `/v1` endpoints and their decision rules remain.

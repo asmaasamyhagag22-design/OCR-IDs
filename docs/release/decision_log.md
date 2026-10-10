@@ -3493,3 +3493,26 @@ readings stay the same. That was not verified on real non-AVX-512 hardware or
 on the work machine, and card-level decisions on such a CPU are unknown. The
 decision is scoped to an AVX-512 x86-64 host. The live `git ls-remote depi`
 (7b3557f / fed4461) ran after the owner's `gh auth login`, before any change.
+
+## D-105 - Documented run without Docker (2026-10-10)
+
+The owner asked for a documented way to run the service without the container.
+README_SERVICE.md gains "Run without Docker (Python environment)": a uv-made
+Python 3.11.9 environment with the image's pinned lock and OpenCV build, the
+same ocr.env, and `python -m src.service` with the image's environment
+variables, on Linux or WSL only. Its commands were executed literally from a
+fresh clone of this branch. The only adaptations were that the service ran in
+the background and the /ready check was polled, which step 6 tells the reader
+to do. Results: /ready 200, and /engine 200 with the same item as the container
+(INVALID_READING, identical confidence). The first run stopped because curl
+gets a refused connection before the port opens. Step 6 now says `HTTP 000`
+also means not ready yet. `.venv-ocr/` is git-ignored. The container stays the
+recommended form: only it has the 296/296 parity proof and the read-only,
+non-root, memory-limited runtime. The self-test, and so the AVX-512 caveat of
+D-100, is the same in both. No image input changes; the delivery image and
+tarball are rebuilt from the final commit, as in D-103/D-104.
+
+The owner had already pushed 53e2423 (D-104's commit) to ocr-team/national-id;
+`git ls-remote` shows it, and national-id2 is still fed4461. This change is
+therefore a second commit, a fast-forward on 53e2423, not an amendment. The
+prepared one-commit form is kept as backup/phase4-repo-selfsufficient-amended-4dc7b65.

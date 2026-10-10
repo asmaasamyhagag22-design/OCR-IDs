@@ -1,9 +1,9 @@
 # Phase 4 repo self-sufficiency - progress (resume from here)
 
 Status (2026-10-10): COMPLETE. Decision REPO_SELF_SUFFICIENT on an AVX-512
-x86-64 host (report: reports/phase4_repo_selfsufficient.md, D-097..D-104).
-Delivery: one commit on phase4-repo-selfsufficient directly on 7b3557f; not
-pushed. Push, from this folder:
+x86-64 host (report: reports/phase4_repo_selfsufficient.md, D-097..D-105).
+Delivery: 53e2423 was pushed by the owner (ocr-team/national-id tip). The
+follow-up commit on it (no-Docker section, D-105) is not pushed. Push, from this folder:
   git push https://github.com/MCIT-DEPI/DEPI-OCR.git phase4-repo-selfsufficient:ocr-team/national-id
 Working history: backup/phase4-repo-selfsufficient-work-20261010.
 Docker tarball: artifacts/phase4_repo/delivery/ (ignored), with .sha256.

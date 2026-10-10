@@ -7,6 +7,7 @@ artifacts/
 __pycache__/
 .pytest_cache/
 .venv/
+.venv-ocr/
 *.egg-info/
 third_party/
 reports/
