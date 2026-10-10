@@ -1,0 +1,53 @@
+{
+  "version": "phase4-repo-v1",
+  "declared_date": "2026-10-10",
+  "purpose": "Make the team repository (depi ocr-team/national-id) build and run the verified service from a fresh clone, with no private path, sibling worktree, junction or owner-only folder.",
+  "base": {
+    "branch": "phase4-repo-selfsufficient",
+    "parent": "7b3557f",
+    "parent_is": "depi ocr-team/national-id tip, verified live by git ls-remote on 2026-10-10",
+    "verified_image": "fixed14-ocr-service:fixed14-bcfinal-3101-f3811cf",
+    "verified_image_id": "sha256:9c78e3b694ddce665553834060dd01a3cae16083d815360a329638c2fee1cdc5"
+  },
+  "hard_lines": [
+    "No audit data, no internal-validation or external-test card, no spent-set selection.",
+    "No model, threshold, decoder, decider or pipeline change; docker/model_files.sha256 and every shipped source file stay byte-identical to f3811cf.",
+    "No sealed-module edit.",
+    "No national ID printed or committed.",
+    "No force push, no push by this task; ocr-team/national-id2 is never touched."
+  ],
+  "gates": {
+    "fresh_clone": "git clone of depi ocr-team/national-id into a folder with no sibling worktree and no ignored artifacts; only commands written in README_SERVICE.md are run.",
+    "build": "bash scripts/phase4_service_docker.sh build exits 0 in the fresh clone; the in-image sha256sum --strict check over docker/model_files.sha256 passes.",
+    "model_hashes": "Every file listed in docker/model_files.sha256, read from inside the fresh-clone image, has exactly the listed sha256 (these are the hashes the verified image was built and checked against).",
+    "shipping_source": "git diff f3811cf HEAD over the image inputs (Dockerfile, .dockerignore, locks, docker/*, docker/app_code_files.txt entries, model manifest entries) shows only additions of manifest files, no modification or deletion.",
+    "ready": "GET /ready with the X-API-Key from ocr.env returns 200.",
+    "engine_smoke": "One POST /engine with one synthetic, generated image (no card, no real digits) returns 200 with exactly one item holding item_id, front.finding, front.error_codes (list), front.confidence, front.model_version, front.decision_rule_version.",
+    "container_parity": "python scripts/phase4_final.py container-subset against the fresh-clone container: the same 296-file development selection as run enginev2 (168 controls, fix-touched and previously-413 files); pass = equal_in_all_11_fields == files == 296 and no field mismatch. Development cards only; same instrument as D-080..D-093, already validated.",
+    "team_client": "scripts/check_team_api_client.py and the team caller run with --dry-run against the fresh-clone container exactly as docs/TEAM_API_CLIENT.md says; no Mongo document is modified.",
+    "quick_start": "README_SERVICE.md 'Quick start for the team' is executed literally, command by command, in a second fresh clone."
+  },
+  "health": {
+    "fast_target": "pytest -m service passes on this host.",
+    "full_suite": "python -m pytest -q passes; tests needing owner-only inputs (Windows fonts under Microsoft licence, ignored private artifacts) are reported separately and never counted as passes.",
+    "privacy_scan": "tests/test_no_real_values_in_source.py and tests/test_official_eval_privacy.py pass with no skip.",
+    "lint": "ruff check, ruff format --check, mypy --strict on src/service, vulture: as scripts/lint_shipped.sh."
+  },
+  "models_in_repo": {
+    "policy": "Owner-approved: model files are committed. Each file under 50 MB, listed with sha256 and licence notice; no Git LFS unless unavoidable. A file whose licence forbids redistribution gets a documented, hash-verified download step instead."
+  },
+  "decision_tokens": [
+    "REPO_SELF_SUFFICIENT",
+    "REPO_PARTIAL:<step>"
+  ],
+  "amendments": [
+    {
+      "id": 1,
+      "date": "2026-10-10",
+      "written_after_observing": "the full-suite results (D-102) and the stats-reviewer's findings; nothing below changes a gate's measured value",
+      "full_suite": "Report two runs. (a) Clean clone: no fonts, no sibling OCR_ID_working, no DocCornerNet history, no artifacts; every non-pass must be a stated skip or a failure caused by a named owner-only input. (b) Owner inputs (fonts, private artifacts, upstream history): every test passes except test_governance_hooks.py::test_blocklist_is_current_with_the_manifests_it_came_from, excused only while its sole drift is `blocked_paths` because this host holds no card images (sources, counts and card ids equal); its pass is not claimed.",
+      "delivered_commit": "Gates measured on bc172e5 carry to the delivered commit only if the README_SERVICE.md Quick start commands, the client bundle (docs/TEAM_API_CLIENT.md, the caller, its checker, requirements-api-client.txt, NATID_OCR_PIPELINE_PLAN.md) and all image inputs are byte-identical, and the delivered image's layers equal the gated image's except the final useradd layer, whose only file differences may be the revision label and the ocr user's password-change day in /etc/shadow.",
+      "decision_scope": "The decision covers an x86-64 host with AVX-512, the only CPU tested. Readiness on CPUs without AVX-512, including the work machine, is outside it (D-100)."
+    }
+  ]
+}

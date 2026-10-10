@@ -16,46 +16,29 @@ The batch pipeline calls `POST /engine` on port 8081. The authenticated
 - [Engine verification and delivery record](reports/phase4_engine.md).
 - [Release decisions](docs/release/decision_log.md).
 
-Build in Linux or WSL with Docker Desktop integration enabled:
+**New machine? Start with the [Quick start for the team](README_SERVICE.md#quick-start-for-the-team):**
+clone, build, create `ocr.env`, run and test, command by command. It needs
+only this repository, Docker and git; no other folder or download.
+
+Build in Linux, or in WSL with Docker Desktop integration enabled:
 
 ```bash
 bash scripts/phase4_service_docker.sh build
 ```
 
-The build prints the image tag. Follow README_SERVICE.md to create the private
-environment file and run the container on localhost port 8081.
-
 The model files needed by the image are included and pinned in
-`docker/model_files.sha256`. DocCornerNet is MIT-licensed; PaddleOCR models are
+`docker/model_files.sha256`; [models/README.md](models/README.md) lists each one
+with its source and licence. DocCornerNet is MIT-licensed; PaddleOCR models are
 published under Apache-2.0. Card images, labels, per-card outputs and secrets
 are excluded.
 
 The fast test target is `bash scripts/test_service.sh` with `PYTHON` set to a
 Python 3.11 environment containing the pinned service and test dependencies.
-Private-data/history checks explain their skips in a fresh clone. In this
-Windows/WSL development checkout, the legacy synthetic font tests need
-`XDG_DATA_HOME=/mnt/c/Windows`; fonts are not shipped in the image.
+Private-data/history checks explain their skips in a fresh clone. The frozen
+detector's provenance tests need the upstream DocCornerNet history: run
+`bash scripts/fetch_doccornernet_upstream.sh` once (hash-verified). The legacy
+synthetic font tests need Microsoft fonts that cannot be redistributed: point
+`XDG_DATA_HOME` at a folder whose `fonts/` holds them (on WSL,
+`XDG_DATA_HOME=/mnt/c/Windows`). The image itself contains no font.
 
 Verification results and operational limitations belong in the linked reports.
-
-
-
-python3 -c 'import secrets; print("OCR_API_KEY=" + secrets.token_urlsafe(32))' > "$HOME/.config/fixed14/ocr.env"
-
-ls -l "$HOME/.config/fixed14/ocr.env"
-
-
-sudo docker run -d --name fixed14-engine --restart unless-stopped -p 127.0.0.1:8081:8081 --env-file "$HOME/.config/fixed14/ocr.env" --read-only --tmpfs /tmp --tmpfs /home/ocr:uid=10001,gid=10001 --cap-drop ALL --security-opt no-new-privileges --ulimit core=0 --memory 6g --pids-limit 512 fixed14-engine:1.0
-
-
-sudo docker inspect --format '{{.State.Status}} {{.State.Health.Status}}' fixed14-engine
-ر
-
-sudo docker inspect --format '{{.State.Status}} {{.State.Health.Status}}' fixed14-engine
-
-
-sudo docker logs --tail 50 fixed14-engine
-
-
-sudo docker logs fixed14-engine 2>&1 | grep models_failed
-

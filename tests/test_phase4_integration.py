@@ -1,6 +1,8 @@
 """Phase 4-I parity checks (amendment 2), on synthetic arrays only."""
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 
 from scripts import phase4_integration as pi
@@ -61,7 +63,7 @@ def test_identical_rehearsal_passes_and_a_changed_reading_fails():
 def test_portable_maps_a_windows_path_only_under_linux():
     assert pi.portable(r"C:\Users\a\b\c.png", windows=False).as_posix() == "/mnt/c/Users/a/b/c.png"
     assert pi.portable("data/x.png", windows=False).as_posix() == "data/x.png"
-    assert pi.portable(r"C:\Users\a\b.png", windows=True).as_posix() == "C:/Users/a/b.png"
+    assert pi.portable(r"C:\Users\a\b.png", windows=True) == Path(r"C:\Users\a\b.png")
 
 
 def test_the_font_shim_restores_pil_and_leaves_windows_alone():

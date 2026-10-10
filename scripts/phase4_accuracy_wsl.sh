@@ -4,7 +4,7 @@
 # Paddle is blocked on Windows, so every Paddle-dependent step runs here. The
 # safe.directory entry is process scope and names the vendored detector only.
 set -euo pipefail
-ROOT=/mnt/c/Users/asmaa/Documents/OCR_ID_parallel
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 export DISABLE_MODEL_SOURCE_CHECK=True
 export PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True

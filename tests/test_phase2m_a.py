@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 import subprocess
+import sys
 import zipfile
 from pathlib import Path
 
@@ -132,8 +133,9 @@ def test_tracked_phase2m_text_contains_no_decimal_id_or_protected_truth():
 
 
 def test_local_demo_import_and_production_route_are_unchanged():
+    windows_venv = audit.ROOT / ".venv" / "Scripts" / "python.exe"
     completed = subprocess.run(
-        [str(audit.ROOT / ".venv" / "Scripts" / "python.exe"), "-c",
+        [str(windows_venv) if windows_venv.exists() else sys.executable, "-c",
          "import scripts.phase2l_d_local_demo"],
         cwd=audit.ROOT, capture_output=True, text=True, check=False,
     )

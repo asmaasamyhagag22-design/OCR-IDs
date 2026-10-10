@@ -3293,3 +3293,203 @@ Package the client and helper with their guides/requirements for transfer.
 Scan the outgoing tree and preserve image inputs and original client behaviour.
 These checks establish caller completeness, not work-machine readiness: the
 reported GoldenMismatch still needs its failing-check details and resolution.
+
+## D-097 - New Linux host: forensics before any change (2026-10-10)
+
+The owner moved the project to a new native Ubuntu 24.04 host (dual boot with
+the Windows host that held every previous phase) and asked to resume an
+interrupted session, make the team repository self-sufficient and prove it
+from a fresh clone. Forensics first, read-only: the Linux folder is a file copy
+of the Windows `test` worktree whose `.git` pointer names a Windows path, so the
+repository was read from the Windows partition mounted read-only and mirrored
+to Linux. git fsck clean; no lock, stash or in-progress operation in any
+worktree; every worktree clean except CRLF-only noise plus four old untracked
+files in the main worktree (saved as a patch and archive under the ignored
+artifacts/recovery/). Live `git ls-remote depi`: ocr-team/national-id 7b3557f,
+national-id2 fed4461, equal to the last recorded fetch: no partial or unexpected
+push. No self-sufficiency work had started (no progress file, no models/), so
+nothing is finished or reverted; the last completed unit is D-096. Backup refs
+backup/phase4-repo-entry-20261010/* were created for every branch in the Linux
+mirror; the Windows repository stays read-only and untouched.
+
+The project hooks call `python`, which did not exist on this host, so the data
+and commit guards failed open until the owner installed python-is-python3.
+Nothing card-level was read before that; afterwards a blocked card was denied
+(exit 2) and README allowed (exit 0). Recorded so the gap is not repeated.
+
+## D-098 - Working base and checkout on the new host (2026-10-10)
+
+Recommended option taken: work on a new branch phase4-repo-selfsufficient from
+7b3557f, the live team tip, so the single delivery commit fast-forwards it. The
+Linux folder becomes a real checkout from the mirror (its old pointer file is
+kept under artifacts/recovery/). The session's permission classifier refused
+rewriting remote configuration, so GitHub is reached by explicit URL and the
+owner's push command names the URL. Git identity is the owner's normal one
+(asmaasamyhagag22-design, GitHub noreply address), as in D-093.
+
+Python 3.11.9 venvs are made with uv in user space. Paddle runs natively on this
+Linux host; the "Paddle only in WSL" line existed to keep Paddle off native
+Windows and is satisfied. Rule file configs/phase4_repo_rule_v1.json is
+committed before any gate is measured.
+
+## D-099 - Reproduce the team build before changing anything (2026-10-10)
+
+D-094 records an open work-machine report: the image built there reached
+`running unhealthy` with GoldenMismatch. The team branch already tracks all 22
+files of docker/model_files.sha256 (every hash verified here, every file under
+10 MiB), and the shipped code at 7b3557f equals f3811cf (the only differences
+over the image inputs are those 13 model-file additions). The documented build
+is therefore reproduced from a fresh clone first, and only inputs that are
+shown missing are added. The golden tolerances (1e-5 band margin, 1e-4 detector
+score) are part of the shipped self-check and are not changed.
+
+## D-100 - Fresh-clone build passes; the work-machine GoldenMismatch is CPU-dependent (2026-10-10)
+
+The documented build ran in a fresh clone of depi ocr-team/national-id 7b3557f
+(no sibling worktree, no ignored artifacts): exit 0, every model-file hash
+checked inside the image, no build error to record. The container became
+healthy in 30 s and its golden self-test passed (58 checks). So the team
+repository already holds every build and runtime input; the work machine's
+`running unhealthy`/GoldenMismatch (D-094) is not a missing file.
+
+The service log names only the exception type, so the same self-test was run in
+a throwaway container that prints the failed check names (synthetic golden
+inputs only). On this AVX-512 CPU it passes, reproducing stored values within
+5e-9. With oneDNN capped below AVX-512 (ONEDNN_MAX_CPU_ISA=AVX2, AVX or SSE41,
+which TensorFlow and Paddle both honour) it fails with only margin checks
+named: band margins move up to 1.07e-5 (tolerance 1e-5) and the end-to-end
+margin up to 2.3e-3 (tolerance 1e-4), while every v2/BC-final argmax, detector
+result and Paddle text is unchanged. A CPU without AVX-512 therefore makes the
+unchanged service refuse to become ready. The ISA cap emulates such a CPU; the
+work machine's own CPU was not inspected, so this is the leading explanation,
+not a confirmed diagnosis.
+
+Tolerances, stored golden values and the image stay unchanged: widening them is
+a self-test threshold change that needs the owner, and on a non-AVX-512 CPU the
+v1 margin near 0.966875 and the container parity are unverified. Recommended
+option taken: ship scripts/golden_diagnose.sh, which prints the failed checks
+and the CPU's vector sets, document the case in README_SERVICE.md, and list the
+owner's choices under Waiting for Asmaa.
+
+## D-101 - What changes to make the repository self-sufficient (2026-10-10)
+
+Model files stay at the paths the code and Dockerfile load them from (moving
+them would change the image); models/ holds MODELS.sha256 (the 13 weight and
+third-party files, repository-relative, same hashes as docker/model_files.sha256),
+an inventory with source and licence, and the Apache-2.0 text for the PaddleOCR
+models. DocCornerNet's MIT LICENSE is already committed beside it. All files are
+under 10 MiB: no Git LFS. Licences allow redistribution, so no download step is
+needed for any image input.
+
+Development-only inputs that a clone lacked: (1) the upstream DocCornerNet git
+history, which the frozen detector's provenance tests read with `git show`
+(222 MB, not committed). scripts/fetch_doccornernet_upstream.sh fetches the pinned
+revision d877dc3 shallowly and refuses unless upstream model.py and LICENSE
+equal the committed copies with CRLF read as LF (the comparison doccornernet.py
+makes; the committed copies are the CRLF Windows checkout, hash-pinned). With it
+the fast target is 228 passed, as in phase4_engine. (2) Microsoft fonts for the
+legacy synthetic font tests: not redistributable, never in the image, documented
+as a test-only input.
+
+Nine development shell scripts hard-coded ROOT=/mnt/c/Users/asmaa/...; ROOT is
+now the repository holding the script, which is the same folder on the owner's
+machine. phase4_final_image.sh uses git.exe only for a Windows-pointer worktree,
+as phase4_service_docker.sh already did. test_service.sh falls back to `python`
+on PATH when the sibling Windows venv is absent. Research scripts whose default
+search roots include ../OCR_ID_working are left as they are: they search for
+private data on the owner's machine and are not part of any team flow.
+scripts/phase2l_a.py and phase2l_b.py are image inputs and stay byte-identical.
+
+README_SERVICE.md gains "Quick start for the team"; README.md links to it. The
+unformatted command notes appended to README.md on 2026-10-07 (including a stray
+character and a `fixed14-engine:1.0` tag that the documented build never makes)
+are replaced by that tested section, which keeps their ocr.env location and
+container name. CRLF line endings of the edited README files are preserved.
+
+## D-102 - Full suite on the new host: five failures, sorted by cause (2026-10-10)
+
+The full suite on this host (Python 3.11.9 service venv, Microsoft fonts from
+the owner's Windows partition via XDG_DATA_HOME, DocCornerNet history fetched):
+1289 passed, 4 skipped (locked audit not authorised, superseded audit path, no
+display, labelled set not present), 5 failed. Each failure was traced:
+
+- test_blocklist_is_current_with_the_manifests_it_came_from: only
+  `blocked_paths` drifts. The blocklist was derived on Windows, where 1012
+  forbidden card images existed on disk; data/ is empty here, so none resolve.
+  Sources, counts, card ids and external names are identical. The blocklist is
+  not regenerated: the Windows one blocks a superset, and if card images ever
+  arrive here the check reports drift and the guard fails closed. Host-specific.
+- test_tracked_outputs_paths_and_tests_contain_no_id_shaped_literal and
+  test_private_artifacts_ignored_and_tracked_outputs_aggregate: they encoded
+  "no weight file is ever tracked", which the team branch has not satisfied since
+  its snapshot commit and which the owner's approval to commit model files
+  replaces. They now accept exactly the files in models/MODELS.sha256, tracked
+  and at their pinned hash, and still refuse any other weight, array or jsonl
+  and still scan every text output for ID-shaped literals.
+- test_local_demo_import_and_production_route_are_unchanged ran the Windows
+  sibling venv by path; it now uses this interpreter when that venv is absent.
+- test_portable_maps_a_windows_path_only_under_linux compared a host Path's
+  spelling of a Windows path, true only on Windows; it now asserts the path is
+  returned unchanged, which is the behaviour under test on every host.
+
+No source, model, threshold or pipeline file changes; the edited tests pass
+(61 passed across the four files).
+
+## D-103 - Release gate passed; one-commit delivery (2026-10-10)
+
+Every gate of configs/phase4_repo_rule_v1.json passed from a second isolated
+fresh clone of this branch (bc172e5), with the README_SERVICE.md Quick start
+executed literally: model hashes 13/13 before build and 22/22 inside the image,
+healthy, /ready 200, /engine 200 with a well-formed item for a synthetic image,
+container parity 296/296 equal in all 11 fields with the enginev2 selection and
+thresholds hash, and the team caller's D-095 dry-run proof PASS. Health: fast
+target 228 passed, full suite 1293 passed with only the host-specific blocklist
+drift failing (D-102), privacy scan 41 passed with no skip, lint clean.
+
+Recommended options taken. The branch's working commits are squashed into one
+commit directly on 7b3557f, with the owner's normal identity; the working history
+is kept on backup/phase4-repo-selfsufficient-work-20261010. Image inputs are
+unchanged from the gated commit, so the delivered image is rebuilt from the final
+commit and accepted only if its filesystem layers equal the gated image's. It is
+also saved with `docker save | gzip` under the ignored artifacts/phase4_repo/delivery/
+as an alternative delivery, with its sha256 and `docker load` instructions. The
+outgoing tree is scanned with scripts/phase4_engine_release.py's validated scan
+against 7b3557f before the push command is given. Decision REPO_SELF_SUFFICIENT;
+the owner pushes; national-id2 is not touched.
+
+## D-104 - Review findings, delivery image and two full-suite numbers (2026-10-10)
+
+The stats-reviewer found three gaps and three consistency issues; all are
+addressed, and rule amendment 1 records the conditions below, written after the
+results were seen.
+
+Full suite, two runs. In a clean clone (no fonts, no sibling OCR_ID_working, no
+DocCornerNet history, no artifacts): 1207 passed, 84 skipped, each skip naming
+its absent private input; the 4 failures and 3 errors are all the Microsoft
+fonts (6 `OSError: cannot open resource`, 1 "self-test fonts are missing").
+With the owner's inputs: 1293 passed, 4 skipped, 1 failed; that failure is
+the blocklist path drift of D-102, excused by the amendment and not counted as
+a pass.
+
+Carry-over from the gated commit bc172e5 to the delivered commit: the rule file
+is unchanged since e31561b, which precedes bc172e5 (backup/phase4-repo-
+selfsufficient-work-20261010 keeps that history). Between bc172e5 and the
+delivered commit, only README_SERVICE.md prose (step 8's expected answer),
+tests, the decision log and reports change; the 15 Quick start commands, the
+five-file client bundle and all 86 image inputs are byte-identical. The image
+built from the squashed commit has its first 17 filesystem layers equal to the
+gated image's. The final useradd layer differs only in the revision label and
+the ocr user's password-change day in /etc/shadow (20735 vs 20736: the builds
+straddled UTC midnight); /etc/hostname differs only at container run time. That
+image was healthy with 22/22 in-image hashes, /ready 200 and /engine 200.
+The pre-push scan of the squashed tree against 7b3557f passed: 331 files,
+25 changed or new, no new weight blob, no file over 10 MiB, 45 approved
+synthetic and 48 inherited fixture occurrences (as in D-093), no error.
+
+Corrections. D-100's title states a cause; its body and this entry state the
+finding: under oneDNN instruction-set caps that emulate a CPU without AVX-512,
+the golden self-test fails on margin checks while the 58-check synthetic golden
+readings stay the same. That was not verified on real non-AVX-512 hardware or
+on the work machine, and card-level decisions on such a CPU are unknown. The
+decision is scoped to an AVX-512 x86-64 host. The live `git ls-remote depi`
+(7b3557f / fed4461) ran after the owner's `gh auth login`, before any change.

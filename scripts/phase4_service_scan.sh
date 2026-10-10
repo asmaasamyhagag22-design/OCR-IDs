@@ -5,7 +5,7 @@
 # never of the service image (the scanner's precondition, found by the
 # instrument-validator's fourth pass): a base tar holding any app/ path is refused.
 set -euo pipefail
-ROOT=/mnt/c/Users/asmaa/Documents/OCR_ID_parallel
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WORK="$HOME/build/scan"
 cd "$ROOT"
 IMAGE="${1:-$(bash scripts/phase4_service_docker.sh image)}"

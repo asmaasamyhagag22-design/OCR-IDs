@@ -13,6 +13,120 @@ MongoDB, media and OCR services, follow [the API client guide](docs/TEAM_API_CLI
 Install only `requirements-api-client.txt` on the caller's computer; it does
 not need the OCR models or the private research artifacts.
 
+## Quick start for the team
+
+This section takes a new Linux machine (Ubuntu 22.04 or 24.04, or WSL) from
+nothing to a working service. Run the commands in order, in one terminal. You
+need git, Python 3, curl and Docker Engine with BuildKit, and your user must be
+able to run `docker` without `sudo`. You also need about 8 GB of free disk and
+6 GiB of memory for the container. The first build downloads about 1.5 GB of
+Python packages, and takes 20-40 minutes on a slow link.
+
+1. Clone the repository. Every model file is included (see `models/README.md`).
+
+   ```bash
+   git clone --branch ocr-team/national-id https://github.com/MCIT-DEPI/DEPI-OCR.git national-id
+   ```
+   ```bash
+   cd national-id
+   ```
+
+2. Check the model files against their pinned hashes. Every line must say `OK`.
+
+   ```bash
+   sha256sum --strict --check models/MODELS.sha256
+   ```
+
+3. Build the image. The build checks every model file's hash again inside the
+   image, and prints the image tag at the end.
+
+   ```bash
+   bash scripts/phase4_service_docker.sh build
+   ```
+   ```bash
+   IMAGE="$(bash scripts/phase4_service_docker.sh image)"
+   ```
+
+4. Create the private `ocr.env`, outside the repository and readable only by you.
+
+   ```bash
+   mkdir -p "$HOME/.config/fixed14"
+   ```
+   ```bash
+   (umask 077; python3 -c 'import secrets; print("OCR_API_KEY=" + secrets.token_urlsafe(32))' > "$HOME/.config/fixed14/ocr.env")
+   ```
+
+5. Run the service on localhost port 8081.
+
+   ```bash
+   docker run -d --name fixed14-engine --restart unless-stopped -p 127.0.0.1:8081:8081 --env-file "$HOME/.config/fixed14/ocr.env" --read-only --tmpfs /tmp --tmpfs /home/ocr:uid=10001,gid=10001 --cap-drop ALL --security-opt no-new-privileges --ulimit core=0 --memory 6g --pids-limit 512 "$IMAGE"
+   ```
+
+6. Wait until the models have loaded and the startup self-test has passed. This
+   usually takes 1-4 minutes. The last line must be `running healthy`.
+
+   ```bash
+   until [ "$(docker inspect --format '{{.State.Health.Status}}' fixed14-engine)" != starting ]; do sleep 5; done; docker inspect --format '{{.State.Status}} {{.State.Health.Status}}' fixed14-engine
+   ```
+
+7. Test `/ready`. It needs the key from `ocr.env`, and must print `HTTP 200`.
+
+   ```bash
+   curl -s -w '\nHTTP %{http_code}\n' -H "X-API-Key: $(sed -n 's/^OCR_API_KEY=//p' "$HOME/.config/fixed14/ocr.env")" http://127.0.0.1:8081/ready
+   ```
+
+8. Test `/engine` with a synthetic image: a plain grey picture, made inside the
+   image, with no card on it. The answer must be `HTTP 200` with one item,
+   `synthetic-1`, holding `finding`, `error_codes`, `confidence`,
+   `model_version` and `decision_rule_version`. There is no card to read, so
+   `error_codes` is not empty: a grey picture gives `INVALID_READING` with a
+   meaningless `finding`. The first call can take up to about two minutes while
+   the engine warms up.
+
+   ```bash
+   docker run --rm --network none --entrypoint python "$IMAGE" -c "import base64, io, json; from PIL import Image; b = io.BytesIO(); Image.new('RGB', (640, 400), (200, 200, 200)).save(b, 'PNG'); print(json.dumps({'request_id': 'quickstart-1', 'items': [{'item_id': 'synthetic-1', 'front_b64': base64.b64encode(b.getvalue()).decode(), 'back_b64': None}]}))" > /tmp/fixed14_engine_request.json
+   ```
+   ```bash
+   curl -s -w '\nHTTP %{http_code}\n' -H 'Content-Type: application/json' --data @/tmp/fixed14_engine_request.json http://127.0.0.1:8081/engine
+   ```
+
+9. Point the team's API client at `http://127.0.0.1:8081/engine` and follow
+   [the API client guide](docs/TEAM_API_CLIENT.md). Start with `--dry-run`.
+
+Stop and remove the service with `docker rm -f fixed14-engine`.
+
+**Without building.** If you received the image as a `docker save` file,
+check it against the sha256 you were given, then load it instead of doing
+steps 1-3:
+
+```bash
+sha256sum fixed14-ocr-service.tar.gz
+```
+```bash
+docker load -i fixed14-ocr-service.tar.gz
+```
+
+`docker load` prints the image tag. Set `IMAGE` to that tag, then continue
+from step 4.
+
+**If step 6 says `unhealthy`.** The service log names only the error type
+(`models_failed`, `error=GoldenMismatch`). This command runs the same startup
+self-test in a throwaway container and prints which checks failed:
+
+```bash
+bash scripts/golden_diagnose.sh "$IMAGE"
+```
+
+`GOLDEN_OK` means the models reproduce their stored results on this machine.
+`GOLDEN_FAIL GOLDEN_SELF_TEST_FAILED:...` means they do not, so the service
+refuses to serve. A failure that names only `..._margin` checks, on a CPU
+whose vector sets do not include `avx512f`, is the known case in decision
+D-100: the readings are identical, but the confidence margins differ slightly
+from the ones stored on the AVX-512 machine that made them. Run the service
+on a CPU with AVX-512 until that is resolved, and send the two lines the
+command printed to the model owner. They hold no image or ID. Do not route
+traffic to an unhealthy container.
+
 ## Batch engine on port 8081
 
 `POST /engine` is additive; all `/v1` endpoints and their decision rules remain.

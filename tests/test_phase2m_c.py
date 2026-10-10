@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import inspect
 import json
 import re
@@ -168,16 +169,22 @@ def test_access_ledger_has_no_forbidden_reads():
 
 
 def test_private_artifacts_ignored_and_tracked_outputs_aggregate():
+    pins = (ROOT / "models" / "MODELS.sha256").read_text(encoding="utf-8").splitlines()
+    pinned = {line.split("  ", 1)[1]: line.split("  ", 1)[0] for line in pins if line.strip()}
+    tracked = subprocess.check_output(["git", "-C", str(ROOT), "ls-files"], text=True).splitlines()
     for rel in ("artifacts/phase2m_c/external_train_bands.npy", "artifacts/phase2m_c/eligible_115_private.json",
                 "artifacts/phase2m_c/models/B_seed3101/best.weights.h5", "artifacts/phase2m_c/frozen/fixed14_v3.weights.h5"):
-        assert subprocess.run(["git", "-C", str(ROOT), "check-ignore", "-q", rel]).returncode == 0
-    tracked = subprocess.check_output(["git", "-C", str(ROOT), "ls-files"], text=True).splitlines()
+        if rel in pinned:  # committed with the owner's approval (D-101): tracked and hash-pinned
+            assert rel in tracked
+            assert hashlib.sha256((ROOT / rel).read_bytes()).hexdigest() == pinned[rel]
+        else:
+            assert subprocess.run(["git", "-C", str(ROOT), "check-ignore", "-q", rel]).returncode == 0
     for rel in [p for p in tracked if "phase2m_c" in p and p.endswith((".json", ".md"))]:
         text = (ROOT / rel).read_text(encoding="utf-8")
         c.base.assert_aggregate_safe(text)
         assert "member" not in text.lower() or "members" not in text.lower()
         assert not re.search(r"\.jpe?g\b", text, re.I)
-    assert not any(p.endswith((".npy", ".npz", ".h5", ".jsonl")) for p in tracked if "phase2m_c" in p)
+    assert not any(p.endswith((".npy", ".npz", ".h5", ".jsonl")) for p in tracked if "phase2m_c" in p and p not in pinned)
 
 
 def test_production_and_frozen_v2_sources_unchanged():

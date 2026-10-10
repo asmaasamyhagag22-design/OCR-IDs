@@ -4,11 +4,12 @@
 # Layers 1-15 (base, system libraries, pip, the model files and their check) must be identical
 # to ce10649's; the changed layers are scanned by the validated scripts/phase4_final_layer_scan.py.
 set -euo pipefail
-ROOT=/mnt/c/Users/asmaa/Documents/OCR_ID_parallel
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WORK="$HOME/build/final"
 REFERENCE=fixed14-ocr-service:fixed14-bcfinal-3101-ce10649
 cd "$ROOT"
-git() { git.exe "$@"; }
+# a WSL worktree whose .git names a Windows path needs the Windows git; a plain clone uses its own
+if [ -f .git ] && command -v git.exe >/dev/null 2>&1; then git() { git.exe "$@"; }; fi
 cmd="$1"; IMAGE="$2"
 case "$cmd" in
   layer-scan)

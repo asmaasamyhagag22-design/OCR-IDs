@@ -3,6 +3,7 @@
 No test prints or embeds a digit sequence.  Real-data checks skip on machines
 without the protected Phase 2L-A manifest.
 """
+import hashlib
 import json
 import re
 import subprocess
@@ -253,11 +254,21 @@ def _tracked_phase2l_b_outputs():
     return sorted({ROOT / name for name in names} | {path for path in forced if path.exists()})
 
 
+def _pinned_model_files():
+    """The model files committed with the owner's approval (D-101), each with its pinned sha256."""
+    pins = (ROOT / "models" / "MODELS.sha256").read_text(encoding="utf-8").splitlines()
+    return {ROOT / line.split("  ", 1)[1]: line.split("  ", 1)[0] for line in pins if line.strip()}
+
+
 def test_tracked_outputs_paths_and_tests_contain_no_id_shaped_literal():
     files = _tracked_phase2l_b_outputs()
+    pinned = _pinned_model_files()
     assert any(path.name == "test_phase2l_b.py" for path in files)
     for path in files:
         assert not ID_LIKE.search(str(path.relative_to(ROOT)))
+        if path in pinned:  # a committed weight file: binary, so its pinned hash is checked instead
+            assert hashlib.sha256(path.read_bytes()).hexdigest() == pinned[path]
+            continue
         text = path.read_text(encoding="utf-8")
         match = ID_LIKE.search(text)
         assert match is None, f"{path.name} contains an ID-shaped literal of length {len(match.group(0))}"

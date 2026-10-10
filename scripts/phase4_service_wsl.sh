@@ -6,7 +6,7 @@
 # requirements-linux.txt (~/venvs/ocrid-service-py3119), where the service runs.
 # The safe.directory entry is process scope and names the vendored detector only.
 set -euo pipefail
-ROOT=/mnt/c/Users/asmaa/Documents/OCR_ID_parallel
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 VENV="$HOME/venvs/ocrid-py3119"
 if [ "${1:-}" = "--service-venv" ]; then
