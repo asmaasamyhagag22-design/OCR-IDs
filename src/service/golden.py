@@ -38,8 +38,11 @@ CARD_BOX = (100, 135, 1100, 765)  # x0, y0, x1, y1: a 1000 x 630 card, the canon
 CANVAS_BACKGROUND = (38, 42, 48)
 CARD_FILL = (226, 222, 214)
 BAND_BBOX = (350, 430, 1000, 610)  # the frozen broad band, canonical coordinates
-BAND_TOLERANCE, DETECTOR_CORNER_TOLERANCE, DETECTOR_SCORE_TOLERANCE = 1e-5, 1e-3, 1e-4
-PADDLE_CONFIDENCE_TOLERANCE, END_TO_END_MARGIN_TOLERANCE = 1e-3, 1e-4
+# The two margin tolerances hold the drift of CPUs without AVX-512 (D-106): 4 x the largest drift measured
+# under the AVX2, AVX and SSE41 caps, rounded up (configs/phase4_golden_isa_rule_v1.json). Every exact check
+# (argmax, Paddle text, detector acceptance, admission) and every stored value is unchanged.
+BAND_TOLERANCE, DETECTOR_CORNER_TOLERANCE, DETECTOR_SCORE_TOLERANCE = 7e-5, 1e-3, 1e-4
+PADDLE_CONFIDENCE_TOLERANCE, END_TO_END_MARGIN_TOLERANCE = 1e-3, 9e-3
 
 
 class GoldenMismatch(RuntimeError):
