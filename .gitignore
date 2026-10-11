@@ -8,6 +8,8 @@ __pycache__/
 .pytest_cache/
 .venv/
 .venv-ocr/
+.venv-client/
+natid_ocr_pipeline.log
 *.egg-info/
 third_party/
 reports/

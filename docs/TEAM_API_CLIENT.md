@@ -26,9 +26,9 @@ If Ubuntu reports that `ensurepip` is unavailable, install its matching
 |---|---|---|
 | `MONGO_URI` | `mongodb://127.0.0.1:27017/` | The reachable MongoDB URI; keep any credentials private. |
 | `OCR_ENGINE_URL` | `http://127.0.0.1:8081/engine` | The reachable engine's full `/engine` URL. |
-| `MEDIA_SERVER_IP` | `127.0.0.1:8082` | The reachable media host, including its port when needed. |
+| `MEDIA_SERVER_IP` | `127.0.0.1` | The reachable media host, including its port when needed. The default is nginx on port 80 of the work machine. |
 | `MEDIA_SERVER_PLACEHOLDER` | `<IP_adress>` | Keep this spelling when the Mongo paths use it. |
-| `LOG_FILE` | `/dev/null` | Discards the file log on Linux; terminal logging remains unchanged. |
+| `LOG_FILE` | `natid_ocr_pipeline.log` | The file log, in the folder the client runs from. It holds national IDs (see below), is created readable by its owner only and is git-ignored. Set `/dev/null` to keep terminal logging only. |
 
 The original database and collection are `DEPI_R5_Applicant_DB.applicants`.
 The input field is `download folder path`. For example, a neutral record can
@@ -98,10 +98,19 @@ for an intended update of the target collection.
 
 The supplied original file's SHA-256 is
 `f88460cd0e011a32740f1f2c335bda21ed9c65b36f04bf04de5e0c3245d2758e`.
-Only `MONGO_URI`, `OCR_ENGINE_URL`, `MEDIA_SERVER_IP`,
-`MEDIA_SERVER_PLACEHOLDER` and `LOG_FILE` differ from it. Its query, batches,
-timeouts, retries, classification and write/dry-run behaviour are unchanged.
+It differs in `MONGO_URI`, `OCR_ENGINE_URL`, `MEDIA_SERVER_IP`,
+`MEDIA_SERVER_PLACEHOLDER` and `LOG_FILE`. One further change came from the work
+machine's first full run (decision D-108): when writing, the client also logs
+one line per record. The line holds the result written, the applicant's typed
+`National Id` (`original=`), and whether the reading equals it (`match=`). The
+log file is created mode 600. The values written to MongoDB, the query,
+batches, timeouts, retries, classification and dry-run behaviour are unchanged.
 This addition does not change the OCR image or either decision policy.
+
+The log therefore holds national IDs. Keep it on the work machine, readable
+only by you, and share only its `Processed` and `Final status_counts` lines.
+`scripts/team_accuracy_report.py` computes the same comparison from MongoDB,
+printing counts only.
 
 The standalone package was tested in a fresh Python 3.11 environment, without
 private research files. See [verification and its limits](release/team_api_client_verification.md).

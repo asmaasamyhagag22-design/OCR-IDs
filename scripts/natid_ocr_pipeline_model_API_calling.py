@@ -15,6 +15,7 @@ import base64
 import concurrent.futures
 import datetime
 import logging
+import os
 import sys
 import time
 import uuid
@@ -52,11 +53,13 @@ FRONT_SUFFIX = "/Nid_Front/Nid_Front.jpg"
 
 # Stored `download folder path` values contain the literal placeholder
 # "<ip_adress>" instead of a real host. Substitute the real media-server
-# address here.
-MEDIA_SERVER_IP = "127.0.0.1:8082"
+# address here. On the work machine the images are served by nginx on port 80.
+MEDIA_SERVER_IP = "127.0.0.1"
 MEDIA_SERVER_PLACEHOLDER = "<IP_adress>"
 
-LOG_FILE = "/dev/null"
+# One line per record, with the reading and the typed `National Id`: the file holds national IDs and
+# is created readable by its owner only. Set "/dev/null" to keep terminal logging only.
+LOG_FILE = "natid_ocr_pipeline.log"
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -74,6 +77,8 @@ logger.addHandler(_stream_handler)
 _file_handler = logging.FileHandler(LOG_FILE, encoding="utf-8")
 _file_handler.setFormatter(_fmt)
 logger.addHandler(_file_handler)
+if LOG_FILE != os.devnull:
+    os.chmod(LOG_FILE, 0o600)
 
 
 # ---------------------------------------------------------------------------
@@ -317,9 +322,16 @@ def write_results(collection, results: List[OcrResult], dry_run: bool) -> None:
             logger.info("[dry-run] %s -> %s", r.doc_id, r.to_subdoc())
         return
 
+    subdocs = [(r, r.to_subdoc()) for r in results]
+    typed = {d["_id"]: d.get("National Id") for d in collection.find({"_id": {"$in": [r.doc_id for r in results]}}, {"National Id": 1})}
+    for r, sub in subdocs:
+        original = typed.get(r.doc_id)
+        original = None if original in (None, "") else str(original).strip()
+        logger.info("%s -> %s | original=%s | match=%s", r.doc_id, sub, original,
+                    r.national_id is not None and r.national_id == original)
     ops = [
-        UpdateOne({"_id": r.doc_id}, {"$set": {OUTPUT_FIELD: r.to_subdoc()}})
-        for r in results
+        UpdateOne({"_id": r.doc_id}, {"$set": {OUTPUT_FIELD: sub}})
+        for r, sub in subdocs
     ]
     collection.bulk_write(ops, ordered=False)
 

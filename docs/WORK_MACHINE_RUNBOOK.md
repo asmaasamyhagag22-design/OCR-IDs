@@ -31,17 +31,10 @@ Use the folder that holds the fix. This must print `7e-5` and `9e-3`:
 grep -n "_TOLERANCE = " src/service/golden.py
 ```
 
-The client must point at nginx on this machine. This must print `"127.0.0.1"`:
-
-```bash
-grep -n "^MEDIA_SERVER_IP" scripts/natid_ocr_pipeline_model_API_calling.py
-```
-
-If it prints `"127.0.0.1:8082"`, set it:
-
-```bash
-sed -i 's|^MEDIA_SERVER_IP = "127.0.0.1:8082"$|MEDIA_SERVER_IP = "127.0.0.1"|' scripts/natid_ocr_pipeline_model_API_calling.py
-```
+The client points at nginx on this machine by default (`MEDIA_SERVER_IP = "127.0.0.1"`),
+and writes its log to `natid_ocr_pipeline.log` (step 5). A copy of the repository
+from before 2026-10-11 still has `"127.0.0.1:8082"` and `"/dev/null"`: use the
+current repository.
 
 The environments are `.venv-ocr` (the service) and `.venv-client` (the client
 and the scripts below). README_SERVICE.md "Run without Docker" creates
@@ -113,18 +106,20 @@ backup holds personal data. Make it readable only by you:
 chmod -R go-rwx "$HOME/mongo_backup_$(date +%F)"
 ```
 
-## 5. Optional: a log file
+## 5. The log file
 
-By default the client logs to the terminal only (`LOG_FILE = "/dev/null"`). To
-keep a file log, `natid_ocr_pipeline.log` in the repository folder:
+The client writes `natid_ocr_pipeline.log` in the repository folder. When
+writing, it logs one line per record: the result, the typed ID (`original=`),
+and whether they match (`match=`). Count the matches without printing an ID:
 
 ```bash
-sed -i 's|^LOG_FILE = "/dev/null"$|LOG_FILE = "natid_ocr_pipeline.log"|' scripts/natid_ocr_pipeline_model_API_calling.py
+grep -o "| match=[A-Za-z]*" natid_ocr_pipeline.log | sort | uniq -c
 ```
 
-**The log can hold national IDs and image paths.** Keep it readable only by you
-(`chmod 600 natid_ocr_pipeline.log`), and share only its `Processed` and
-`Final status_counts` lines.
+**The log holds national IDs and image paths.** The client creates it readable
+only by you, and git ignores it. Share only its `Processed` and
+`Final status_counts` lines. To log to the terminal only, set
+`LOG_FILE = "/dev/null"` in the client.
 
 ## 6. Write 10 records, then the rest
 

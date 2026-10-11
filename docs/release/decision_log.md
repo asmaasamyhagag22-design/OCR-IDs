@@ -3606,3 +3606,24 @@ README_SERVICE.md points to it. The accuracy is measured against the typed
 `National Id`, so it is a lower bound. The image folders are named from the
 typed IDs and give no independent check. No service, model or image input
 changes.
+
+## D-108 - The client ships with the work machine's settings (2026-10-11)
+
+The owner asked that a full download of the repository work on the work machine
+without hand edits. Three edits made there during the first full run therefore
+move into the repository:
+- `MEDIA_SERVER_IP = "127.0.0.1"`, nginx on port 80 there;
+- `LOG_FILE = "natid_ocr_pipeline.log"`;
+- one log line per written record, giving the result, the typed `National Id`
+  (`original=`) and `match=`.
+
+The owner explicitly chose this beyond D-094's five configuration constants.
+The values written to MongoDB, the query, batches, timeouts, retries,
+classification and dry-run behaviour stay unchanged.
+
+Because the log now holds national IDs, the client creates it mode 600, and
+.gitignore lists it together with `.venv-client/`. docs/TEAM_API_CLIENT.md and
+the runbook describe the new defaults and the privacy handling. The change is
+verified from a fresh clone against a throwaway MongoDB, nginx and the service:
+the preflight passes, a write run records the expected statuses, the log
+carries `original=`/`match=` lines, and the log's mode is 600.
