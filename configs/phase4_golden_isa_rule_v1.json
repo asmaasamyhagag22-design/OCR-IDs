@@ -27,7 +27,18 @@
   },
   "decision_gate": {
     "unit": "file (card image) level, 296 development files, each sent with an honest and a typo typed ID, per cap.",
-    "answer_fields": ["status_honest", "status_typo", "reading", "admitted", "reason_code", "decision_honest", "decision_typo", "suggested_honest", "suggested_typo", "models_agree"],
+    "answer_fields": [
+      "status_honest",
+      "status_typo",
+      "reading",
+      "admitted",
+      "reason_code",
+      "decision_honest",
+      "decision_typo",
+      "suggested_honest",
+      "suggested_typo",
+      "models_agree"
+    ],
     "go": "For every cap (AVX2, AVX, SSE41), all 296 files equal the reference in all 10 answer fields. The 11th field, confidence (the margin), is numeric and is reported: max absolute difference, and the count of reference files whose margin lies within that difference of 0.966875.",
     "no_go": "Any answer-field mismatch under any cap. Then no tolerance changes, the decision is GOLDEN_ISA_NO_GO, and the recommendation is to run on an AVX-512 host (option A)."
   },
@@ -44,6 +55,20 @@
     "frozen": "phase4_final.py check all_pass true at entry and at exit; docker/model_files.sha256 and every sealed module unchanged.",
     "work_machine": "Owner runs the rebuilt service on the work machine: /ready 200 (reported by the owner; not a gate this task can execute)."
   },
-  "decision_tokens": ["GOLDEN_ISA_READY", "GOLDEN_ISA_NO_GO", "GOLDEN_ISA_PARTIAL:<gate>"],
-  "amendments": []
+  "decision_tokens": [
+    "GOLDEN_ISA_READY",
+    "GOLDEN_ISA_NO_GO",
+    "GOLDEN_ISA_PARTIAL:<gate>"
+  ],
+  "amendments": [
+    {
+      "id": 1,
+      "date": "2026-10-11",
+      "before_any_decision_number": true,
+      "reason": "The owner's work-machine golden drifts (default threads: band 1.0674418298273203e-05, end-to-end 0.002129045956467679, Paddle 1.8116317745953125e-07) showed that capping oneDNN alone left Paddle's drift different (MKL dispatch) and OpenCV/NumPy still on AVX-512. With MKL capped, band and Paddle drifts equal the work machine's to the last digit; the end-to-end drift still differs, attributed to library thread counts (the work-machine command ran with its library default threads). A first measurement batch with the oneDNN-only cap was stopped before it wrote any result.",
+      "instrument": "Each cap now sets ONEDNN_MAX_CPU_ISA, MKL_ENABLE_INSTRUCTIONS, OPENCV_CPU_DISABLE (OpenCV's name AVX512-SKX, verified by cv2.getCPUFeaturesLine marking it disabled) and NPY_DISABLE_CPU_FEATURES, inside scripts/phase4_golden_isa.py before any library loads, and the harness caps library threads at 4 as the image's OCR_CPU_THREADS=4 does.",
+      "added_validation": "Real-hardware numeric check: the owner runs the golden drift with configure_threads(4) on the work machine; the decision is computed only if the band, end-to-end and Paddle drifts equal the emulated AVX2 drifts with 4 threads, or the difference is reported and judged before the decision.",
+      "unchanged": "decision_gate, tolerance_rule, verification_after_change, hard_lines."
+    }
+  ]
 }
