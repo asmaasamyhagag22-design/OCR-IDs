@@ -3516,3 +3516,60 @@ The owner had already pushed 53e2423 (D-104's commit) to ocr-team/national-id;
 `git ls-remote` shows it, and national-id2 is still fed4461. This change is
 therefore a second commit, a fast-forward on 53e2423, not an amendment. The
 prepared one-commit form is kept as backup/phase4-repo-selfsufficient-amended-4dc7b65.
+
+## D-106 - CPU-independent golden self-test: GO for AVX2 CPUs (2026-10-11)
+
+Confirmed on the work machine (x86-64, AVX2, no AVX-512, 28 cores): the
+unchanged service failed its startup self-test with
+GOLDEN_SELF_TEST_FAILED:band_6_bc_margin,end_to_end_6_margin. The owner chose a
+phase to make the self-test CPU-independent (option B); rule
+configs/phase4_golden_isa_rule_v1.json, committed before any measurement, with
+three disclosed amendments.
+
+Instrument. scripts/phase4_golden_isa.py caps oneDNN, MKL, OpenCV and NumPy
+together and runs 4 library threads, as the image does. With that, the emulated
+AVX2 golden drifts equal the work machine's to the last digit (band
+1.0444575243240273e-05, end-to-end 0.002133973301735148, Paddle
+2.374349975520218e-07); a oneDNN-only cap did not (amendment 1). The
+instrument-validator returned INSTRUMENT_PASS with conditions, adopted in
+amendment 2 before the control finished.
+
+Card level, 296 development files (the enginev2 selection), in process:
+DEFAULT control 296/296 equal in all 11 fields; AVX2 296/296 equal in the 10
+answer fields (reading, admitted, reason, both decisions, both suggestions, both
+statuses, models_agree), the confidence changing in 138 of 294 by at most
+0.002178; 3 reference margins lie within that of 0.966875 and none changed.
+The AVX card-level run was stopped at the owner's choice after the AVX2 result
+(amendment 3, recorded as written after it); SSE41 was not run. The decision
+covers AVX2 CPUs only.
+
+Change, by the declared formula (4 x the largest drift under AVX2, AVX, SSE41,
+rounded up): BAND_TOLERANCE 1e-5 -> 7e-5, END_TO_END_MARGIN_TOLERANCE 1e-4 ->
+9e-3, in src/service/golden.py only. Detector and Paddle tolerances, exact
+checks, stored golden values, models, thresholds and sealed modules unchanged;
+frozen check all_pass true at entry and exit.
+
+Verification. Golden 58/58 under DEFAULT, AVX2, AVX and SSE41. Image
+fixed14-ocr-service:fixed14-bcfinal-3101-cbed000 from a fresh clone: healthy
+and /ready 200 under all four caps, /engine 200 under AVX2, 22/22 in-image
+hashes. Container parity without a cap 296/296 in all 11 fields (AVX-512
+behaviour unchanged); under the AVX2 cap 296/296 in the 10 answer fields, only
+confidence differing (138), all 296 HTTP 200. On the work machine itself (owner,
+venv, the same two values) the self-test passed 58/58, the service became ready
+(/ready 200), and 60 records ran `success` in --dry-run. /engine answers with
+OCR_ENGINE_WORKERS=5 equal those with 2 on 50 development control images in every
+field. Fast target 228 passed; lint clean.
+
+Limits: CPUs without AVX2 start but their answers are unverified. Card-level
+parity was measured on one emulated path, matched to the work machine to the
+last digit. Other AVX2 CPUs, whose libraries may dispatch differently, pass the
+self-test, but their parity is inferred. The largest confidence difference
+seen was 0.002178 on 294 development files, an observation and not a bound; a
+v1 decision for a card that close to 0.966875 could differ between CPUs (none
+did among the 296). docs/WORK_MACHINE_RUNBOOK.md gives the team the
+work-machine steps.
+
+Decision GOLDEN_ISA_PARTIAL:AVX,SSE41. Under the gate committed before any
+data, AVX and SSE41 have no card-level result. Under amendment 3, written after
+the AVX2 result at the owner's choice, this is a GO for the work machine and for
+AVX2 CPUs on the same library code paths (stats-reviewer, 2026-10-11).

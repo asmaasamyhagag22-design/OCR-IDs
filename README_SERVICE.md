@@ -119,13 +119,15 @@ bash scripts/golden_diagnose.sh "$IMAGE"
 
 `GOLDEN_OK` means the models reproduce their stored results on this machine.
 `GOLDEN_FAIL GOLDEN_SELF_TEST_FAILED:...` means they do not, so the service
-refuses to serve. A failure that names only `..._margin` checks, on a CPU
-whose vector sets do not include `avx512f`, is the known case in decision
-D-100: the readings are identical, but the confidence margins differ slightly
-from the ones stored on the AVX-512 machine that made them. Run the service
-on a CPU with AVX-512 until that is resolved, and send the two lines the
-command printed to the model owner. They hold no image or ID. Do not route
-traffic to an unhealthy container.
+refuses to serve. Send the two lines the command printed to the model owner;
+they hold no image or ID. Do not route traffic to an unhealthy container.
+
+CPUs without AVX-512 (`avx512f` missing from the vector sets) compute the
+confidence margins slightly differently. Since decision D-106 the self-test
+allows for that, and the service starts on any x86-64 CPU with AVX2. On such
+a CPU, the 296 development cards gave the same readings and decisions as on
+AVX-512, and the confidence differed by at most 0.0022. CPUs without AVX2
+(older than about 2013) start too, but their answers were not checked.
 
 ## Run without Docker (Python environment)
 

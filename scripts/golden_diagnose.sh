@@ -4,10 +4,11 @@
 # error type (models_failed, error=GoldenMismatch); this prints the check names and the CPU's vector
 # instruction sets. The golden inputs are synthetic: nothing printed is an image or an ID.
 #   bash scripts/golden_diagnose.sh [IMAGE]          (default: the image for this checkout's HEAD)
-# Known cause (D-100): on a CPU without AVX-512 the margins differ from the stored ones by up to about
-# 1e-5 (band) and 2e-3 (end to end) while every reading stays the same, which exceeds the self-test's
-# tolerances, so the service refuses to become ready. ONEDNN_MAX_CPU_ISA=AVX2 reproduces it on an
-# AVX-512 machine.
+# CPUs without AVX-512 compute the margins slightly differently: up to about 1.5e-5 (band) and 2.2e-3
+# (end to end) under the AVX2, AVX and SSE41 caps, every reading the same. That failed the self-test
+# until D-106 widened its two margin tolerances (7e-5, 9e-3). An emulation that reproduces a real AVX2
+# CPU's drift exactly caps oneDNN, MKL, OpenCV and NumPy together: see scripts/phase4_golden_isa.py
+# CAP_ENV; ONEDNN_MAX_CPU_ISA alone, as passed through here, is only approximate.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 IMAGE="${1:-$(bash scripts/phase4_service_docker.sh image)}"
