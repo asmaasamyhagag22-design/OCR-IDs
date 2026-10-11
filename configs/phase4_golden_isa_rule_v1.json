@@ -83,6 +83,16 @@
         "reference_margins_within_max_diff_of_threshold is reported as a lower bound (float comparison can drop exact ties on the 6-decimal grid); it is not gating."
       ],
       "harness": "Unchanged for this batch: scripts/phase4_golden_isa.py as committed in e932533 (sha256 prefix b071285b3de84aa1). The validator's code fixes (assert 296, integer-millionths exposure, status breakdown, unmeasured end-to-end drift) are applied only if a rerun is needed."
+    },
+    {
+      "id": 3,
+      "date": "2026-10-11",
+      "before_any_decision_number": false,
+      "written_after": "the DEFAULT control (296/296 in all 11 fields) and the AVX2 card-level result (296/296 in the 10 answer fields) were known. The AVX card-level run had reached about 200 of 592 requests (all HTTP 200) in 47 minutes when it was stopped at the owner's choice; it wrote no output and none of it is used. SSE41 never started.",
+      "reason": "At the measured rate, AVX and SSE41 card-level runs would take 5-6 hours. The owner's target, the work machine, is an AVX2 CPU, and every x86-64 CPU since about 2013 has AVX2. The owner chose in chat (option 2) to scope the decision to AVX2-capable CPUs.",
+      "decision_gate": "GO requires the DEFAULT control and the AVX2 cap to pass as declared. AVX and SSE41 have no card-level result; the decision does not cover CPUs without AVX2, and the report says so.",
+      "tolerance_rule": "Unchanged formula. Its input is the golden drift measured with `scripts/phase4_golden_isa.py golden <cap>` (same caps, same 4 threads, no card read) for AVX2, AVX and SSE41, so the service can also start on older CPUs; their card-level answers stay unverified.",
+      "verification_after_change": "Unchanged, except that the healthy-container check also runs under the AVX and SSE41 caps, and the AVX2 container parity is the card-level check."
     }
   ]
 }

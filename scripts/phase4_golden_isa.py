@@ -2,6 +2,7 @@
 
     python scripts/phase4_golden_isa.py measure AVX2|AVX|SSE41   (the caps of CAP_ENV, set by this script)
     python scripts/phase4_golden_isa.py measure DEFAULT          (no cap: the control)
+    python scripts/phase4_golden_isa.py golden AVX2|AVX|SSE41|DEFAULT   (the golden self-test's drift only)
     python scripts/phase4_golden_isa.py selfcheck                (the comparator on synthetic rows)
 
 Each cap limits every vector-instruction dispatcher the service uses, before any of them loads: oneDNN
@@ -33,7 +34,7 @@ CAP_ENV = {
               "OPENCV_CPU_DISABLE": _OCV_AVX512 + ",AVX2,FMA3,AVX,FP16",
               "NPY_DISABLE_CPU_FEATURES": _NPY_AVX512 + " AVX2 FMA3 AVX F16C"},
 }
-if __name__ == "__main__" and len(sys.argv) == 3 and sys.argv[1] == "measure" and sys.argv[2] in CAP_ENV:
+if __name__ == "__main__" and len(sys.argv) == 3 and sys.argv[1] in ("measure", "golden") and sys.argv[2] in CAP_ENV:
     for _name in ("ONEDNN_MAX_CPU_ISA", "MKL_ENABLE_INSTRUCTIONS", "OPENCV_CPU_DISABLE", "NPY_DISABLE_CPU_FEATURES"):
         if _name in os.environ:
             raise SystemExit(f"GOLDEN_ISA_BLOCKED:{_name} is set outside the script; unset it")
@@ -194,6 +195,25 @@ def measure(cap: str) -> None:
     print(json.dumps(summary, indent=1, sort_keys=True))
 
 
+def golden_only(cap: str) -> None:
+    """The golden self-test's drift under a cap, with the service's 4 threads, and no card read
+    (amendment 3: the tolerance formula's input for the caps whose card-level run was not completed)."""
+    if cap not in CAPS or any(os.environ.get(k) != v for k, v in CAP_ENV[cap].items()):
+        raise SystemExit("GOLDEN_ISA_BLOCKED:the cap's environment is not in force")
+    from src.service.runtime import configure_threads
+
+    threads = configure_threads(4)
+    from src.service.recognizer import Recognizer
+
+    recognizer = Recognizer()
+    recognizer.load()
+    summary = {"rule": "configs/phase4_golden_isa_rule_v1.json amendment 3", "cap": cap,
+               "cap_environment": CAP_ENV[cap], "threads": threads, "golden_drift": golden_drift(recognizer.runtime)}
+    OUT.mkdir(parents=True, exist_ok=True)
+    acc().write_json(OUT / f"golden_{cap}.json", summary)
+    print(json.dumps(summary, indent=1, sort_keys=True))
+
+
 def acc():
     from scripts import phase4_accuracy as module
 
@@ -206,5 +226,7 @@ if __name__ == "__main__":
         selfcheck()
     elif command == "measure" and len(sys.argv) == 3:
         measure(sys.argv[2])
+    elif command == "golden" and len(sys.argv) == 3:
+        golden_only(sys.argv[2])
     else:
         raise SystemExit(__doc__)
