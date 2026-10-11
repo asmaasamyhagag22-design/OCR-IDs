@@ -69,6 +69,20 @@
       "instrument": "Each cap now sets ONEDNN_MAX_CPU_ISA, MKL_ENABLE_INSTRUCTIONS, OPENCV_CPU_DISABLE (OpenCV's name AVX512-SKX, verified by cv2.getCPUFeaturesLine marking it disabled) and NPY_DISABLE_CPU_FEATURES, inside scripts/phase4_golden_isa.py before any library loads, and the harness caps library threads at 4 as the image's OCR_CPU_THREADS=4 does.",
       "added_validation": "Real-hardware numeric check: the owner runs the golden drift with configure_threads(4) on the work machine; the decision is computed only if the band, end-to-end and Paddle drifts equal the emulated AVX2 drifts with 4 threads, or the difference is reported and judged before the decision.",
       "unchanged": "decision_gate, tolerance_rule, verification_after_change, hard_lines."
+    },
+    {
+      "id": 2,
+      "date": "2026-10-11",
+      "before_any_decision_number": true,
+      "written_while": "the DEFAULT control was still running; no measurement output existed (artifacts/phase4_golden_isa/ absent).",
+      "control_bound": "Under DEFAULT the golden drifts must be at most 1e-8 for band margin, end-to-end margin, detector score and detector corners, and at most 1e-6 for Paddle confidence. Reason: a container diagnostic with configure_threads(4) and no cap, run before amendment 1 but not carried into it, gave Paddle confidence drift 1.778e-7 (band 4.47e-9, end-to-end 4.98e-9); the stored golden Paddle values come from a different thread setting. PADDLE_CONFIDENCE_TOLERANCE is 1e-3, so this is far from any check. The card-level control (296/296 equal in all 11 fields) is unchanged.",
+      "instrument_validator_conditions_adopted": [
+        "Each output must report files == 296; decide on equal_in_10_answer_fields == files == 296, not on answer_field_mismatches being empty (it also holds confidence_presence).",
+        "Before applying the tolerance formula, inspect failed_checks: an end-to-end margin check that fails while end_to_end_margin reports 0.0 (a missing margin) blocks the formula for that check.",
+        "A NO_GO is broken down by status code (non-answers vs wrong answers) and any 500/503 is re-measured before it counts.",
+        "reference_margins_within_max_diff_of_threshold is reported as a lower bound (float comparison can drop exact ties on the 6-decimal grid); it is not gating."
+      ],
+      "harness": "Unchanged for this batch: scripts/phase4_golden_isa.py as committed in e932533 (sha256 prefix b071285b3de84aa1). The validator's code fixes (assert 296, integer-millionths exposure, status breakdown, unmeasured end-to-end drift) are applied only if a rerun is needed."
     }
   ]
 }
