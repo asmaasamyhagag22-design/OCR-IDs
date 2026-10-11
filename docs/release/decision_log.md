@@ -3573,3 +3573,36 @@ Decision GOLDEN_ISA_PARTIAL:AVX,SSE41. Under the gate committed before any
 data, AVX and SSE41 have no card-level result. Under amendment 3, written after
 the AVX2 result at the owner's choice, this is a GO for the work machine and for
 AVX2 CPUs on the same library code paths (stats-reviewer, 2026-10-11).
+
+## D-107 - Work-machine run tools and runbook (2026-10-11)
+
+The owner and the team's engineer ran the full batch on the work machine. The
+service ran from the Python environment with 5 engine workers and the D-106
+tolerances, and wrote 35,237 records in about two hours. The owner asked for
+the README to carry what was used, so the engineer can repeat it.
+
+Recommended option taken: turn the ad-hoc commands into four scripts under
+scripts/ instead of long inline commands:
+- team_reset_request_errors.py, retry failed requests;
+- team_download_problems.py, explain download errors and find images on disk;
+- team_reread_found_images.py, read those images; dry run by default;
+- team_accuracy_report.py, accuracy against the typed ID.
+
+They reuse the team client's settings, engine call, classification and MongoDB
+write, and print counts only. Files holding IDs are written mode 600, with a
+masked twin. They never change `download folder path`, and the reset touches
+only request-failure statuses. They passed a test against a throwaway MongoDB
+with synthetic, impossible IDs, a synthetic image tree and the cbed000 image.
+Each status and problem class was counted as constructed, a dry run wrote
+nothing, a repeat read nothing, and the reset touched only its two statuses.
+
+docs/WORK_MACHINE_RUNBOOK.md now records:
+- the lessons of the run: one client at a time (a concurrent run's records end
+  `ocr_request_error`), never the old `fixed14-engine:1.0` image, the optional
+  file log and its privacy handling;
+- the first run's aggregate results.
+
+README_SERVICE.md points to it. The accuracy is measured against the typed
+`National Id`, so it is a lower bound. The image folders are named from the
+typed IDs and give no independent check. No service, model or image input
+changes.

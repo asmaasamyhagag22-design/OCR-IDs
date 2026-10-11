@@ -205,6 +205,34 @@ behaviour as the container (see "If step 6 says `unhealthy`" above).
 8. Point the team's API client at `http://127.0.0.1:8081/engine`, and start
    with `--dry-run --limit 10` ([the API client guide](docs/TEAM_API_CLIENT.md)).
 
+## Running a full batch on the work machine
+
+[docs/WORK_MACHINE_RUNBOOK.md](docs/WORK_MACHINE_RUNBOOK.md) has every step,
+command by command:
+
+- start the service with 5 engine workers;
+- check the connections;
+- back up MongoDB;
+- write 10 records, then the rest;
+- retry failed requests;
+- explain missing images, and read the ones found elsewhere on disk;
+- compute the accuracy.
+
+The first full run (2026-10-11) took about two hours for 35,237 records.
+
+Four scripts support it. They use the client's own MongoDB settings, need only
+`requirements-api-client.txt`, and print counts only:
+
+| Script | What it does |
+|---|---|
+| `scripts/team_reset_request_errors.py [--apply]` | Makes records whose OCR request failed (`ocr_request_error`, `ocr_missing_in_response`) pending again. Readings are never touched. |
+| `scripts/team_download_problems.py` | Explains every `download_error` from the disk, and finds images stored under the applicant's ID in another folder. Writes a masked and a full CSV, readable only by you. |
+| `scripts/team_reread_found_images.py [--write]` | Reads those found images (a dry run by default), and writes only `Auto Id_Validation`. |
+| `scripts/team_accuracy_report.py` | Accuracy, coverage and precision against the typed `National Id`, with a breakdown of the mismatches. |
+
+Run one client at a time: the engine admits one batch at a time, and a second
+run's records end as `ocr_request_error`.
+
 ## Batch engine on port 8081
 
 `POST /engine` is additive; all `/v1` endpoints and their decision rules remain.
