@@ -1,0 +1,49 @@
+{
+  "version": "phase4-golden-isa-v1",
+  "declared_date": "2026-10-11",
+  "owner_decision": "Option B, chosen by the owner in chat on 2026-10-11 after the work machine (CPU flags: avx2, no avx512f) failed the startup golden self-test with GOLDEN_SELF_TEST_FAILED:band_6_bc_margin,end_to_end_6_margin.",
+  "purpose": "Let the unchanged service become ready on x86-64 CPUs without AVX-512 by widening only the golden self-test's numeric margin tolerances, if and only if the service's card-level answers do not change on such CPUs.",
+  "base": {
+    "branch": "phase4-golden-isa",
+    "parent": "a595c15",
+    "parent_is": "depi ocr-team/national-id tip, verified by git ls-remote on 2026-10-11"
+  },
+  "hard_lines": [
+    "No model, weight, decoder, decider threshold (0.966875), engine margin, pipeline, preprocessing or sealed-module change.",
+    "No change to golden_expected.json, golden_fixtures.npz or any stored golden value; exact golden checks (argmax, Paddle text hash, detector accepted, admission status, admitted, sealed known-prediction hashes) stay exact.",
+    "Only the numeric tolerance constants in src/service/golden.py may change, and only by the rule below.",
+    "Development cards only (the 296-file enginev2 container selection); no audit, internal-validation, external-test or external-validation card; no new labels; no human review.",
+    "No national ID printed or committed; no force push; national-id2 untouched."
+  ],
+  "instrument": {
+    "emulation": "oneDNN's ONEDNN_MAX_CPU_ISA cap (honoured by TensorFlow and Paddle) on the AVX-512 development laptop emulates CPUs without AVX-512. Caps measured: AVX2, AVX, SSE41. DEFAULT (no cap) is the control.",
+    "harness": "scripts/phase4_golden_isa.py measure: the in-process service (the shipped Recognizer and app) with the golden self-test recorded instead of enforced, the same 296-file selection and typed-ID pairs as phase4_final.py container-subset, compared field by field with the sealed reference rows artifacts/phase4_final/service/service_rows_wsl.json.",
+    "validation": [
+      "Synthetic ground truth: the comparator's built-in self-check on constructed row pairs with known mismatches must count them exactly before any real row is read.",
+      "Known answer: under DEFAULT the golden drifts are at most 1e-8 and the comparison is 296/296 equal in all 11 fields; otherwise INSTRUMENT_FAIL and nothing is decided.",
+      "Real hardware: the emulated AVX2 golden failure names must equal those the work machine reported (band_6_bc_margin, end_to_end_6_margin).",
+      "instrument-validator subagent review of the harness before the decision is computed."
+    ]
+  },
+  "decision_gate": {
+    "unit": "file (card image) level, 296 development files, each sent with an honest and a typo typed ID, per cap.",
+    "answer_fields": ["status_honest", "status_typo", "reading", "admitted", "reason_code", "decision_honest", "decision_typo", "suggested_honest", "suggested_typo", "models_agree"],
+    "go": "For every cap (AVX2, AVX, SSE41), all 296 files equal the reference in all 10 answer fields. The 11th field, confidence (the margin), is numeric and is reported: max absolute difference, and the count of reference files whose margin lies within that difference of 0.966875.",
+    "no_go": "Any answer-field mismatch under any cap. Then no tolerance changes, the decision is GOLDEN_ISA_NO_GO, and the recommendation is to run on an AVX-512 host (option A)."
+  },
+  "tolerance_rule": {
+    "applies_to": "BAND_TOLERANCE and END_TO_END_MARGIN_TOLERANCE; DETECTOR_SCORE_TOLERANCE, DETECTOR_CORNER_TOLERANCE and PADDLE_CONFIDENCE_TOLERANCE only if their observed drift exceeds their current value.",
+    "formula": "new = max(current, 4 x the largest drift observed for that check across AVX2, AVX and SSE41), rounded up to one significant digit.",
+    "stated_before_measurement": true
+  },
+  "verification_after_change": {
+    "golden": "scripts/golden_diagnose.sh on the rebuilt image prints GOLDEN_OK under DEFAULT, AVX2, AVX and SSE41.",
+    "default_parity": "phase4_final.py container-subset on the rebuilt image without a cap: 296/296 equal in all 11 fields (behaviour on AVX-512 unchanged).",
+    "avx2_container": "The rebuilt image run with ONEDNN_MAX_CPU_ISA=AVX2 becomes healthy; container-subset against it equals the reference in the 10 answer fields for all 296 files, and /engine answers 200 for the synthetic image.",
+    "health": "fast target, privacy scan (no skip), lint as before; full suite as phase4-repo amendment 1.",
+    "frozen": "phase4_final.py check all_pass true at entry and at exit; docker/model_files.sha256 and every sealed module unchanged.",
+    "work_machine": "Owner runs the rebuilt service on the work machine: /ready 200 (reported by the owner; not a gate this task can execute)."
+  },
+  "decision_tokens": ["GOLDEN_ISA_READY", "GOLDEN_ISA_NO_GO", "GOLDEN_ISA_PARTIAL:<gate>"],
+  "amendments": []
+}
