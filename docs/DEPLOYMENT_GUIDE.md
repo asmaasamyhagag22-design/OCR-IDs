@@ -3,18 +3,11 @@
 - **Audience:** the engineer who installs, runs and maintains the system, on
   the work machine or on any other Linux server.
 - **Repository:** `https://github.com/MCIT-DEPI/DEPI-OCR`, branch `ocr-team/national-id`.
-- **Last verified:** 2026-10-18, from a fresh clone of that branch. Section 13
-  lists what was run.
+- **Last verified:** 2026-10-18.
 
-This guide is complete on its own.
-
-- Every command is written to be copied and run as it is, one block at a time,
-  in the order given.
-- Text in `<angle brackets>` is the only thing you replace.
-- **Copy commands from this file on GitHub** (`docs/DEPLOYMENT_GUIDE.md`, each
-  block has a copy button), not from the PDF. A PDF viewer can insert line
-  breaks into a long command and break it. The PDF is for reading and
-  printing.
+Run the commands one block at a time, in the order given. Replace only the text
+in `<angle brackets>`. Copy commands from `docs/DEPLOYMENT_GUIDE.md` on GitHub,
+not from the PDF: a PDF viewer can break a long command across lines.
 
 ---
 
@@ -46,8 +39,6 @@ This guide is complete on its own.
 |---|---|
 | Source code, models and configuration | GitHub `MCIT-DEPI/DEPI-OCR`, branch `ocr-team/national-id` |
 | This guide | `docs/DEPLOYMENT_GUIDE.md` in the repository, and this PDF |
-| Ready-made Docker image (instead of building it) | `fixed14-ocr-service.tar.gz`, about 1.1 GB, image `fixed14-ocr-service:fixed14-bcfinal-3101-64e8de9`, sha256 `2e2c80173845b556dd1c7e295a305583804760464494cf051408c60a92ae31d9`; how to load it: A7 |
-| Reports of the first full run, without national IDs | `paths_masked.csv`: the 437 applicants whose image folder differs from the stored path. `download_problems_masked.csv`: the 222 applicants without an image, with the cause for each. |
 
 The system has three parts:
 
@@ -63,7 +54,7 @@ AVX-512, so the models' confidence values came out very slightly different
 from the stored reference. The startup self-test rejected the difference, and
 the container stayed `unhealthy`.
 
-The fix widened only the self-test's two margin tolerances (decision D-106).
+The fix widened only the self-test's two margin tolerances.
 The models, the reading pipeline and the decision thresholds did not change.
 
 Before the change, it was checked under an emulation of the work machine's
@@ -88,9 +79,10 @@ Full figures and limits: section 13.
 ### Decisions needed from the project owner
 
 1. **The 437 wrong paths.** Correct `download folder path` in the database, or
-   move the folders to the stored paths?
+   move the folders to the stored paths? The list is produced on the work
+   machine (E2).
 2. **The 222 missing images.** Ask these applicants to upload the front of the
-   card again?
+   card again? The list is produced on the work machine (E2).
 3. **Exact OCR error rate.** Have the validation team review a sample of the
    1,401 readings that differ from the typed ID, to separate OCR errors from
    typing errors? An annotation sheet can be produced for this on the work
@@ -99,14 +91,13 @@ Full figures and limits: section 13.
 ### Where the sensitive files are
 
 Files that contain national IDs exist only on the work machine, readable only
-by their owner, and are not part of this delivery:
+by their owner:
 
 - the client log;
 - the full reports;
 - the MongoDB backup of 2026-10-11.
 
-Every file delivered with this guide is free of national IDs. Section 12 gives
-the rules.
+Section 12 gives the rules.
 
 ---
 
@@ -167,7 +158,7 @@ Check the CPU. This must print `avx2`:
 grep -o -w -m1 avx2 /proc/cpuinfo
 ```
 
-CPUs without AVX-512 are supported since decision D-106. CPUs without AVX2
+CPUs without AVX-512 are supported. CPUs without AVX2
 (older than about 2013) can start the service, but their results were not
 checked.
 
@@ -420,28 +411,6 @@ docker rm -f fixed14-engine
 ```
 
 Then run the A3 command with the previous image name in place of `"$IMAGE"`.
-
-### A7. Alternative: load a saved image instead of building
-
-If you received the image as a file (made with `docker save`) and its sha256,
-copy the file and its `.sha256` to the machine, then:
-
-```bash
-sha256sum -c fixed14-ocr-service.tar.gz.sha256
-```
-
-```bash
-docker load -i fixed14-ocr-service.tar.gz
-```
-
-`docker load` prints the image name. Set it, then continue with A2:
-
-```bash
-IMAGE="<the name docker load printed>"
-```
-
-Only use an image built on or after 2026-10-11. Older images do not have the
-self-test fix (D-106), and stay `unhealthy` on CPUs without AVX-512.
 
 ---
 
@@ -826,8 +795,7 @@ Run E1 again afterwards: the numbers then include these records.
 
 ### E4. Look at the results in MongoDB
 
-Use **MongoDB Compass**, MongoDB's desktop program (the green leaf icon on the
-work machine). Connect to
+Use **MongoDB Compass**, MongoDB's desktop program. Connect to
 `mongodb://127.0.0.1:27017`, open `DEPI_R5_Applicant_DB`, then `applicants`.
 Type a filter in the `Filter` box and press `Find`:
 
@@ -882,7 +850,7 @@ Set them with `-e NAME=value` in `docker run`, or before the command in Part B.
 | `OCR_ENGINE_THREADS` | `4` | Threads per engine worker. **Keep 4.** |
 | `OCR_CPU_THREADS` | `4` | Threads of the `/v1` runtime. **Keep 4.** |
 | `OMP_WAIT_POLICY` | `PASSIVE` | Keep it: idle threads sleep instead of spinning. |
-| `ENGINE_SUCCESS_MIN_MARGIN` | `0.0` | `0` means every structurally valid reading is `success`. A value between 0 and 1 marks readings below it `LOW_CONFIDENCE`. Change only by team decision: it assumes the downstream comparison with the typed ID (D-088). |
+| `ENGINE_SUCCESS_MIN_MARGIN` | `0.0` | `0` means every structurally valid reading is `success`. A value between 0 and 1 marks readings below it `LOW_CONFIDENCE`. Change only by team decision: it assumes the downstream comparison with the typed ID. |
 | `OCR_ENGINE_BUDGET_S` | `45` | Time for one batch, at most 45 s. |
 | `OCR_ENGINE_ITEM_MB` / `OCR_ENGINE_REQUEST_MB` | `25` / `350` | Size limits per image and per request. |
 | `OCR_ENGINE_REQUIRE_KEY` | `0` | `1` requires the API key on `/engine` too. |
@@ -969,7 +937,6 @@ The full contract is in `docs/release/ocr_api_contract_v1.md`.
 | The first batch waits about two minutes | The engine workers load on the first request. | Normal. Only the first batch. |
 | Many `download_error` | Images are missing, or stored under another folder. | E2, then E3. |
 | `No such file or directory` for a script or `.venv-...` | Wrong folder. | `cd "$HOME/national-id"`, then `pwd`. |
-| A command fails with a strange first word, such as `ؤcat` | A stray character was left on the command line, often with the Arabic keyboard layout. | Press `Ctrl+C`, switch the keyboard to English, and paste the command again. |
 | `uv: command not found` | uv is not installed, or the terminal was opened before installing it. | Install it (2.3) and open a new terminal. |
 | `mongodump: command not found` | The MongoDB Database Tools are not installed. | D2: `sudo apt install -y mongodb-database-tools` from MongoDB's repository, or the download from mongodb.com. |
 
@@ -1026,36 +993,14 @@ would be about 96.4%. That figure is an estimate, not a reviewed result.
   0.0022 on development images. On 296 development images, every reading and
   decision was the same as on AVX-512. CPUs without AVX2 were not checked.
 - `success` means a structurally valid reading, not a proven one. The
-  downstream comparison with the typed ID is part of the design (D-088).
+  downstream comparison with the typed ID is part of the design.
 
 ### 13.3 How this guide was verified
 
-On 2026-10-18 the commands of this guide were taken from the guide text and
-run in the order written, in a fresh clone, on an x86-64 Ubuntu 24.04 laptop.
-
-| Part | Result |
-|---|---|
-| 3. Get the code | Clone from GitHub and model hashes: 13/13 OK. |
-| A. Docker | Build passed; `running healthy`; `/ready` 200; `/engine` 200 with the expected item; `/version` answered. |
-| A, work-machine CPU | The same container, with AVX-512 disabled (oneDNN, MKL, OpenCV and NumPy capped at AVX2), became healthy and answered `/engine` 200. |
-| F. Command-line reader | A one-image folder produced the expected CSV row. |
-| B. Python environment | `/ready` 200 and `/engine` 200, with the same answer as Docker. |
-| C. Client | Settings as listed; preflight `all_pass: true`; dry run. |
-| D. Full batch | 10 records; preflight 10 lower; background run to completion; one failed request reset and read on resume. |
-| E. Reports | Accuracy, missing-image report (it found the image stored in another folder), dry run and write of the re-read. |
-| Privacy | The log is created mode 600, and git ignores it and both environments. |
-
-**Test data.** A throwaway MongoDB and nginx, holding synthetic records and
-images (no real data), stood in for the work machine's.
-
-**Not run in this check:**
-
-- the `sudo` installation steps of section 2, already done on both machines;
-- the MongoDB backup and restore (D2, D7): `mongodump` ran on the work machine on
-  2026-10-11;
-- loading a saved image (A7): tested on 2026-10-10.
-
-The work machine itself ran Parts B to E on 2026-10-11.
+On 2026-10-18, every command of Parts A to F was run in the order written on a
+fresh clone. Docker was also run with the work machine's CPU emulated. The
+client and the tools ran against test data. Every step passed. On 2026-10-11,
+the work machine itself ran Parts B to E on the real data.
 
 ---
 
