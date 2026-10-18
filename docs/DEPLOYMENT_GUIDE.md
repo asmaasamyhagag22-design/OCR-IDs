@@ -20,20 +20,93 @@ This guide is complete on its own.
 
 ## Contents
 
-1. [What you are deploying](#1-what-you-are-deploying)
-2. [Requirements](#2-requirements)
-3. [Get the code](#3-get-the-code)
-4. [Part A: run the OCR service with Docker](#4-part-a-run-the-ocr-service-with-docker)
-5. [Part B: run the OCR service in a Python environment](#5-part-b-run-the-ocr-service-in-a-python-environment)
-6. [Part C: the team API client](#6-part-c-the-team-api-client)
-7. [Part D: process a full batch](#7-part-d-process-a-full-batch)
-8. [Part E: after the run, reports and checks](#8-part-e-after-the-run-reports-and-checks)
-9. [Part F: the command-line reader (optional)](#9-part-f-the-command-line-reader-optional)
-10. [Reference](#10-reference)
-11. [Troubleshooting](#11-troubleshooting)
-12. [Data protection rules](#12-data-protection-rules)
-13. [Results of the first full run, limits, and how this guide was verified](#13-results-of-the-first-full-run-limits-and-how-this-guide-was-verified)
-14. [Appendix: command cheat sheet](#appendix-command-cheat-sheet)
+- [0. Handover summary](#0-handover-summary)
+- [1. What you are deploying](#1-what-you-are-deploying)
+- [2. Requirements](#2-requirements)
+- [3. Get the code](#3-get-the-code)
+- [4. Part A: run the OCR service with Docker](#4-part-a-run-the-ocr-service-with-docker)
+- [5. Part B: run the OCR service in a Python environment](#5-part-b-run-the-ocr-service-in-a-python-environment)
+- [6. Part C: the team API client](#6-part-c-the-team-api-client)
+- [7. Part D: process a full batch](#7-part-d-process-a-full-batch)
+- [8. Part E: after the run, reports and checks](#8-part-e-after-the-run-reports-and-checks)
+- [9. Part F: the command-line reader (optional)](#9-part-f-the-command-line-reader-optional)
+- [10. Reference](#10-reference)
+- [11. Troubleshooting](#11-troubleshooting)
+- [12. Data protection rules](#12-data-protection-rules)
+- [13. Results of the first full run, limits, and how this guide was verified](#13-results-of-the-first-full-run-limits-and-how-this-guide-was-verified)
+- [Appendix: command cheat sheet](#appendix-command-cheat-sheet)
+
+---
+
+## 0. Handover summary
+
+### What is delivered
+
+| Item | Where |
+|---|---|
+| Source code, models and configuration | GitHub `MCIT-DEPI/DEPI-OCR`, branch `ocr-team/national-id` |
+| This guide | `docs/DEPLOYMENT_GUIDE.md` in the repository, and this PDF |
+| Ready-made Docker image (instead of building it) | `fixed14-ocr-service.tar.gz`, about 1.1 GB, image `fixed14-ocr-service:fixed14-bcfinal-3101-64e8de9`, sha256 `2e2c80173845b556dd1c7e295a305583804760464494cf051408c60a92ae31d9`; how to load it: A7 |
+| Reports of the first full run, without national IDs | `paths_masked.csv`: the 437 applicants whose image folder differs from the stored path. `download_problems_masked.csv`: the 222 applicants without an image, with the cause for each. |
+
+The system has three parts:
+
+- the OCR service (Part A with Docker, or Part B in a Python environment);
+- the team's API client, which processes the applicants in MongoDB (Parts C
+  and D);
+- four report and repair tools (Part E).
+
+### What was fixed for the work machine
+
+The unchanged service did not start on the work machine. Its CPU has no
+AVX-512, so the models' confidence values came out very slightly different
+from the stored reference. The startup self-test rejected the difference, and
+the container stayed `unhealthy`.
+
+The fix widened only the self-test's two margin tolerances (decision D-106).
+The models, the reading pipeline and the decision thresholds did not change.
+
+Before the change, it was checked under an emulation of the work machine's
+CPU, matched to the real machine's numbers to the last digit. On 296
+development images, every reading and every decision was identical to the
+reference. After the change, the service started on the work machine itself
+and processed the full batch.
+
+### Results of the first full run (2026-10-11)
+
+- **44,305** applicants with an image were evaluated.
+- **95.5%** of the readings equal the national ID the applicant typed. This is
+  a lower bound: part of the differences are the applicants' own typing
+  mistakes.
+- The service produced a valid reading for **98.6%**.
+- **437** images were stored in another folder than the database says; they
+  were found and read.
+- **222** applicants have no image on the server.
+
+Full figures and limits: section 13.
+
+### Decisions needed from the project owner
+
+1. **The 437 wrong paths.** Correct `download folder path` in the database, or
+   move the folders to the stored paths?
+2. **The 222 missing images.** Ask these applicants to upload the front of the
+   card again?
+3. **Exact OCR error rate.** Have the validation team review a sample of the
+   1,401 readings that differ from the typed ID, to separate OCR errors from
+   typing errors? An annotation sheet can be produced for this on the work
+   machine.
+
+### Where the sensitive files are
+
+Files that contain national IDs exist only on the work machine, readable only
+by their owner, and are not part of this delivery:
+
+- the client log;
+- the full reports;
+- the MongoDB backup of 2026-10-11.
+
+Every file delivered with this guide is free of national IDs. Section 12 gives
+the rules.
 
 ---
 
@@ -976,6 +1049,7 @@ run in the order written, in a fresh clone, on an x86-64 Ubuntu 24.04 laptop.
 images (no real data), stood in for the work machine's.
 
 **Not run in this check:**
+
 - the `sudo` installation steps of section 2, already done on both machines;
 - the MongoDB backup and restore (D2, D7): `mongodump` ran on the work machine on
   2026-10-11;
