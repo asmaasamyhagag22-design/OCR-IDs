@@ -45,6 +45,9 @@ def main() -> None:
     )
     args = parser.parse_args()
     cl = client_module()
+    # the client logs one line per written record, with the reading, to the terminal and to its log
+    # file: keep it in the (private) log file only, so this terminal shows counts only
+    cl.logger.removeHandler(cl._stream_handler)
     found = json.loads(Path(args.found).read_text())
     coll = MongoClient(cl.MONGO_URI)[cl.MONGO_DB][cl.MONGO_COLLECTION]
     todo = [

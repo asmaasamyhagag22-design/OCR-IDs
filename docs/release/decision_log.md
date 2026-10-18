@@ -3627,3 +3627,33 @@ the runbook describe the new defaults and the privacy handling. The change is
 verified from a fresh clone against a throwaway MongoDB, nginx and the service:
 the preflight passes, a write run records the expected statuses, the log
 carries `original=`/`match=` lines, and the log's mode is 600.
+
+## D-109 - Handover guide, verified by running it (2026-10-18)
+
+The owner asked for one detailed, easy-to-read guide for the final handover,
+covering the work machine with Docker and with the Python environment.
+docs/DEPLOYMENT_GUIDE.md now covers:
+- requirements;
+- getting the code;
+- the service in Docker and in a Python environment;
+- the team API client and a full batch;
+- the reports and the command-line reader;
+- the settings and API reference;
+- troubleshooting for every problem met on 2026-10-10/11, and data protection;
+- the first run's results and the verification record.
+
+README.md and README_SERVICE.md point to it. A PDF is produced from it for
+reading. It is not committed: the outgoing-tree scan refuses PDF files.
+
+The guide was verified by taking its commands from its own text and running
+them in order in a fresh clone. The service was checked under Docker, under
+Docker with the work machine's CPU emulated, and in the Python environment.
+The client, batch and tools ran against a throwaway MongoDB and nginx holding
+synthetic data. Every step passed. Not run: the sudo installation steps,
+mongodump/mongorestore, and docker load; these were exercised earlier, as
+section 13.3 states.
+
+The run showed that, since D-108, team_reread_found_images.py --write printed
+each record's reading to the terminal through the client's logger. The script
+now detaches the client's terminal handler, so the terminal shows counts only
+and the per-record lines go to the private log file only.

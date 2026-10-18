@@ -1,14 +1,20 @@
 # Fixed14 National ID OCR: Deployment and Operations Guide
 
-**Audience:** the engineer who installs, runs and maintains the system, on the
-work machine or on any other Linux server.
-**Repository:** `https://github.com/MCIT-DEPI/DEPI-OCR`, branch `ocr-team/national-id`.
-**Last verified:** 2026-10-18, from a fresh clone of that branch. Section 13
-lists what was run.
+- **Audience:** the engineer who installs, runs and maintains the system, on
+  the work machine or on any other Linux server.
+- **Repository:** `https://github.com/MCIT-DEPI/DEPI-OCR`, branch `ocr-team/national-id`.
+- **Last verified:** 2026-10-18, from a fresh clone of that branch. Section 13
+  lists what was run.
 
-This guide is complete on its own. Every command is written to be copied and
-run as it is, one block at a time, in the order given. Text in `<angle
-brackets>` is the only thing you replace.
+This guide is complete on its own.
+
+- Every command is written to be copied and run as it is, one block at a time,
+  in the order given.
+- Text in `<angle brackets>` is the only thing you replace.
+- **Copy commands from this file on GitHub** (`docs/DEPLOYMENT_GUIDE.md`, each
+  block has a copy button), not from the PDF. A PDF viewer can insert line
+  breaks into a long command and break it. The PDF is for reading and
+  printing.
 
 ---
 
@@ -529,6 +535,11 @@ to it.
 Without `--dry-run`, the client writes each result into MongoDB. Part D gives
 the safe procedure for a full batch.
 
+When the client runs in a terminal without the `grep` filter used in this
+guide, it prints one line per record, and those lines contain national IDs. Do
+not photograph or share that terminal. The commands in this guide show only
+the final counts, or run the client in the background (D4).
+
 ### C6. The log file
 
 The client writes `natid_ocr_pipeline.log` in the repository folder. When it
@@ -876,7 +887,7 @@ The full contract is in `docs/release/ocr_api_contract_v1.md`.
 | `permission denied while trying to connect to the docker API` | Your user is not in the `docker` group, or you have not logged in again since adding it. | `sudo usermod -aG docker $USER`, then log out and in (or restart). `id` must list `docker`. |
 | `docker.service` is `failed`; `docker.socket` says `no open socket file descriptor left` | Docker's socket broke during installation. | `sudo systemctl reset-failed docker.service docker.socket`, then `sudo systemctl restart docker.socket docker.service`. |
 | `sudo bash scripts/phase4_service_docker.sh build` fails with `detected dubious ownership` | git refuses a repository owned by another user when run as root. | Do not use `sudo` for the build. Join the `docker` group (first row). |
-| `address already in use` on 8081, or a new container cannot start | Another service holds port 8081: the Part B service, or an old container. | `docker ps` (or `sudo docker ps`). Remove an old container with `docker rm -f <name>`, or stop the Part B service with `Ctrl+C`. `sudo ss -ltnp \| grep ':8081 '` shows who holds the port. |
+| `address already in use` on 8081, or a new container cannot start | Another service holds port 8081: the Part B service, or an old container. | `docker ps` (or `sudo docker ps`). Remove an old container with `docker rm -f <name>`, or stop the Part B service with `Ctrl+C`. `sudo ss -ltnp` lists every port and the program that holds it. |
 | Container `unhealthy`; log shows `models_failed` and `GoldenMismatch` | The startup self-test failed. On CPUs without AVX-512 this happened with images built before 2026-10-11. | Build from the current repository (A1) and run that image. Never start the old image `fixed14-engine:1.0`. `bash scripts/golden_diagnose.sh "$IMAGE"` names the failed checks. |
 | `/ready` keeps answering `503` or `HTTP 000` | Still loading, or the self-test failed. | Wait 2 minutes. Then check `docker logs --tail 50 fixed14-engine`, or the terminal of Part B. |
 | Preflight: `sample_media_headers: FAIL:ConnectionError` | The client cannot reach the image server. | `MEDIA_SERVER_IP` must be `127.0.0.1` (nginx on port 80). Check nginx: `curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1/` must print a number other than `000`. |
@@ -898,14 +909,11 @@ The data are real applicants' personal data. National IDs are sensitive.
 1. **Never send, paste or photograph a national ID**, a reading, a card image,
    or an image path: the image folders are named by national ID. Share counts
    only.
-2. **Files that hold IDs stay on the work machine, readable only by you:**
-   - `natid_ocr_pipeline.log`;
-   - `download_problems_full.csv`;
-   - `found_front_images.json`;
-   - the MongoDB backups;
-   - the output of the command-line reader.
-
-   Share the `_masked` files instead.
+2. **Files that hold IDs stay on the work machine, readable only by you.**
+   These are the client log `natid_ocr_pipeline.log`,
+   `download_problems_full.csv`, `found_front_images.json`, the MongoDB
+   backups, and the output of the command-line reader. Share the `_masked`
+   files instead.
 3. **Delete them when they are no longer needed:** `rm <file>` for a file,
    `rm -r <folder>` for a backup folder.
 4. **Never commit them.** git already ignores the client log and the Python
@@ -949,12 +957,31 @@ would be about 96.4%. That figure is an estimate, not a reviewed result.
 
 ### 13.3 How this guide was verified
 
-On 2026-10-18, from a fresh clone of `ocr-team/national-id`, the commands of
-Parts A, B, C, D (dry run, 10 records, full run, reset) and E were run in the
-order written. The machine was an x86-64 Ubuntu 24.04 laptop, with a throwaway
-MongoDB and nginx holding synthetic records and images, and no real data. The
-service also became healthy under an emulation of the work machine's CPU
-(AVX-512 disabled). The work machine itself ran Parts B to E on 2026-10-11.
+On 2026-10-18 the commands of this guide were taken from the guide text and
+run in the order written, in a fresh clone, on an x86-64 Ubuntu 24.04 laptop.
+
+| Part | Result |
+|---|---|
+| 3. Get the code | Clone from GitHub and model hashes: 13/13 OK. |
+| A. Docker | Build passed; `running healthy`; `/ready` 200; `/engine` 200 with the expected item; `/version` answered. |
+| A, work-machine CPU | The same container, with AVX-512 disabled (oneDNN, MKL, OpenCV and NumPy capped at AVX2), became healthy and answered `/engine` 200. |
+| F. Command-line reader | A one-image folder produced the expected CSV row. |
+| B. Python environment | `/ready` 200 and `/engine` 200, with the same answer as Docker. |
+| C. Client | Settings as listed; preflight `all_pass: true`; dry run. |
+| D. Full batch | 10 records; preflight 10 lower; background run to completion; one failed request reset and read on resume. |
+| E. Reports | Accuracy, missing-image report (it found the image stored in another folder), dry run and write of the re-read. |
+| Privacy | The log is created mode 600, and git ignores it and both environments. |
+
+**Test data.** A throwaway MongoDB and nginx, holding synthetic records and
+images (no real data), stood in for the work machine's.
+
+**Not run in this check:**
+- the `sudo` installation steps of section 2, already done on both machines;
+- the MongoDB backup and restore (D2, D7): `mongodump` ran on the work machine on
+  2026-10-11;
+- loading a saved image (A7): tested on 2026-10-10.
+
+The work machine itself ran Parts B to E on 2026-10-11.
 
 ---
 
@@ -975,7 +1002,7 @@ Run from the repository folder (`cd "$HOME/national-id"`).
 | Test 10 without writing | `.venv-client/bin/python scripts/natid_ocr_pipeline_model_API_calling.py --dry-run --limit 10` |
 | Write 10 | `.venv-client/bin/python scripts/natid_ocr_pipeline_model_API_calling.py --limit 10` |
 | Full run in the background | `nohup .venv-client/bin/python scripts/natid_ocr_pipeline_model_API_calling.py > /dev/null 2>&1 &` |
-| Progress | `tail -f natid_ocr_pipeline.log \| grep --line-buffered -E "Processed\|Final"` |
+| Progress | the D5 command |
 | Is a run going? | `pgrep -af natid_ocr_pipeline_model_API_calling` |
 | Stop the run | `pkill -f natid_ocr_pipeline_model_API_calling.py` |
 | Retry failed requests | `.venv-client/bin/python scripts/team_reset_request_errors.py --apply` |

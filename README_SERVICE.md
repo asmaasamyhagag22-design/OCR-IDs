@@ -13,6 +13,9 @@ MongoDB, media and OCR services, follow [the API client guide](docs/TEAM_API_CLI
 Install only `requirements-api-client.txt` on the caller's computer; it does
 not need the OCR models or the private research artifacts.
 
+> **For installation and operation, start with [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md):**
+> the complete, verified guide. This file is the detailed reference.
+
 ## Quick start for the team
 
 This section takes a new Linux machine (Ubuntu 22.04 or 24.04, or WSL) from
