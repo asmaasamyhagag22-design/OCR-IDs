@@ -3816,6 +3816,8 @@ assistant used on this work.
 - `src/governance/guard.py` is shipped in the OCR image and is not edited. Its
   "blocklist cannot be trusted" message still names the builder's old path.
   The command is now `python scripts/governance/build_blocklist.py`.
+  **Owner decision:** the message is corrected in the next release of the OCR
+  image, not in this one.
 
 **What this changes:**
 - The hooks enforced the data governance on the assistant's own tool calls. The
