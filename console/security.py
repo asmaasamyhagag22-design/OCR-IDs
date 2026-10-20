@@ -75,6 +75,9 @@ def same(a: str | None, b: str | None) -> bool:
 class LoginThrottle:
     """At most ``limit`` failed logins per username in ``window_s``; then refused until the window passes."""
 
+    #: Names tracked at most; beyond it, names without a failure inside the window are dropped first.
+    MAX_TRACKED = 10_000
+
     def __init__(self, limit: int = 5, window_s: int = 300) -> None:
         self.limit, self.window_s = limit, window_s
         self._failures: dict[str, list[float]] = {}
@@ -84,10 +87,14 @@ class LoginThrottle:
         return [t for t in self._failures.get(key, []) if now - t < self.window_s]
 
     def blocked(self, username: str) -> bool:
+        """Read-only: a name that never failed is not stored, so unknown names cost no memory."""
         key = username.strip().lower()
         with self._lock:
             recent = self._recent(key, time.monotonic())
-            self._failures[key] = recent
+            if recent:
+                self._failures[key] = recent
+            else:
+                self._failures.pop(key, None)
             return len(recent) >= self.limit
 
     def failed(self, username: str) -> None:
@@ -95,6 +102,10 @@ class LoginThrottle:
         with self._lock:
             now = time.monotonic()
             self._failures[key] = self._recent(key, now) + [now]
+            if len(self._failures) > self.MAX_TRACKED:
+                self._failures = {k: v for k, v in self._failures.items() if now - v[-1] < self.window_s}
+                while len(self._failures) > self.MAX_TRACKED:  # all recent: drop the oldest last failure
+                    del self._failures[min(self._failures, key=lambda k: self._failures[k][-1])]
 
     def succeeded(self, username: str) -> None:
         with self._lock:

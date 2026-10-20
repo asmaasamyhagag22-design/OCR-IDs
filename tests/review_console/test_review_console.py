@@ -446,3 +446,183 @@ def test_an_unknown_category_never_reaches_a_redirect(world):
     client = login(app, "reviewer")
     response = client.get("/review/next?category=%0d%0aSet-Cookie:x", follow_redirects=False)
     assert response.status_code == 303 and "Set-Cookie" not in response.headers["location"]
+
+
+# ---------------------------------------------------------------- images found outside their stored path
+def test_found_images_map_disk_paths_under_the_media_root(tmp_path):
+    import json
+
+    from console.found import FoundImages
+
+    found_file = tmp_path / "found_front_images.json"
+    found_file.write_text(json.dumps({
+        "a": "/var/www/html/batch 7/X1/Nid_Front/Nid_Front.jpg",
+        "b": "/etc/passwd",
+        "c": "/var/www/html/../secret.jpg",
+        "d": "relative/Nid_Front/img.png",
+    }))
+    found = FoundImages(str(found_file), "/var/www/html")
+    assert found.url("a", "10.0.0.5") == "http://10.0.0.5/batch%207/X1/Nid_Front/Nid_Front.jpg"
+    assert found.url("b", "h") is None and found.url("c", "h") is None, "nothing outside the media root"
+    assert found.url("d", "h") == "http://h/relative/Nid_Front/img.png"
+    assert found.url("missing", "h") is None and "a" in found and len(found) == 4
+    found_file.write_text("not json")
+    import os
+    os.utime(found_file, (1, 1))
+    assert len(found) == 0, "an unreadable file is ignored, not fatal"
+    assert len(FoundImages("", "/var/www/html")) == 0 and len(FoundImages(str(tmp_path / "none"), "/")) == 0
+
+
+def test_the_media_host_reads_a_relocated_image_from_where_it_was_found(tmp_path, settings):
+    import json
+
+    import httpx
+
+    from console.services import MediaHost
+
+    found_file = tmp_path / "found.json"
+    found_file.write_text(json.dumps({"rec1": "/var/www/html/other/Nid_Front/Nid_Front.jpg"}))
+    host = MediaHost(replace(settings, found_images=str(found_file), media_host="media.local"))
+    seen = []
+
+    def handler(request):
+        seen.append(request.url.path)
+        return httpx.Response(200, content=b"\xff\xd8\xff" + b"0" * 10)
+
+    host.client = httpx.Client(transport=httpx.MockTransport(handler))
+    assert host.front("http://<IP_adress>/stored", "rec1")[1] == "image/jpeg"
+    assert host.front("http://<IP_adress>/stored", "rec2")[1] == "image/jpeg"
+    assert seen == ["/other/Nid_Front/Nid_Front.jpg", "/stored/Nid_Front/Nid_Front.jpg"]
+    assert host.relocated("rec1") and not host.relocated("rec2")
+
+
+def test_console_env_wins_over_compose_defaults_and_tls_needs_both_files():
+    s = config.load({"CONSOLE_DEFAULT_INSPECTOR_URL": "http://127.0.0.1:8082",
+                     "CONSOLE_INSPECTOR_URL": "http://10.0.0.9:8082"})
+    assert s.inspector_url == "http://10.0.0.9:8082"
+    assert config.load({"CONSOLE_DEFAULT_INSPECTOR_URL": "http://127.0.0.1:8082"}).inspector_url.endswith(":8082")
+    with pytest.raises(config.ConfigError):
+        config.load({"CONSOLE_TLS_CERT": "/x.crt"})
+    assert config.load({"CONSOLE_TLS_CERT": "/x.crt", "CONSOLE_TLS_KEY": "/x.key"}).cookie_secure
+
+
+def test_a_database_outage_shows_a_page_not_a_crash(world, settings):
+    from pymongo.errors import ServerSelectionTimeoutError
+
+    store, app, _ = world
+    client = login(app, "reviewer")
+
+    def down(*args, **kwargs):
+        raise ServerSelectionTimeoutError("down")
+
+    store.records = down
+    response = client.get("/overview")
+    assert response.status_code == 503 and "قاعدة البيانات غير متاحة" in response.text
+
+
+# ---------------------------------------------------------------- regressions from the code review
+def test_corrections_never_offer_another_persons_number(world):
+    import io
+    import zipfile
+
+    store, app, _ = world
+    reviewer = login(app, "reviewer")
+    mismatches = [r for r, rv in store.queue(category="mismatch", state="pending")][:2]
+    for record, verdict in zip(mismatches, ("another_person", "ocr_correct"), strict=True):
+        token = csrf_of(reviewer, f"/review/{record.key}")
+        reviewer.post(f"/review/{record.key}", data={"csrf": token, "verdict": verdict}, follow_redirects=False)
+    sheet = login(app, "supervisor").get("/reports/corrections.xlsx").content
+    with zipfile.ZipFile(io.BytesIO(sheet)) as book:
+        rows = book.read("xl/worksheets/sheet1.xml").decode()
+    assert mismatches[1].key in rows and mismatches[0].key not in rows
+
+
+def test_the_relocated_badge_needs_a_usable_path(tmp_path, settings):
+    import json
+
+    from console.services import MediaHost
+
+    found_file = tmp_path / "found.json"
+    found_file.write_text(json.dumps({"inside": "/var/www/html/a/Nid_Front/x.jpg", "outside": "/etc/x.jpg"}))
+    host = MediaHost(replace(settings, found_images=str(found_file)))
+    assert host.relocated("inside") and not host.relocated("outside") and not host.relocated("absent")
+
+
+def test_a_found_file_fixed_in_place_is_reread(tmp_path):
+    import json
+    import os
+
+    from console.found import FoundImages
+
+    path = tmp_path / "found.json"
+    path.write_text('{"a": "/var/www/html/a/Nid_Front/x.jp')  # caught mid-write
+    found = FoundImages(str(path), "/var/www/html")
+    assert len(found) == 0
+    stamp = path.stat().st_mtime_ns
+    path.write_text(json.dumps({"a": "/var/www/html/a/Nid_Front/x.jpg"}))
+    os.utime(path, ns=(stamp, stamp))  # same mtime: the size (and ctime) still differ
+    assert len(found) == 1
+
+
+def test_index_creation_retries_only_connection_failures():
+    from pymongo.errors import AutoReconnect, OperationFailure
+
+    from console.app import start_index_builder
+
+    class Fails:
+        def __init__(self, error):
+            self.error = error
+
+        def ensure_indexes(self):
+            raise self.error
+
+    start_index_builder(Fails(AutoReconnect("down")), retry_s=3600)  # retried in the background
+    with pytest.raises(OperationFailure):
+        start_index_builder(Fails(OperationFailure("not authorized")))
+
+
+def test_changing_your_password_ends_your_other_sessions(world):
+    store, app, _ = world
+    phone = login(app, "reviewer")
+    desk = login(app, "reviewer")
+    token = csrf_of(desk, "/account")
+    desk.post("/account", data={"csrf": token, "current": demo.DEMO_PASSWORD, "new": "a brand new password",
+                                "confirm": "a brand new password"}, follow_redirects=False)
+    assert desk.get("/overview", follow_redirects=False).status_code == 200
+    assert phone.get("/overview", follow_redirects=False).status_code == 303
+
+
+def test_the_login_throttle_stores_only_failures_and_stays_bounded():
+    throttle = security.LoginThrottle(limit=2, window_s=60)
+    for i in range(50):
+        assert not throttle.blocked(f"nobody-{i}")
+    assert throttle._failures == {}
+    throttle.MAX_TRACKED = 10
+    for i in range(25):
+        throttle.failed(f"user-{i}")
+    assert len(throttle._failures) <= 10
+
+
+def test_an_empty_setting_turns_a_compose_default_off():
+    assert config.load({"CONSOLE_INSPECTOR_URL": "",
+                        "CONSOLE_DEFAULT_INSPECTOR_URL": "http://127.0.0.1:8082"}).inspector_url == ""
+
+
+def test_an_empty_login_form_is_a_validation_error_not_a_lockout(world):
+    store, app, _ = world
+    response = TestClient(app).post("/login", data={"username": "", "password": ""})
+    assert response.status_code == 400 and not store.audit_entries(action="login_blocked")
+
+
+def test_the_health_check_needs_an_http_answer(monkeypatch):
+    import socket
+
+    from console import healthcheck
+
+    with socket.socket() as listener:  # accepts TCP, never answers HTTP
+        listener.bind(("127.0.0.1", 0))
+        listener.listen()
+        monkeypatch.setenv("CONSOLE_HOST", "127.0.0.1")
+        monkeypatch.setenv("CONSOLE_PORT", str(listener.getsockname()[1]))
+        monkeypatch.delenv("CONSOLE_TLS_CERT", raising=False)
+        assert healthcheck.main() == 1

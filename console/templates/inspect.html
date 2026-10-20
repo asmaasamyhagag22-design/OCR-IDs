@@ -15,7 +15,7 @@
 
 {% if error %}<div class="notice bad" role="alert">{{ error }}</div>{% endif %}
 {% if not available %}
-<div class="notice warn">خدمة فحص النموذج غير مشغّلة على هذا الجهاز. تُشغَّل بالأمر <span class="mono">docker compose --profile engine up -d</span> أو <span class="mono">python -m inspector</span>، ويُضبط عنوانها في <span class="mono">CONSOLE_INSPECTOR_URL</span> (الدليل، القسم 6).</div>
+<div class="notice warn">خدمة فحص النموذج غير مشغّلة على هذا الجهاز. تُشغَّل بالأمر <span class="mono">docker compose --profile engine up -d</span> أو <span class="mono">python -m inspector</span>، ويُضبط عنوانها في <span class="mono">CONSOLE_INSPECTOR_URL</span> (الدليل، القسم 9).</div>
 {% endif %}
 {% if illustrative %}
 <div class="notice warn"><b>عرض توضيحي:</b> خدمة فحص النموذج غير موصولة في وضع العرض هذا، لذا فالأرقام والخرائط أدناه مرسومة لتوضيح الشاشة فقط ولا تصدر عن النموذج. للحصول على نتائج فعلية تُشغَّل <span class="mono">python -m inspector</span> ويُضبط <span class="mono">CONSOLE_INSPECTOR_URL</span>.</div>

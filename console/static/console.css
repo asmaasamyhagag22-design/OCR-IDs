@@ -24,6 +24,7 @@
   --good: #2b7a4b;
   --good-soft: #e2f1e7;
   --focus: #1b74c9;
+  --on-accent: #ffffff;
   --shadow: 0 1px 2px rgba(14, 28, 34, .06), 0 4px 16px rgba(14, 28, 34, .05);
   --font: "Segoe UI", "Noto Sans Arabic", "Noto Sans", Tahoma, "DejaVu Sans", sans-serif;
   --mono: "Cascadia Mono", "Consolas", "DejaVu Sans Mono", "Liberation Mono", monospace;
@@ -36,7 +37,7 @@
     --line: #26363d; --line-strong: #34474f; --ink: #081014; --ink-fg: #d6e1e4; --ink-muted: #7f949a;
     --accent: #3fbab4; --accent-strong: #5fd0ca; --accent-soft: #143634; --warn: #e3a557; --warn-soft: #3a2b18;
     --bad: #ec7b6e; --bad-soft: #3b1f1c; --good: #6cc792; --good-soft: #17301f; --focus: #6aaef0;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .3); color-scheme: dark;
+    --on-accent: #062321; --shadow: 0 1px 2px rgba(0, 0, 0, .3); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
@@ -44,7 +45,7 @@
   --line: #26363d; --line-strong: #34474f; --ink: #081014; --ink-fg: #d6e1e4; --ink-muted: #7f949a;
   --accent: #3fbab4; --accent-strong: #5fd0ca; --accent-soft: #143634; --warn: #e3a557; --warn-soft: #3a2b18;
   --bad: #ec7b6e; --bad-soft: #3b1f1c; --good: #6cc792; --good-soft: #17301f; --focus: #6aaef0;
-  --shadow: 0 1px 2px rgba(0, 0, 0, .3); color-scheme: dark;
+  --on-accent: #062321; --shadow: 0 1px 2px rgba(0, 0, 0, .3); color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -63,7 +64,7 @@ p { margin: 0; }
 .small { font-size: .82rem; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
-.skip { position: absolute; inset-inline-start: 12px; top: -48px; background: var(--accent); color: #fff; padding: 8px 14px;
+.skip { position: absolute; inset-inline-start: 12px; top: -48px; background: var(--accent); color: var(--on-accent); padding: 8px 14px;
   border-radius: 6px; z-index: 20; }
 .skip:focus { top: 12px; }
 .eyebrow { color: var(--accent); font-size: .74rem; font-weight: 700; letter-spacing: .08em; margin-bottom: 4px; }
@@ -96,6 +97,7 @@ tr.em td { font-weight: 700; background: var(--accent-soft); }
 .who { display: grid; gap: 2px; }
 .who b { font-weight: 600; }
 .who span { color: var(--ink-muted); font-size: .8rem; }
+.who a, p a, .notice a { text-decoration: underline; text-underline-offset: 2px; }
 .side-foot form { margin: 0; }
 .link-btn { background: none; border: 0; color: var(--ink-muted); padding: 0; font: inherit; cursor: pointer; }
 .link-btn:hover { color: var(--ink-fg); }
@@ -120,14 +122,14 @@ main { min-width: 0; padding: 26px clamp(16px, 3vw, 36px) 48px; display: grid; g
   border: 1px solid var(--line-strong); background: var(--surface); color: var(--fg); padding: 8px 14px;
   font: inherit; font-weight: 600; cursor: pointer; line-height: 1.3; }
 .btn:hover { background: var(--surface-2); text-decoration: none; }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .btn.primary:hover { background: var(--accent-strong); }
 .btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
 .btn.small { padding: 5px 10px; font-size: .85rem; }
 .btn[disabled] { opacity: .55; cursor: progress; }
 kbd { font-family: var(--mono); font-size: .72rem; border: 1px solid var(--line-strong); border-bottom-width: 2px;
   border-radius: 4px; padding: 0 5px; background: var(--surface-2); color: var(--muted); }
-.btn.primary kbd { background: rgba(255, 255, 255, .15); color: #fff; border-color: rgba(255, 255, 255, .35); }
+.btn.primary kbd { background: transparent; color: var(--on-accent); border-color: currentColor; }
 
 .pill { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 1px 10px;
   font-size: .78rem; font-weight: 600; white-space: nowrap; border: 1px solid transparent; }
@@ -149,7 +151,7 @@ kbd { font-family: var(--mono); font-size: .72rem; border: 1px solid var(--line-
 .kpi .label { color: var(--muted); font-size: .82rem; }
 .kpi .value { font-family: var(--mono); font-size: 1.7rem; font-weight: 600; direction: ltr; text-align: right;
   font-variant-numeric: tabular-nums; line-height: 1.2; }
-.kpi .note { color: var(--faint); font-size: .78rem; line-height: 1.5; }
+.kpi .note { color: var(--muted); font-size: .78rem; line-height: 1.5; }
 .kpi.accent .value { color: var(--accent); }
 .kpi.warn .value { color: var(--warn); }
 
@@ -241,13 +243,11 @@ textarea { resize: vertical; min-height: 64px; width: 100%; }
 .cells span.g { margin-left: 7px; }
 fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 
-.facts { display: grid; grid-template-columns: auto 1fr 1fr; gap: 0; font-size: .88rem; border: 1px solid var(--line);
-  border-radius: 6px; overflow: hidden; }
-.facts > div { padding: 7px 12px; border-bottom: 1px solid var(--line); }
-.facts > div:nth-last-child(-n+3) { border-bottom: 0; }
-.facts .h { background: var(--surface-2); color: var(--muted); font-weight: 600; font-size: .78rem; }
-.facts .k { color: var(--muted); background: var(--surface-2); }
-.facts .bad { color: var(--bad); font-weight: 600; }
+.facts-wrap { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+table.facts { font-size: .88rem; }
+table.facts th, table.facts td { padding: 7px 12px; }
+table.facts th[scope="row"] { color: var(--muted); background: var(--surface-2); font-weight: 600; font-size: .84rem; }
+table.facts .bad { color: var(--bad); font-weight: 600; }
 
 /* --------------------------------------------------------------- review */
 .review { display: grid; grid-template-columns: minmax(0, 1fr) minmax(460px, 540px); gap: 18px; align-items: start; }
@@ -275,7 +275,7 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .verdict small { color: var(--muted); font-size: .8rem; }
 .verdict:has(input:checked) { border-color: var(--accent); background: var(--accent-soft);
   box-shadow: inset -3px 0 0 var(--accent); }
-.verdict:has(input:checked) .key { background: var(--accent); border-color: var(--accent); color: #fff; }
+.verdict:has(input:checked) .key { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .verdict:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
 .corrected { display: grid; gap: 6px; }
 .corrected input { font-family: var(--mono); font-size: 1.25rem; letter-spacing: .18em; direction: ltr;

@@ -16,8 +16,10 @@ RUN apt-get update \
 
 COPY console/requirements.txt /tmp/console-requirements.txt
 RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
-    pip install --timeout 120 --retries 20 -r /tmp/console-requirements.txt \
- && rm /tmp/console-requirements.txt
+    pip install --timeout 120 --retries 20 pip==26.2.1 \
+ && pip install --timeout 120 --retries 20 -r /tmp/console-requirements.txt \
+ && rm /tmp/console-requirements.txt \
+ && pip uninstall -y -q setuptools wheel  # build tools from the base image, unused at run time (pip-audit)
 
 WORKDIR /app
 # governorate names, the sealed routing threshold, and the API client's connection constants
@@ -30,6 +32,7 @@ RUN useradd --uid 10002 --create-home --shell /usr/sbin/nologin console
 USER console
 
 EXPOSE 8090
-HEALTHCHECK --interval=30s --timeout=6s --start-period=20s --retries=3 \
-  CMD ["python", "-c", "import os, urllib.request; h = os.environ.get('CONSOLE_HOST', '127.0.0.1'); h = '127.0.0.1' if h in ('0.0.0.0', '') else h; urllib.request.urlopen(f\"http://{h}:{os.environ.get('CONSOLE_PORT', '8090')}/login\", timeout=5)"]
+# a real GET /login over HTTP or HTTPS (console/healthcheck.py), so a wedged application is restarted
+HEALTHCHECK --interval=30s --timeout=8s --start-period=20s --retries=3 \
+  CMD ["python", "-m", "console.healthcheck"]
 CMD ["python", "-m", "console", "serve"]

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import ast
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,6 +55,14 @@ def _int(env: dict[str, str], name: str, default: int, lo: int, hi: int) -> int:
     return value
 
 
+def with_default(env: dict[str, str], name: str) -> str | None:
+    """``name``, else ``CONSOLE_DEFAULT_…``: compose.yaml supplies defaults under the second name, so a
+    value in console.env (an env_file, which ``environment:`` would otherwise override) still wins."""
+    if name in env:  # set, even empty: an empty value turns the feature off
+        return env[name]
+    return env.get(name.replace("CONSOLE_", "CONSOLE_DEFAULT_", 1))
+
+
 def _flag(env: dict[str, str], name: str) -> bool:
     return env.get(name, "").strip().lower() in ("1", "true", "yes", "on")
 
@@ -82,6 +90,10 @@ class Settings:
     engine_timeout_s: int = 120
     inspector_url: str = ""
     inspector_key: str = ""
+    found_images: str = ""
+    media_root: str = "/var/www/html"
+    tls_cert: str = ""
+    tls_key: str = ""
 
     @property
     def reviews(self) -> str:
@@ -135,9 +147,17 @@ def load(env: dict[str, str] | None = None) -> Settings:
         stats_ttl_s=_int(env, "CONSOLE_STATS_TTL_S", 30, 0, 3600),
         media_timeout_s=_int(env, "CONSOLE_MEDIA_TIMEOUT_S", 15, 1, 120),
         engine_timeout_s=_int(env, "CONSOLE_ENGINE_TIMEOUT_S", 120, 5, 600),
-        inspector_url=(env.get("CONSOLE_INSPECTOR_URL") or "").rstrip("/"),
+        inspector_url=(with_default(env, "CONSOLE_INSPECTOR_URL") or "").rstrip("/"),
         inspector_key=env.get("CONSOLE_INSPECTOR_KEY") or "",
+        found_images=with_default(env, "CONSOLE_FOUND_IMAGES") or "",
+        media_root=env.get("CONSOLE_MEDIA_ROOT") or "/var/www/html",
+        tls_cert=env.get("CONSOLE_TLS_CERT") or "",
+        tls_key=env.get("CONSOLE_TLS_KEY") or "",
     )
+    if bool(settings.tls_cert) != bool(settings.tls_key):
+        raise ConfigError("CONSOLE_TLS_CERT and CONSOLE_TLS_KEY must be set together")
+    if settings.tls_cert:
+        settings = replace(settings, cookie_secure=True)
     if not settings.engine_url.startswith(("http://", "https://")):
         raise ConfigError("CONSOLE_OCR_ENGINE_URL must be an http(s) URL")
     if settings.inspector_url and not settings.inspector_url.startswith(("http://", "https://")):

@@ -10,6 +10,7 @@
       <span class="pill {{ r.category }}">{{ category_labels[r.category] }}</span>
       <span class="pill neutral">{{ kind_labels[r.kind] }}</span>
       {% if decided %}<span class="pill decided">القرار: {{ verdicts[rv.verdict].label }}</span>{% endif %}
+      {% if relocated %}<span class="pill claimed" title="المسار المسجّل في قاعدة البيانات لا يحتوي الصورة؛ عُثر عليها في مجلد آخر على خادم الصور وقُرئت منه">الصورة من موضع بديل</span>{% endif %}
       <span class="muted small">المتبقي: {{ remaining|num }} حالة{% if category %} في «{{ category_labels[category] }}»{% endif %}</span>
     </div>
   </div>
@@ -48,14 +49,19 @@
           {{ idg.row(typed_cells, diff, 'typed', 'الرقم المُدخل') }}
           {{ idg.labels(segments, segment_labels) }}
         </div>
-        <div class="facts" role="table" aria-label="البيانات المستخرجة من الرقمين">
-          <div class="h" role="columnheader"></div><div class="h" role="columnheader">القراءة الآلية</div><div class="h" role="columnheader">الرقم المُدخل</div>
-          <div class="k">تاريخ الميلاد</div><div class="mono">{{ read_info.birth_date or '—' }}</div><div class="mono">{{ typed_info.birth_date or '—' }}</div>
-          <div class="k">المحافظة</div><div>{{ read_info.governorate or '—' }}</div><div>{{ typed_info.governorate or '—' }}</div>
-          <div class="k">النوع</div><div>{{ read_info.sex or '—' }}</div><div>{{ typed_info.sex or '—' }}</div>
-          <div class="k">صلاحية الرقم</div>
-          <div class="{{ '' if read_info.valid else 'bad' }}">{{ 'صالح' if read_info.valid else ('لا توجد قراءة' if not r.read else 'غير صالح') }}</div>
-          <div class="{{ '' if typed_info.valid else 'bad' }}">{{ 'صالح' if typed_info.valid else 'غير صالح' }}</div>
+        <div class="facts-wrap">
+          <table class="facts">
+            <caption class="sr">البيانات المستخرجة من الرقمين</caption>
+            <thead><tr><th scope="col"><span class="sr">البيان</span></th><th scope="col">القراءة الآلية</th><th scope="col">الرقم المُدخل</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">تاريخ الميلاد</th><td class="mono">{{ read_info.birth_date or '—' }}</td><td class="mono">{{ typed_info.birth_date or '—' }}</td></tr>
+              <tr><th scope="row">المحافظة</th><td>{{ read_info.governorate or '—' }}</td><td>{{ typed_info.governorate or '—' }}</td></tr>
+              <tr><th scope="row">النوع</th><td>{{ read_info.sex or '—' }}</td><td>{{ typed_info.sex or '—' }}</td></tr>
+              <tr><th scope="row">صلاحية الرقم</th>
+                <td class="{{ '' if read_info.valid else 'bad' }}">{{ 'صالح' if read_info.valid else ('لا توجد قراءة' if not r.read else 'غير صالح') }}</td>
+                <td class="{{ '' if typed_info.valid else 'bad' }}">{{ 'صالح' if typed_info.valid else 'غير صالح' }}</td></tr>
+            </tbody>
+          </table>
         </div>
         {% for name, value in r.extra.items() %}{% if value %}<p class="small"><span class="muted">{{ name }}:</span> {{ value }}</p>{% endif %}{% endfor %}
         <div class="reread" data-reread-box>

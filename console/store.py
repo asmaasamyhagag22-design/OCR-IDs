@@ -56,6 +56,9 @@ VERDICTS = {
 OCR_RIGHT = ("ocr_correct", "another_person")
 OCR_WRONG = ("typed_correct", "other")
 NEEDS_REUPLOAD = ("unreadable", "wrong_document")
+#: Verdicts after which the card is the applicant's own, so its number may replace a mistyped one.
+#: "another_person" is excluded: that card's number belongs to someone else.
+APPLICANT_CARD = ("ocr_correct", "typed_correct", "other")
 CLAIM_MINUTES = 10
 
 
@@ -354,8 +357,12 @@ class Store:
     def end_session(self, digest: str) -> None:
         self.sessions.delete_many({"token": digest})
 
-    def end_user_sessions(self, username: str) -> None:
-        self.sessions.delete_many({"username": username})
+    def end_user_sessions(self, username: str, keep: str | None = None) -> None:
+        """End every session of ``username``, except the one whose token digest is ``keep``."""
+        query: dict[str, Any] = {"username": username}
+        if keep:
+            query["token"] = {"$ne": keep}
+        self.sessions.delete_many(query)
 
     def purge_sessions(self) -> None:
         self.sessions.delete_many({"expires_at": {"$lte": now()}})

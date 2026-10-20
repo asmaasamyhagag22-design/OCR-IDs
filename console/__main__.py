@@ -3,6 +3,7 @@
     python -m console serve                 the web application (settings from CONSOLE_* variables)
     python -m console create-user NAME      an account; the password is asked twice, never echoed
     python -m console demo                  an in-memory demonstration with synthetic records
+    python -m console check                 verify connections and data shape (counts only, no IDs)
 """
 from __future__ import annotations
 
@@ -58,8 +59,9 @@ def serve(settings: config.Settings) -> None:
         client = MongoClient(settings.mongo_uri, tz_aware=True, serverSelectionTimeoutMS=8000)
         app = create_app(settings, Store(settings, client[settings.mongo_db]), MediaHost(settings), Engine(settings),
                          Inspector(settings) if settings.inspector_url else None)
+    tls = {"ssl_certfile": settings.tls_cert, "ssl_keyfile": settings.tls_key} if settings.tls_cert else {}
     uvicorn.run(app, host=settings.host, port=settings.port, log_level="info", server_header=False,
-                proxy_headers=False)
+                proxy_headers=False, **tls)
 
 
 def create_user(settings: config.Settings, username: str, role: str, display_name: str) -> int:
@@ -96,6 +98,7 @@ def main(argv: list[str] | None = None) -> int:
     user.add_argument("--name", default="", help="the name shown in the console")
     demo = sub.add_parser("demo", help="run with synthetic records in memory")
     demo.add_argument("--port", type=int, default=None)
+    sub.add_parser("check", help="verify connections and data shape before first use (prints counts only)")
     args = parser.parse_args(argv)
     try:
         settings = config.load()
@@ -104,6 +107,10 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     if args.command == "serve":
         serve(settings)
+    elif args.command == "check":
+        from .check import main as check_main
+
+        return check_main(settings)
     elif args.command == "create-user":
         return create_user(settings, args.username, args.role, args.name)
     else:

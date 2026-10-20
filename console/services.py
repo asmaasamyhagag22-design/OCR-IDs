@@ -42,14 +42,24 @@ class ImageSource(Protocol):
 
 class MediaHost:
     def __init__(self, settings: Settings) -> None:
+        from .found import FoundImages
+
         self.settings = settings
         self.client = httpx.Client(timeout=settings.media_timeout_s, follow_redirects=False)
+        self.found = FoundImages(settings.found_images, settings.media_root)
+
+    def relocated(self, key: str) -> bool:
+        """Whether this record's image is read from where team_download_problems.py found it."""
+        return self.found.url(key, self.settings.media_host) is not None
 
     def front(self, folder: str | None, key: str) -> tuple[bytes, str]:
-        if not folder:
-            raise MediaError("no_folder_path")
+        url = self.found.url(key, self.settings.media_host)
+        if url is None:
+            if not folder:
+                raise MediaError("no_folder_path")
+            url = self.settings.front_url(folder)
         try:
-            with self.client.stream("GET", self.settings.front_url(folder)) as response:
+            with self.client.stream("GET", url) as response:
                 if response.status_code == 404:
                     raise MediaError("not_found")
                 if response.status_code != 200:

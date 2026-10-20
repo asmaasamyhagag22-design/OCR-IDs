@@ -3734,3 +3734,60 @@ The owner asked for the console to be finished, reviewed and made formal.
   Not built here: the inspector image from the OCR image, and the console
   image's apt step (Debian mirrors unreachable in this environment). Both are
   to be built on the work machine.
+
+## D-112 - Senior inspection of the console before the work machine (2026-10-20)
+
+The owner asked for everything that can be finished before access to the work
+machine, under a senior-level inspection.
+
+**Added:**
+- **Found images.** The console reads found_front_images.json from
+  team_download_problems.py, so the records stored outside their recorded
+  path show the image the OCR read, with a badge. Paths outside the media root
+  are refused.
+- **Preflight.** `python -m console check` covers connections, field names,
+  writable console collections, an admin account, one media image, the found
+  file, the engine and the inspector. It prints counts only.
+- **Operations.** Optional HTTPS, with an HTTP(S) health check that pins the
+  console's own certificate. Backup and restore commands for the console's
+  collections. Windows and Linux demo launchers. A graceful page when MongoDB
+  is unavailable.
+
+**A code review found ten defects, all fixed, each with a regression test:**
+- The corrections export offered another person's number for an applicant's
+  record.
+- The relocated badge appeared on records whose found path was unusable.
+- A found file fixed in place was not re-read.
+- The index builder retried permanent errors forever.
+- The preflight passed unreadable files.
+- A password change did not end the user's other sessions.
+- The login throttle grew without bound.
+- The health check accepted a bare TCP connect.
+- compose.yaml overrode console.env.
+- An empty login form was reported as a lockout.
+
+**Further checks:**
+- An accessibility scan (axe-core, WCAG 2.1 AA) found 26 violations on 10
+  pages in two themes. All were fixed, and the rescan found none.
+- pip-audit found advisories for pillow, anyio, pip, setuptools and wheel in
+  the console image. The console now pins pillow 12.3.0, anyio 4.14.2 and
+  pip 26.2.1, and drops the unused build tools; the rescan found none.
+
+**Verified with Docker here:**
+- The OCR image was built from its Dockerfile. Debian mirrors are blocked in
+  this environment, so the same bookworm packages were copied from the full
+  python:3.11.9 image instead of apt.
+- The inspector image was built from that OCR image through compose.
+- The whole stack ran under `docker compose --profile engine up -d`. Engine,
+  inspector and console were healthy; the engine passed its golden self-test
+  in the container and the inspector its parity check.
+- A browser script passed 18 of 18 checks, including relocated images.
+- A concurrency test ran 20 simultaneous claims on each of 30 cases and got
+  one winner every time.
+- A database outage, a process crash (Docker restarted it), HTTPS, and backup
+  and restore each behaved as documented.
+
+**Owner decision pending.** The OCR image (and therefore the inspector)
+pins pillow 10.4.0, which has published advisories about image decoding.
+Raising it changes a frozen pin and needs the golden parity re-established.
+This work does not do it.

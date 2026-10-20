@@ -64,14 +64,22 @@ services:
     image: fixed14-console:local
     container_name: fixed14-console
     restart: unless-stopped
+    # run as the machine's own user (CONSOLE_USER=$(id -u):$(id -g) in .env), so the private files
+    # in ~/.config/fixed14/console (mode 600) can be read without loosening their permissions
+    user: ${CONSOLE_USER:-10002:10002}
     # host networking: MongoDB, the media server (nginx) and the engine are reached exactly
     # as the API client reaches them from this machine (127.0.0.1 or the configured hosts)
     network_mode: host
     env_file:
       - path: ${HOME}/.config/fixed14/console.env
         required: false
+    # defaults only: the same names without DEFAULT_, in console.env, take precedence
     environment:
-      CONSOLE_INSPECTOR_URL: ${CONSOLE_INSPECTOR_URL:-http://127.0.0.1:8082}
+      CONSOLE_DEFAULT_INSPECTOR_URL: ${CONSOLE_INSPECTOR_URL:-http://127.0.0.1:8082}
+      CONSOLE_DEFAULT_FOUND_IMAGES: /run/fixed14/found_front_images.json
+    # read-only: found_front_images.json (team_download_problems.py) and, for HTTPS, tls.crt and tls.key
+    volumes:
+      - ${HOME}/.config/fixed14/console:/run/fixed14:ro
     read_only: true
     tmpfs:
       - /tmp

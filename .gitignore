@@ -44,3 +44,4 @@ paddleocr_fixed_crop_bundle/
 /.venv
 /data
 /third_party
+.env

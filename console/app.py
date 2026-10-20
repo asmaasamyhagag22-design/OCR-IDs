@@ -26,6 +26,7 @@ from . import ids, inspection, security, stats, xlsx
 from .config import Settings
 from .services import Engine, ImageSource, MediaError
 from .store import (
+    APPLICANT_CARD,
     CATEGORY_LABELS,
     NEEDS_REUPLOAD,
     QUEUE_CATEGORIES,
@@ -73,7 +74,7 @@ EXPORTS = {
         "columns": ["applicant_id", "category", "kind", "verdict", "ocr_reading", "typed_id", "card_number",
                     "reviewer", "reviewed_at", "note"],
         "labels": ["رقم السجل", "التصنيف", "نوع الاختلاف", "القرار", "القراءة الآلية", "الرقم المُدخل",
-                   "الرقم الصحيح", "المراجِع", "وقت المراجعة", "ملاحظة"],
+                   "الرقم على البطاقة", "المراجِع", "وقت المراجعة", "ملاحظة"],
     },
     "corrections": {
         "title": "تصحيح الرقم المُدخل",
@@ -142,7 +143,7 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
     )
     app.mount("/static", StaticFiles(directory=str(HERE / "static")), name="static")
     throttle = security.LoginThrottle()
-    store.ensure_indexes()
+    start_index_builder(store)
 
     # ------------------------------------------------------------- plumbing
     @app.middleware("http")
@@ -155,6 +156,8 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["X-Frame-Options"] = "DENY"
+        if settings.tls_cert:
+            response.headers["Strict-Transport-Security"] = "max-age=31536000"
         if not request.url.path.startswith("/static/"):
             response.headers["Cache-Control"] = "no-store"
         return response
@@ -162,6 +165,13 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
     @app.exception_handler(Redirect)
     async def on_redirect(request: Request, exc: Redirect):
         return RedirectResponse(exc.location, status_code=303)
+
+    from pymongo.errors import PyMongoError
+
+    @app.exception_handler(PyMongoError)
+    async def on_database_error(request: Request, exc: PyMongoError):
+        message = "تعذّر الاتصال بقاعدة البيانات. يُرجى المحاولة بعد قليل، وإن استمر الأمر فيُرجى إبلاغ مدير النظام."
+        return page(request, "error.html", {"title": "قاعدة البيانات غير متاحة", "message": message}, status=503)
 
     @app.exception_handler(Denied)
     async def on_denied(request: Request, exc: Denied):
@@ -233,8 +243,11 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         username = str(form.get("username", "")).strip().lower()
         password = str(form.get("password", ""))
         target = safe_next(str(form.get("next", "/")))
-        if not username or throttle.blocked(username):
-            store.audit(username or None, "login_blocked")
+        if not username or not password:
+            return page(request, "login.html", {"title": "تسجيل الدخول", "next": target,
+                                                "error": "يُرجى إدخال اسم المستخدم وكلمة المرور."}, status=400)
+        if throttle.blocked(username):
+            store.audit(username, "login_blocked")
             return page(request, "login.html", {
                 "title": "تسجيل الدخول", "next": target,
                 "error": "تجاوزت عدد المحاولات المسموح به. يُرجى الانتظار خمس دقائق ثم المحاولة مرة أخرى."},
@@ -356,6 +369,7 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
             "typed_info": ids.decode(record.typed), "allowed": allowed, "remaining": remaining,
             "category": category, "error": error if error in ("claimed", "invalid") else "",
             "can_change": can_change, "true_id": true_id(record, current_review),
+            "relocated": bool(getattr(images, "relocated", lambda _key: False)(record.key)),
         })
 
     @app.post("/review/{key}")
@@ -433,7 +447,8 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
                              card or "", rv.get("reviewer", ""), at, rv.get("note", "")])
             elif name == "reupload" and rv["verdict"] in NEEDS_REUPLOAD:
                 rows.append([record.key, category, verdict, rv.get("reviewer", ""), at])
-            elif name == "corrections" and card and card != record.typed:
+            elif (name == "corrections" and rv["verdict"] in APPLICANT_CARD and card
+                  and card != record.typed):
                 rows.append([record.key, record.typed or "", card, verdict, rv.get("reviewer", ""), at])
         return rows
 
@@ -534,6 +549,7 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         except ValueError:
             return RedirectResponse("/account?error=short", status_code=303)
         store.update_user(user["username"], password_hash=password_hash)
+        store.end_user_sessions(user["username"], keep=security.token_digest(request.cookies.get(COOKIE, "")))
         store.audit(user["username"], "password_change")
         return RedirectResponse("/account?saved=1", status_code=303)
 
@@ -593,6 +609,40 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         return inspector_page(request, payload, f"/media/{urllib.parse.quote(record.key)}/front", None, record)
 
     return app
+
+
+def start_index_builder(store: Store, retry_s: float = 30.0) -> None:
+    """Create the console's indexes; while MongoDB is unreachable, retry in the background.
+
+    Only a connection failure is retried: the console then starts and its pages report the
+    database as unavailable until it is back. Any other failure (a missing createIndex privilege,
+    duplicate usernames that block the unique index) stops start-up with the error, because
+    serving without those indexes would allow duplicate accounts and full scans on every request.
+    """
+    import logging
+    import threading
+    import time
+
+    from pymongo.errors import ConnectionFailure
+
+    def build() -> None:
+        while True:
+            time.sleep(retry_s)
+            try:
+                store.ensure_indexes()
+                logging.getLogger("console").info("MongoDB indexes created")
+                return
+            except ConnectionFailure as exc:
+                logging.getLogger("console").warning("MongoDB unreachable (%s); indexes retried in %ss",
+                                                     type(exc).__name__, retry_s)
+            except Exception:  # noqa: BLE001 - a permanent error now: say so once, then stop retrying
+                logging.getLogger("console").exception("MongoDB indexes cannot be created")
+                return
+
+    try:
+        store.ensure_indexes()
+    except ConnectionFailure:
+        threading.Thread(target=build, name="console-indexes", daemon=True).start()
 
 
 def preview(data: bytes, longest: int = 1600) -> str | None:
