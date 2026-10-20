@@ -3665,8 +3665,8 @@ reviewers settle the readings that differ from the typed ID (about 1,400 on the
 first run) and those that could not be read, a supervisor sees the accuracy
 that the reviews establish, and the operations team sees the state of the run.
 This is operational review of production records requested by the owner, not
-new labelling for model development; the "no new human review sheets" line in
-CLAUDE.md governs the research sets and is unchanged.
+new labelling for model development; the project's "no new human review
+sheets" rule governs the research sets and is unchanged.
 
 Decisions taken with the owner:
 - Decisions go to new collections (`ocr_reviews`, append-only
@@ -3791,3 +3791,36 @@ machine, under a senior-level inspection.
 pins pillow 10.4.0, which has published advisories about image decoding.
 Raising it changes a frozen pin and needs the golden parity re-established.
 This work does not do it.
+
+## D-113 - The AI assistant's tooling leaves the repository (2026-10-20)
+
+The owner asked that nothing in the repository or its commits name the AI
+assistant used on this work.
+
+**Removed on `feature/review-console`:**
+- The assistant's configuration directory at the repository root: its two
+  agent definitions, its settings, and its two tool-call hooks (the data guard
+  and the commit guard).
+- The assistant's instruction file at the repository root.
+- `tests/test_governance_hooks.py`, which tested those hooks.
+
+**Kept:**
+- The blocklist builder moves, unchanged except for its usage lines, to
+  `scripts/governance/build_blocklist.py`. `src/governance/guard.py` reads the
+  blocklist it writes, and the in-process guard does not depend on any
+  assistant.
+- Its tests move to `tests/test_governance_blocklist.py`.
+- `src/governance/guard.py` is shipped in the OCR image and is not edited. Its
+  "blocklist cannot be trusted" message still names the builder's old path.
+  The command is now `python scripts/governance/build_blocklist.py`.
+
+**What this changes:**
+- The hooks enforced the data governance on the assistant's own tool calls. The
+  in-process guard, the privacy scan and the governance rules in the phase rule
+  files still apply to every process.
+- The commits on both branches were rewritten to the owner's GitHub identity,
+  and their attribution trailers were removed. Only the author, committer and
+  message changed. Both branches were force-pushed.
+- `docs/architecture-explainer` only adds a page, so it removes nothing. Its
+  page now credits the data governance to `src/governance/guard.py`.
+- `main` keeps these files until `feature/review-console` is merged.
