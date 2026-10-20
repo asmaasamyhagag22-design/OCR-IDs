@@ -3810,6 +3810,9 @@ assistant used on this work.
   blocklist it writes, and the in-process guard does not depend on any
   assistant.
 - Its tests move to `tests/test_governance_blocklist.py`.
+- Four docstrings that cited the instruction file now cite the project rule
+  itself: `tests/conftest.py`, `tests/test_official_eval_privacy.py`,
+  `scripts/phase2m_h_verify.py` and `scripts/phase2m_h_error_gallery.py`.
 - `src/governance/guard.py` is shipped in the OCR image and is not edited. Its
   "blocklist cannot be trusted" message still names the builder's old path.
   The command is now `python scripts/governance/build_blocklist.py`.
