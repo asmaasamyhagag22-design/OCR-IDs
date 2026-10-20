@@ -1,5 +1,4 @@
 <title>Fixed14 OCR Architecture</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap">
@@ -583,7 +582,7 @@ footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid v
 <section aria-labelledby="s-eval">
   <div class="prose">
     <h2 id="s-eval">6. التقييم وحوكمة البيانات</h2>
-    <p>المشروع مقسّم الداتا بطريقة تمنع إن الموديل يتظبط على نفس البيانات اللي بيتقاس عليها. كل مجموعة ليها حالة واضحة، والـ hooks بتمنع فتح المجموعات المقفولة، حتى من Claude.</p>
+    <p>المشروع مقسّم الداتا بطريقة تمنع إن الموديل يتظبط على نفس البيانات اللي بيتقاس عليها. كل مجموعة ليها حالة واضحة، والحارس اللي في <code>src/governance/guard.py</code> بيرفض فتح أي كارت من المجموعات المقفولة من جوه أي سكريبت بيحاول يقراه.</p>
   </div>
   <div class="tablewrap">
     <table>
