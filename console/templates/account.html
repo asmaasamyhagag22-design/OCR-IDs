@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block main %}
+{% set errors = {'current': 'كلمة السر الحالية غلط.', 'confirm': 'كلمتين السر الجداد مش زي بعض.', 'short': 'كلمة السر لازم تكون 10 حروف على الأقل.'} %}
+<div class="page-head"><div><h1>حسابي</h1><p class="sub">{{ user.display_name }} · <span class="mono">{{ user.username }}</span> · {{ role_labels[user.role] }}</p></div></div>
+{% if error %}<div class="notice bad">{{ errors.get(error, 'حصل خطأ.') }}</div>{% endif %}
+{% if saved %}<div class="notice good">كلمة السر اتغيرت.</div>{% endif %}
+<form class="panel" method="post" action="/account">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <div class="panel-head"><h2>تغيير كلمة السر</h2></div>
+  <div class="panel-body">
+    <div class="field"><label for="c">كلمة السر الحالية</label><input id="c" name="current" type="password" dir="ltr" autocomplete="current-password" required></div>
+    <div class="field"><label for="n">كلمة السر الجديدة (10 حروف على الأقل)</label><input id="n" name="new" type="password" dir="ltr" autocomplete="new-password" required minlength="10"></div>
+    <div class="field"><label for="f">اكتبها تاني</label><input id="f" name="confirm" type="password" dir="ltr" autocomplete="new-password" required minlength="10"></div>
+    <div><button class="btn primary" type="submit">احفظ</button></div>
+  </div>
+</form>
+{% endblock %}

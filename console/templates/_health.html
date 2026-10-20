@@ -1,0 +1,14 @@
+<div class="grid-3">
+  <div class="meta-row">
+    <span class="pill {{ 'ok' if h.ok else 'unreadable' }}">{{ 'شغّال' if h.ok else 'مش بيرد' }}</span>
+    <span>OCR engine</span>
+    {% if h.seconds is not none %}<span class="muted small num">{{ '%.0f'|format(h.seconds * 1000) }} ms</span>{% endif %}
+  </div>
+  <div class="meta-row">
+    <span class="pill {{ 'ok' if mongo_ok else 'unreadable' }}">{{ 'متصل' if mongo_ok else 'مش متصل' }}</span>
+    <span>MongoDB</span>
+  </div>
+  <div class="meta-row small muted">
+    {% if h.model_version %}الموديل: <span class="mono">{{ h.model_version }}</span> · القاعدة: <span class="mono">{{ h.decision_rule_version }}</span>{% else %}السبب: <span class="mono">{{ h.detail }}</span>{% endif %}
+  </div>
+</div>

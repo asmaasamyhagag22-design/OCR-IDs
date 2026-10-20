@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% macro qs(c=category, s=state, k=kind, p=1) -%}
+?category={{ c }}&state={{ s }}&kind={{ k }}&page_no={{ p }}
+{%- endmacro %}
+{% block main %}
+<div class="page-head">
+  <div>
+    <h1>قائمة المراجعة</h1>
+    <p class="sub">الحالات اللي القراءة فيها مختلفة عن الرقم المكتوب، أو ما اتقراتش خالص. الأرقام متخبّية هنا، وبتظهر كاملة جوه شاشة المراجعة بس.</p>
+  </div>
+  <div class="actions">
+    <a class="btn primary" href="/review/next{% if category %}?category={{ category }}{% endif %}">راجع اللي بعده <kbd>↵</kbd></a>
+  </div>
+</div>
+{% if request.query_params.get('done') %}<div class="notice good">مفيش حالات مستنية في القائمة دي. شغل عظيم.</div>{% endif %}
+{% if request.query_params.get('missing') %}<div class="notice warn">السجل ده مش في قائمة المراجعة. ممكن يكون اتقرا تاني واتغيّرت حالته.</div>{% endif %}
+
+<section class="panel">
+  <nav class="tabs" aria-label="التصنيف">
+    <a href="/queue{{ qs(c='', s='pending', k='') }}" class="{{ 'on' if not category and state == 'pending' }}">كل المستني <span class="pill neutral num">{{ (counts.mismatch + counts.unreadable)|num }}</span></a>
+    <a href="/queue{{ qs(c='mismatch', s='pending', k='') }}" class="{{ 'on' if category == 'mismatch' and state == 'pending' }}">مختلف عن المكتوب <span class="pill mismatch num">{{ counts.mismatch|num }}</span></a>
+    <a href="/queue{{ qs(c='unreadable', s='pending', k='') }}" class="{{ 'on' if category == 'unreadable' and state == 'pending' }}">ما اتقراش <span class="pill unreadable num">{{ counts.unreadable|num }}</span></a>
+    <a href="/queue{{ qs(c='', s='decided', k='') }}" class="{{ 'on' if state == 'decided' }}">اتراجع <span class="pill decided num">{{ counts.decided|num }}</span></a>
+  </nav>
+  <form class="filters panel-body" method="get" action="/queue">
+    <input type="hidden" name="category" value="{{ category }}">
+    <input type="hidden" name="state" value="{{ state }}">
+    <label for="kind">شكل الاختلاف
+      <select id="kind" name="kind" data-autosubmit>
+        <option value="">الكل</option>
+        {% for k in kinds %}<option value="{{ k }}" {{ 'selected' if k == kind }}>{{ kind_labels[k] }}</option>{% endfor %}
+      </select>
+    </label>
+    <span class="muted small">{{ total|num }} حالة</span>
+  </form>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>السجل</th><th>التصنيف</th><th>شكل الاختلاف</th><th>الخانات المختلفة</th><th>المكتوب</th><th>الحالة</th><th>القرار</th></tr></thead>
+      <tbody>
+      {% for r, rv, st in rows %}
+        <tr>
+          <td><a class="row-link mono" href="/review/{{ r.key }}{% if category %}?category={{ category }}{% endif %}">…{{ r.key[-8:] }}</a></td>
+          <td><span class="pill {{ r.category }}">{{ category_labels[r.category] }}</span></td>
+          <td>{{ kind_labels[r.kind] }}</td>
+          <td class="mono">{% if r.differing %}{% for p in r.differing %}{{ p + 1 }}{{ '، ' if not loop.last }}{% endfor %}{% else %}—{% endif %}</td>
+          <td class="mono">{{ r.typed|mask }}</td>
+          <td><span class="pill {{ st }}">{{ state_labels[st] }}</span>{% if st == 'claimed' %} <span class="small muted">{{ rv.claim.user }}</span>{% endif %}</td>
+          <td>{% if rv and rv.verdict %}{{ verdicts[rv.verdict].label }} <span class="small muted">· {{ rv.reviewer }}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="muted">مفيش حالات هنا.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if pages > 1 %}
+  <div class="pager">
+    <span>صفحة <span class="num">{{ page_no }}</span> من <span class="num">{{ pages }}</span></span>
+    <span class="actions">
+      {% if page_no > 1 %}<a class="btn small" href="/queue{{ qs(p=page_no - 1) }}">السابقة</a>{% endif %}
+      {% if page_no < pages %}<a class="btn small" href="/queue{{ qs(p=page_no + 1) }}">التالية</a>{% endif %}
+    </span>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

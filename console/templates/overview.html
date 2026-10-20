@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block main %}
+{% set proj = o.projected() %}
+<div class="page-head">
+  <div>
+    <h1>نظرة عامة</h1>
+    <p class="sub">آخر قراءة من الـ OCR: <span class="num">{{ o.last_processed|when }}</span> · الأرقام بتتحدث كل {{ settings.stats_ttl_s }} ثانية</p>
+  </div>
+  <div class="actions">
+    <a class="btn" href="/overview?refresh=1">تحديث الآن</a>
+    <a class="btn primary" href="/review/next">ابدأ المراجعة <kbd>↵</kbd></a>
+  </div>
+</div>
+
+<section class="kpis" aria-label="المؤشرات الأساسية">
+  <div class="kpi warn">
+    <span class="label">الدقة قبل المراجعة</span>
+    <span class="value">{{ o.lower|pct }}</span>
+    <span class="note">القراءة = الرقم المكتوب. ده حد أدنى، لأن غلط كتابة المتقدم بيتحسب على الموديل.</span>
+  </div>
+  <div class="kpi accent">
+    <span class="label">الدقة المؤكدة لحد دلوقتي</span>
+    <span class="value">{{ o.confirmed|pct }}</span>
+    <span class="note">المطابق + الحالات اللي المراجع أكد إن الـ OCR قراها صح ({{ o.mismatch_ocr_right|num }}).</span>
+  </div>
+  <div class="kpi">
+    <span class="label">المتوقع بعد ما المراجعة تخلص</span>
+    <span class="value">{% if proj %}{{ proj[0]|pct(1) }}{% else %}—{% endif %}</span>
+    <span class="note">{% if proj %}بثقة 95%: <span class="num">{{ proj[1]|pct(1) }} – {{ proj[2]|pct(1) }}</span>، من {{ (o.mismatch_ocr_right + o.mismatch_ocr_wrong)|num }} حالة متراجعة.{% else %}محتاج مراجعات الأول.{% endif %}</span>
+  </div>
+  <div class="kpi">
+    <span class="label">التغطية</span>
+    <span class="value">{{ o.coverage|pct }}</span>
+    <span class="note">الموديل طلّع رقم لـ {{ o.readings|num }} من {{ o.evaluated|num }} متقدم.</span>
+  </div>
+  <div class="kpi">
+    <span class="label">تقدّم المراجعة</span>
+    <span class="value">{{ o.progress|pct(0) }}</span>
+    <span class="note">{{ o.queue_decided|num }} من {{ o.queue_total|num }} حالة · انت راجعت النهارده {{ mine_today|num }}</span>
+  </div>
+</section>
+
+{% if chart %}
+<section class="panel">
+  <div class="panel-head"><h2>الدقة الحقيقية بين فين وفين</h2><span class="muted small">كل قرار مراجعة بيضيّق المدى</span></div>
+  <div class="panel-body">
+    <svg class="chart" viewBox="0 0 {{ chart.width }} 120" role="img"
+         aria-label="مقياس الدقة: الحد الأدنى {{ o.lower|pct }}، المؤكد {{ o.confirmed|pct }}، وأعلى قيمة ممكنة {{ o.upper|pct }}">
+      {% for t in chart.ticks %}
+      <line class="grid" x1="{{ t.x }}" y1="34" x2="{{ t.x }}" y2="86"/>
+      <text x="{{ t.x }}" y="104" text-anchor="middle">{{ t.label }}</text>
+      {% endfor %}
+      <line class="axis" x1="24" y1="86" x2="{{ chart.width - 24 }}" y2="86"/>
+      {% if chart.confirmed is not none and chart.upper is not none %}
+      <rect class="range" x="{{ chart.confirmed }}" y="46" width="{{ [chart.upper - chart.confirmed, 1]|max }}" height="28" rx="3"/>
+      {% endif %}
+      {% if chart.projected %}
+      <rect class="proj" x="{{ chart.projected[1] }}" y="46" width="{{ [chart.projected[2] - chart.projected[1], 2]|max }}" height="28"/>
+      <line x1="{{ chart.projected[0] }}" y1="40" x2="{{ chart.projected[0] }}" y2="80" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 2"/>
+      <text class="lbl" x="{{ chart.projected[0] }}" y="22" text-anchor="middle">≈ {{ proj[0]|pct(1) }}</text>
+      {% endif %}
+      {% if chart.lower is not none %}
+      <rect class="mark-lower" x="{{ chart.lower - 2 }}" y="42" width="4" height="36" rx="1"/>
+      <text class="lbl" x="{{ chart.lower }}" y="36" text-anchor="middle">{{ o.lower|pct(1) }}</text>
+      {% endif %}
+      {% if chart.confirmed is not none %}
+      <rect class="mark-confirmed" x="{{ chart.confirmed - 2 }}" y="42" width="4" height="36" rx="1"/>
+      {% endif %}
+      {% if chart.upper is not none %}
+      <rect class="mark-upper" x="{{ chart.upper - 2 }}" y="42" width="4" height="36" rx="1"/>
+      {% endif %}
+    </svg>
+    <div class="legend">
+      <span><i class="sw-lower"></i>قبل المراجعة</span>
+      <span><i class="sw-confirmed"></i>مؤكد</span>
+      <span><i class="sw-range"></i>المدى الممكن لسه</span>
+      <span><i class="sw-upper"></i>لو كل الباقي طلع صح</span>
+      <span>≈ المتوقع، والمستطيل الغامق حواليه هامش ثقة 95%</span>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<div class="grid-2">
+  <section class="panel">
+    <div class="panel-head"><h2>نتيجة القراءة</h2><span class="muted small num">{{ o.processed|num }} سجل</span></div>
+    <div class="panel-body">
+      {% set total = [o.evaluated, 1]|max %}
+      <div class="stack" role="img" aria-label="مطابق {{ o.categories['match'] }}، مختلف {{ o.categories['mismatch'] }}، ما اتقراش {{ o.categories['unreadable'] }}">
+        <span class="s-match" style="width: {{ 100 * o.categories['match'] / total }}%"></span>
+        <span class="s-mismatch" style="width: {{ 100 * o.categories['mismatch'] / total }}%"></span>
+        <span class="s-unreadable" style="width: {{ 100 * o.categories['unreadable'] / total }}%"></span>
+      </div>
+      <div class="legend">
+        <span><i class="sw-match"></i>مطابق <b class="num">{{ o.categories['match']|num }}</b></span>
+        <span><i class="sw-mismatch"></i>مختلف عن المكتوب <b class="num">{{ o.categories['mismatch']|num }}</b></span>
+        <span><i class="sw-unreadable"></i>ما اتقراش <b class="num">{{ o.categories['unreadable']|num }}</b></span>
+      </div>
+      <table>
+        <tbody>
+          <tr><td>اتقيّم (صورة + رقم مكتوب)</td><td class="n">{{ o.evaluated|num }}</td></tr>
+          <tr><td>مفيش صورة على السيرفر</td><td class="n">{{ o.statuses['download_error']|num }}</td></tr>
+          <tr><td>طلب الـ OCR فشل (يتعاد)</td><td class="n">{{ (o.statuses['ocr_request_error'] + o.statuses['ocr_missing_in_response'])|num }}</td></tr>
+          <tr><td>مفيش رقم مكتوب</td><td class="n">{{ o.categories['no_typed']|num }}</td></tr>
+          <tr><td>لسه ما اتقراش خالص</td><td class="n">{{ o.pending_ocr|num }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>قرارات المراجعة</h2><span class="muted small num">{{ o.queue_decided|num }} / {{ o.queue_total|num }}</span></div>
+    <div class="panel-body">
+      <div class="progress" role="img" aria-label="تقدم المراجعة {{ o.progress|pct(0) }}"><span style="width: {{ 100 * (o.progress or 0) }}%"></span></div>
+      {% set vmax = [o.verdicts.values()|max if o.verdicts else 0, 1]|max %}
+      <div class="hbars">
+        {% for name, v in verdicts.items() %}
+        <div class="hbar"><span>{{ v.label }}</span>
+          <span class="track"><span class="fill {{ 'warn' if name in ('typed_correct', 'other') else 'bad' if name in ('unreadable', 'wrong_document') else '' }}" style="width: {{ 100 * o.verdicts[name] / vmax }}%"></span></span>
+          <span class="n">{{ o.verdicts[name]|num }}</span></div>
+        {% endfor %}
+      </div>
+      <p class="small muted">من الحالات المختلفة اللي اتحسمت: الـ OCR كان صح في <b class="num">{{ o.share_ocr_right|pct(0) }}</b> منها، والباقي غلط قراءة. ومحتاجين صورة جديدة لـ <b class="num">{{ o.reupload|num }}</b> متقدم.</p>
+    </div>
+  </section>
+</div>
+
+<div class="grid-2">
+  <section class="panel">
+    <div class="panel-head"><h2>شكل الاختلاف</h2><span class="muted small">في الحالات المختلفة عن المكتوب</span></div>
+    <div class="panel-body">
+      {% set kmax = [o.kinds.values()|max if o.kinds else 0, 1]|max %}
+      <div class="hbars">
+        {% for name, n in o.kinds.most_common() %}
+        <div class="hbar"><span>{{ kind_labels[name] }}</span><span class="track"><span class="fill warn" style="width: {{ 100 * n / kmax }}%"></span></span><span class="n">{{ n|num }}</span></div>
+        {% else %}<p class="muted">مفيش حالات مختلفة.</p>{% endfor %}
+      </div>
+      <p class="small muted">الاختلاف في خانة أو خانتين ممكن يبقى غلط قراءة أو غلط كتابة. 3 خانات أو أكتر غالباً معناه غلط كتابة، أو بطاقة شخص تاني.</p>
+    </div>
+  </section>
+  <section class="panel">
+    <div class="panel-head"><h2>ليه ما اتقراش</h2><span class="muted small">من ردود الـ OCR</span></div>
+    <div class="panel-body">
+      {% set emax = [o.error_codes.values()|max if o.error_codes else 0, 1]|max %}
+      <div class="hbars">
+        {% for code, n in o.error_codes.most_common() %}
+        <div class="hbar"><span>{{ error_code_labels.get(code, code) }}</span><span class="track"><span class="fill bad" style="width: {{ 100 * n / emax }}%"></span></span><span class="n">{{ n|num }}</span></div>
+        {% else %}<p class="muted">مفيش.</p>{% endfor %}
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="grid-2">
+  <section class="panel">
+    <div class="panel-head"><h2>المراجعات في آخر 14 يوم</h2></div>
+    <div class="panel-body">
+      {% set b = chart.bars if chart else {'days': o.per_day, 'max': 1} %}
+      <svg class="chart" viewBox="0 0 560 150" role="img" aria-label="عدد المراجعات في كل يوم من آخر 14 يوم">
+        <line class="axis" x1="10" y1="120" x2="550" y2="120"/>
+        {% for day, n in b.days %}
+        {% set h = 96 * n / b.max %}
+        <rect class="bar {{ 'today' if loop.last }}" x="{{ 14 + loop.index0 * 38.5 }}" y="{{ 120 - h }}" width="28" height="{{ h }}" rx="2"/>
+        {% if n %}<text x="{{ 28 + loop.index0 * 38.5 }}" y="{{ 114 - h }}" text-anchor="middle">{{ n }}</text>{% endif %}
+        <text x="{{ 28 + loop.index0 * 38.5 }}" y="138" text-anchor="middle">{{ day[8:] }}/{{ day[5:7] }}</text>
+        {% endfor %}
+      </svg>
+    </div>
+  </section>
+  <section class="panel">
+    <div class="panel-head"><h2>المراجعين</h2></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>المراجع</th><th>قرارات</th></tr></thead>
+        <tbody>
+        {% for name, n in o.reviewers.most_common() %}
+          <tr><td>{{ name }}</td><td class="n">{{ n|num }}</td></tr>
+        {% else %}<tr><td colspan="2" class="muted">لسه مفيش مراجعات.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<section class="panel">
+  <div class="panel-head"><h2>حالة الأنظمة</h2><span class="muted small">OCR service و MongoDB</span></div>
+  <div class="panel-body" data-fragment="/fragments/health"><p class="muted small">بيتأكد من الخدمات...</p></div>
+</section>
+{% endblock %}

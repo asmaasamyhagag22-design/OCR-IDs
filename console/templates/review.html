@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% import "_idgrid.html" as idg %}
+{% block main %}
+{% set decided = rv and rv.verdict %}
+<div class="page-head">
+  <div>
+    <h1>مراجعة السجل <span class="mono">…{{ r.key[-8:] }}</span></h1>
+    <div class="meta-row sub">
+      <span class="pill {{ r.category }}">{{ category_labels[r.category] }}</span>
+      <span class="pill neutral">{{ kind_labels[r.kind] }}</span>
+      {% if decided %}<span class="pill decided">اتراجع: {{ verdicts[rv.verdict].label }}</span>{% endif %}
+      <span class="muted small">باقي {{ remaining|num }} حالة مستنية{% if category %} في {{ category_labels[category] }}{% endif %}</span>
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn" href="/queue{% if category %}?category={{ category }}{% endif %}">القائمة</a>
+    <a class="btn" href="/review/next?after={{ r.key }}{% if category %}&category={{ category }}{% endif %}" data-key="s">تخطّي <kbd>S</kbd></a>
+  </div>
+</div>
+
+{% if error == 'claimed' %}<div class="notice warn">مراجع تاني فاتح الحالة دي دلوقتي. اختار حالة تانية.</div>{% endif %}
+{% if error == 'invalid' %}<div class="notice bad">القرار ما اتحفظش: اختار قرار، ولو اخترت "الاتنين غلط" اكتب الرقم الصح 14 خانة.</div>{% endif %}
+{% if not claimed %}<div class="notice warn">الحالة دي مع {{ rv.claim.user }} دلوقتي. ممكن تشوفها بس من غير ما تقرر.</div>{% endif %}
+
+<div class="review">
+  <section class="panel">
+    <div class="viewer" data-viewer>
+      <img src="/media/{{ r.key }}/front" alt="صورة وش البطاقة اللي المتقدم رفعها" draggable="false">
+      <div class="msg" hidden data-viewer-msg></div>
+      <div class="viewer-tools" role="toolbar" aria-label="أدوات الصورة">
+        <button type="button" data-zoom="in" title="تكبير (+)">+</button>
+        <button type="button" data-zoom="out" title="تصغير (-)">−</button>
+        <button type="button" data-rotate title="لف 90 درجة (R)">↻</button>
+        <button type="button" data-fit title="ملء الإطار (0)">⤢</button>
+      </div>
+    </div>
+    <div class="panel-body"><p class="small muted">اسحب الصورة بالماوس، وكبّر بالعجلة أو <kbd>+</kbd> <kbd>−</kbd>، ولف بـ <kbd>R</kbd>، ورجّعها بـ <kbd>0</kbd>. الصورة بتتعرض من سيرفر الصور ومش بتتحفظ.</p></div>
+  </section>
+
+  <section class="decide">
+    <div class="panel">
+      <div class="panel-head"><h2>القراءة قدام المكتوب</h2>
+        {% if r.category == 'mismatch' %}<span class="pill mismatch">{{ diff|length }} خانة مختلفة</span>{% endif %}</div>
+      <div class="panel-body">
+        <div class="idstack">
+          {{ idg.row(read_cells, diff, 'read', 'الـ OCR') }}
+          {{ idg.row(typed_cells, diff, 'typed', 'المكتوب') }}
+          {{ idg.labels(segments, segment_labels) }}
+        </div>
+        <div class="facts" role="table" aria-label="معنى الرقمين">
+          <div class="h"></div><div class="h">قراءة الـ OCR</div><div class="h">المكتوب</div>
+          <div class="k">تاريخ الميلاد</div><div class="mono">{{ read_info.birth_date or '—' }}</div><div class="mono">{{ typed_info.birth_date or '—' }}</div>
+          <div class="k">المحافظة</div><div>{{ read_info.governorate or '—' }}</div><div>{{ typed_info.governorate or '—' }}</div>
+          <div class="k">النوع</div><div>{{ read_info.sex or '—' }}</div><div>{{ typed_info.sex or '—' }}</div>
+          <div class="k">رقم سليم؟</div>
+          <div class="{{ '' if read_info.valid else 'bad' }}">{{ 'سليم' if read_info.valid else ('مفيش قراءة' if not r.read else 'مش سليم') }}</div>
+          <div class="{{ '' if typed_info.valid else 'bad' }}">{{ 'سليم' if typed_info.valid else 'مش سليم' }}</div>
+        </div>
+        {% for name, value in r.extra.items() %}{% if value %}<p class="small"><span class="muted">{{ name }}:</span> {{ value }}</p>{% endif %}{% endfor %}
+        <div class="reread" data-reread-box>
+          <button type="button" class="btn small" data-reread="/review/{{ r.key }}/reread">اقرا الصورة تاني بالموديل وشوف الثقة</button>
+        </div>
+      </div>
+    </div>
+
+    <form class="panel" method="post" action="/review/{{ r.key }}" data-decide-form>
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <input type="hidden" name="category" value="{{ category }}">
+      <div class="panel-head"><h2>{{ 'القرار' if not decided else 'تعديل القرار' }}</h2><span class="muted small">اختار بالأرقام من الكيبورد</span></div>
+      <div class="panel-body">
+        {% if not can_change %}
+        <div class="notice good">اتراجعت بواسطة {{ rv.reviewer }}. تعديل القرار للمشرف بس.</div>
+        {% else %}
+        <fieldset class="verdicts" {{ 'disabled' if not claimed }}>
+          <legend class="sr">القرار</legend>
+          {% for name, v in allowed %}
+          <label class="verdict">
+            <input type="radio" name="verdict" value="{{ name }}" data-key="{{ v.key }}" {{ 'checked' if decided and rv.verdict == name }} required>
+            <span class="key">{{ v.key }}</span>
+            <span><b>{{ v.label }}</b><small>{{ v.hint }}</small></span>
+          </label>
+          {% endfor %}
+        </fieldset>
+        <div class="corrected" data-corrected {{ 'hidden' if not (decided and rv.verdict == 'other') }}>
+          <label for="corrected">الرقم الصح زي ما هو في الصورة (14 خانة)</label>
+          <input id="corrected" name="corrected" type="text" inputmode="numeric" maxlength="14" autocomplete="off"
+                 pattern="[0-9٠-٩]{14}" value="{{ rv.corrected_id if decided and rv.corrected_id else '' }}">
+        </div>
+        <label class="field"><span class="small muted">ملاحظة (اختياري)</span>
+          <textarea name="note" rows="2" maxlength="500">{{ rv.note if decided else '' }}</textarea></label>
+        <div class="decide-actions">
+          <button class="btn primary" type="submit" {{ 'disabled' if not claimed }}>احفظ وروح للي بعده <kbd>↵</kbd></button>
+          <button class="btn" type="submit" name="then" value="stay" {{ 'disabled' if not claimed }}>احفظ بس</button>
+        </div>
+        {% endif %}
+        {% if decided %}
+        <div class="history">
+          {% for h in rv.history|reverse %}
+          <div><span>{{ verdicts[h.verdict].label }} · {{ h.reviewer }}</span><span class="num muted">{{ h.reviewed_at|when }}</span></div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}

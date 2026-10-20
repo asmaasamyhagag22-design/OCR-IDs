@@ -3657,3 +3657,30 @@ The run showed that, since D-108, team_reread_found_images.py --write printed
 each record's reading to the terminal through the client's logger. The script
 now detaches the client's terminal handler, so the terminal shows counts only
 and the per-record lines go to the private log file only.
+
+## D-110 - Review console for the operational review of the first run (2026-10-20)
+
+The owner asked for an application the work machine runs for the agency: the
+reviewers settle the readings that differ from the typed ID (about 1,400 on the
+first run) and those that could not be read, a supervisor sees the accuracy
+that the reviews establish, and the operations team sees the state of the run.
+This is operational review of production records requested by the owner, not
+new labelling for model development; the "no new human review sheets" line in
+CLAUDE.md governs the research sets and is unchanged.
+
+Decisions taken with the owner:
+- Decisions go to new collections (`ocr_reviews`, append-only
+  `ocr_review_audit`, `console_users`, `console_sessions`). The applicants
+  collection and the client's `Auto Id_Validation` field are never written.
+- Only mismatches and unreadable records are reviewed. Matches are counted
+  correct, because a wrong match needs the OCR and the applicant to produce the
+  same wrong 14 digits. No sample of matches is drawn.
+- Server-rendered pages (FastAPI and Jinja templates), no build step and no
+  external assets, so the machine needs no Node.js and no internet at run time.
+
+The console (`console/`, `compose.yaml`, docs/CONSOLE_GUIDE.md) loads no model,
+imports no shipped OCR module, and changes no file in docker/app_code_files.txt;
+the OCR image, its pipeline and its thresholds are unchanged. Its accuracy
+figures are bookkeeping over the reviewers' verdicts (lower bound, confirmed,
+upper bound, and a Wilson-interval projection), not a decision instrument for
+the model, and no model decision is computed from them.

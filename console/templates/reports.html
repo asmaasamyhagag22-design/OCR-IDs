@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block main %}
+{% set proj = o.projected() %}
+<div class="page-head">
+  <div>
+    <h1>التقارير</h1>
+    <p class="sub">ملخص للإدارة، وملفات CSV للفرق التانية. كل تصدير بيتسجّل باسمك في سجل العمليات.</p>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel-head"><h2>ملخص الدقة</h2><span class="muted small">على مستوى المتقدم، بنفس طريقة team_accuracy_report.py</span></div>
+  <div class="tablewrap">
+    <table>
+      <tbody>
+        <tr><td>متقدمين اتقيّموا (صورة + رقم مكتوب)</td><td class="n">{{ o.evaluated|num }}</td><td></td></tr>
+        <tr><td>القراءة = المكتوب</td><td class="n">{{ o.categories['match']|num }}</td><td class="n">{{ o.lower|pct }}</td></tr>
+        <tr><td>مختلف، والمراجع أكد إن الـ OCR صح (غلط كتابة أو بطاقة شخص تاني)</td><td class="n">{{ o.mismatch_ocr_right|num }}</td><td></td></tr>
+        <tr><td>مختلف، والمراجع أكد إن الـ OCR غلط</td><td class="n">{{ o.mismatch_ocr_wrong|num }}</td><td></td></tr>
+        <tr><td>مختلف، ولسه ما اتراجعش</td><td class="n">{{ o.mismatch_pending|num }}</td><td></td></tr>
+        <tr><td>ما اتقراش</td><td class="n">{{ o.categories['unreadable']|num }}</td><td></td></tr>
+        <tr><td><b>دقة الـ OCR المؤكدة</b></td><td></td><td class="n"><b>{{ o.confirmed|pct }}</b></td></tr>
+        <tr><td>أعلى قيمة ممكنة (لو كل اللي لسه ما اتراجعش طلع صح)</td><td></td><td class="n">{{ o.upper|pct }}</td></tr>
+        <tr><td>المتوقع بعد ما المراجعة تخلص (ثقة 95%)</td><td></td><td class="n">{% if proj %}{{ proj[0]|pct(1) }} ({{ proj[1]|pct(1) }} – {{ proj[2]|pct(1) }}){% else %}—{% endif %}</td></tr>
+        <tr><td>محتاجين صورة جديدة</td><td class="n">{{ o.reupload|num }}</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="panel-body small muted">
+    المطابق بيتحسب صح، لأن عشان يبقى غلط لازم الموديل والمتقدم الاتنين يكتبوا نفس الرقم الغلط بالظبط. والمتوقع بيفترض إن الحالات اللي لسه ما اتراجعتش شبه اللي اتراجعت، وده بيبقى صح لو المراجعة ماشية بترتيب القائمة ومش بتنقّي.
+  </div>
+</section>
+
+<section class="grid-3">
+  <div class="panel"><div class="panel-body">
+    <h2>كل القرارات</h2>
+    <p class="small muted">سجل لكل حالة اتراجعت: التصنيف، والقرار، والقراءة، والمكتوب، والرقم الصح، والمراجع، والوقت. <b>فيه أرقام قومية كاملة.</b></p>
+    <a class="btn primary" href="/reports/decisions.csv">تنزيل CSV</a>
+  </div></div>
+  <div class="panel"><div class="panel-body">
+    <h2>تصحيح الرقم المكتوب</h2>
+    <p class="small muted">المتقدمين اللي الرقم الصح من البطاقة طلع غير اللي كتبوه، عشان فريق البيانات يصلّحه. <b>فيه أرقام قومية كاملة.</b></p>
+    <a class="btn" href="/reports/corrections.csv">تنزيل CSV</a>
+  </div></div>
+  <div class="panel"><div class="panel-body">
+    <h2>محتاجين يرفعوا صورة تانية</h2>
+    <p class="small muted">الصورة مش واضحة أو مش وش البطاقة. الملف فيه رقم السجل بس، من غير أرقام قومية.</p>
+    <a class="btn" href="/reports/reupload.csv">تنزيل CSV</a>
+  </div></div>
+</section>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block main %}
+{% set errors = {'name': 'اسم المستخدم لازم يكون حروف إنجليزي وأرقام بس.', 'exists': 'اسم المستخدم ده موجود قبل كده.',
+  'password': 'كلمة السر لازم تكون 10 حروف على الأقل.', 'self': 'مينفعش توقّف حسابك انت.',
+  'missing': 'المستخدم مش موجود.', 'action': 'العملية مش معروفة.'} %}
+<div class="page-head">
+  <div>
+    <h1>المستخدمين</h1>
+    <p class="sub">المراجع بيراجع الحالات. المشرف كمان بيشوف التقارير والسجل، ويقدر يعدّل أي قرار. ومدير النظام كمان بيدير الحسابات.</p>
+  </div>
+</div>
+{% if error %}<div class="notice bad">{{ errors.get(error, 'حصل خطأ.') }}</div>{% endif %}
+{% if saved %}<div class="notice good">اتحفظ.</div>{% endif %}
+
+<div class="grid-2">
+  <section class="panel">
+    <div class="panel-head"><h2>الحسابات</h2></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>الاسم</th><th>المستخدم</th><th>الصلاحية</th><th>آخر دخول</th><th></th></tr></thead>
+        <tbody>
+        {% for u in users %}
+          <tr>
+            <td>{{ u.display_name }}{% if not u.get('active', True) %} <span class="pill neutral">موقوف</span>{% endif %}</td>
+            <td class="mono">{{ u.username }}</td>
+            <td>
+              {% if u.username != user.username %}
+              <form method="post" action="/users/{{ u.username }}" class="meta-row">
+                <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="role">
+                <select name="role" aria-label="صلاحية {{ u.display_name }}" data-autosubmit>
+                  {% for r in roles %}<option value="{{ r }}" {{ 'selected' if r == u.role }}>{{ role_labels[r] }}</option>{% endfor %}
+                </select>
+              </form>
+              {% else %}{{ role_labels[u.role] }}{% endif %}
+            </td>
+            <td class="n">{{ u.get('last_login')|when }}</td>
+            <td>
+              {% if u.username != user.username %}
+              <form method="post" action="/users/{{ u.username }}">
+                <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="toggle">
+                <button class="btn small" type="submit">{{ 'إيقاف' if u.get('active', True) else 'تفعيل' }}</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="decide">
+    <form class="panel" method="post" action="/users">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <div class="panel-head"><h2>إضافة مستخدم</h2></div>
+      <div class="panel-body">
+        <div class="field"><label for="nu">اسم المستخدم (إنجليزي)</label><input id="nu" name="username" type="text" dir="ltr" required></div>
+        <div class="field"><label for="nd">الاسم اللي هيظهر</label><input id="nd" name="display_name" type="text" required></div>
+        <div class="field"><label for="nr">الصلاحية</label>
+          <select id="nr" name="role">{% for r in roles %}<option value="{{ r }}">{{ role_labels[r] }}</option>{% endfor %}</select></div>
+        <div class="field"><label for="np">كلمة سر مبدئية (10 حروف على الأقل)</label><input id="np" name="password" type="password" dir="ltr" autocomplete="new-password" required minlength="10"></div>
+        <button class="btn primary" type="submit">إضافة</button>
+      </div>
+    </form>
+    <form class="panel" method="post" data-reset-form>
+      <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="password">
+      <div class="panel-head"><h2>تغيير كلمة سر مستخدم</h2></div>
+      <div class="panel-body">
+        <div class="field"><label for="ru">المستخدم</label>
+          <select id="ru" data-reset-user>{% for u in users %}<option value="{{ u.username }}">{{ u.display_name }} ({{ u.username }})</option>{% endfor %}</select></div>
+        <div class="field"><label for="rp">كلمة السر الجديدة</label><input id="rp" name="password" type="password" dir="ltr" autocomplete="new-password" required minlength="10"></div>
+        <p class="small muted">المستخدم هيخرج من كل الأجهزة، ويدخل بكلمة السر الجديدة.</p>
+        <button class="btn" type="submit">غيّر كلمة السر</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

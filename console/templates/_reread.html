@@ -1,0 +1,17 @@
+{% import "_idgrid.html" as idg %}
+{% set low = res and res.confidence is not none and threshold and res.confidence < threshold %}
+{% if error %}
+<div class="notice bad">{{ error }}</div>
+{% elif res.finding %}
+<div class="idstack">{{ idg.row(cells, [], 'read', 'القراءة دلوقتي') }}</div>
+<div class="conf">
+  <span>الثقة</span>
+  <span class="progress"><span class="{{ 'low' if low }}" style="width: {{ 100 * (res.confidence or 0) }}%"></span></span>
+  <span class="num">{{ '%.4f'|format(res.confidence) if res.confidence is not none else '—' }}</span>
+</div>
+<p class="small muted">{% if same %}نفس القراءة المحفوظة.{% else %}مختلفة عن القراءة المحفوظة.{% endif %}
+  {% if low %}الثقة أقل من حد القرار (<span class="num">{{ threshold }}</span>)، يعني الموديل كان محتار في خانة واحدة على الأقل.{% endif %}
+  <span class="num">{{ '%.1f'|format(res.seconds) }}s</span> · <span class="mono">{{ res.model_version }}</span></p>
+{% else %}
+<div class="notice warn">الموديل ما طلّعش رقم: <span class="mono">{{ res.error_codes|join(', ') }}</span></div>
+{% endif %}

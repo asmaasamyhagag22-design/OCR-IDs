@@ -1,0 +1,54 @@
+# The work machine's two long-running services, started and kept running by Docker:
+#
+#   docker compose --profile engine up -d     the OCR engine and the review console
+#   docker compose up -d console              the console only (the engine already runs as
+#                                             the guide's `docker run ... fixed14-engine`)
+#
+# Both restart after a crash or a reboot; no terminal has to stay open.
+# Before the first start: see docs/CONSOLE_GUIDE.md (image name, key files, first account).
+
+services:
+  ocr:
+    profiles: ["engine"]
+    # the image scripts/phase4_service_docker.sh builds; put its name in .env as OCR_IMAGE
+    image: ${OCR_IMAGE:?set OCR_IMAGE to the output of "bash scripts/phase4_service_docker.sh image"}
+    container_name: fixed14-engine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:8081"
+    env_file:
+      - ${HOME}/.config/fixed14/ocr.env
+    environment:
+      OCR_ENGINE_WORKERS: ${OCR_ENGINE_WORKERS:-5}
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /home/ocr:uid=10001,gid=10001
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    ulimits:
+      core: 0
+    mem_limit: ${OCR_MEMORY:-10g}
+    pids_limit: 1024
+
+  console:
+    build:
+      context: .
+      dockerfile: console/Dockerfile
+    image: fixed14-console:local
+    container_name: fixed14-console
+    restart: unless-stopped
+    # host networking: MongoDB, the media server (nginx) and the engine are reached exactly
+    # as the API client reaches them from this machine (127.0.0.1 or the configured hosts)
+    network_mode: host
+    env_file:
+      - path: ${HOME}/.config/fixed14/console.env
+        required: false
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    ulimits:
+      core: 0
+    mem_limit: 1g
