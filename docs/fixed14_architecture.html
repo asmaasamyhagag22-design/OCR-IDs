@@ -1,0 +1,676 @@
+<title>Fixed14 OCR Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap">
+<style>
+/* Layout: one reading column (~68ch) for prose; figures and tables break out to a wider measure. RTL Arabic prose, LTR technical diagrams. */
+:root {
+  --bg: #f4f6f7;
+  --surface: #ffffff;
+  --fg: #15212b;
+  --muted: #566672;
+  --line: #c9d3da;
+  --accent: #0d6e6c;      /* security-print teal: the frozen, trusted path */
+  --accent-soft: #dcefee;
+  --warn: #a8641a;        /* amber: the weakest slot, the typed-ID boundary, triggers */
+  --warn-soft: #f6ead9;
+  --font-display: "Readex Pro", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --font-body: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.1875rem;
+  --step-2: 1.5rem;
+  --step-3: 2.125rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1519; --surface: #152027; --fg: #e2e9ed; --muted: #93a4ae; --line: #2c3b44;
+    --accent: #43bdb8; --accent-soft: #163a3b; --warn: #e2a654; --warn-soft: #3a2d1c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1519; --surface: #152027; --fg: #e2e9ed; --muted: #93a4ae; --line: #2c3b44;
+  --accent: #43bdb8; --accent-soft: #163a3b; --warn: #e2a654; --warn-soft: #3a2d1c;
+  color-scheme: dark;
+}
+
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: var(--step-0); line-height: 1.75; }
+main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 48px 80px; }
+.wrap { max-width: 1040px; margin-inline: auto; display: grid; gap: 56px; }
+.prose { max-width: 68ch; display: grid; gap: 14px; min-width: 0; }
+section { display: grid; gap: 20px; min-width: 0; }
+
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.3; text-wrap: balance; margin: 0; }
+h1 { font-size: var(--step-3); font-weight: 700; }
+h2 { font-size: var(--step-2); font-weight: 600; }
+h3 { font-size: var(--step-1); font-weight: 600; }
+p, ul, ol { margin: 0; }
+ul, ol { padding-inline-start: 1.3em; display: grid; gap: 6px; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+strong { font-weight: 600; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; direction: ltr; unicode-bidi: isolate; }
+code { background: var(--accent-soft); padding: 0.05em 0.35em; border-radius: 3px; }
+
+.eyebrow { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; direction: ltr; unicode-bidi: isolate; }
+.lede { font-size: var(--step-1); color: var(--fg); max-width: 62ch; }
+.meta { color: var(--muted); font-size: var(--step--1); }
+
+header.hero { display: grid; gap: 18px; padding-bottom: 36px; border-bottom: 1px solid var(--line); }
+
+/* the 14-cell ID strip in the hero: the subject's own structure */
+.idstrip { display: flex; gap: 4px; direction: ltr; flex-wrap: wrap; }
+.idstrip span { width: 30px; height: 38px; display: grid; place-items: center; font-family: var(--font-mono); font-size: 12px; color: var(--muted); border: 1px solid var(--line); background: var(--surface); border-radius: 3px; }
+.idstrip span.c { border-color: var(--accent); color: var(--accent); }
+.idstrip span.k { border-style: dashed; }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.stat { background: var(--surface); padding: 16px 18px; display: grid; gap: 4px; min-width: 0; }
+.stat b { font-family: var(--font-mono); font-size: var(--step-2); font-weight: 500; direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: var(--step--1); line-height: 1.5; }
+
+figure { margin: 0; display: grid; gap: 12px; min-width: 0; }
+.fig-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); padding: 16px; }
+.fig-scroll svg { display: block; width: 100%; min-width: 760px; height: auto; color: var(--muted); }
+figcaption { color: var(--muted); font-size: var(--step--1); max-width: 80ch; line-height: 1.7; }
+
+/* SVG vocabulary, styled from the page so both themes work */
+.bx { fill: var(--surface); stroke: var(--line); stroke-width: 1.2; }
+.bx-acc { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.4; }
+.bx-warn { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.2; stroke-dasharray: 5 3; }
+.tt { fill: var(--fg); font-family: var(--font-mono); font-size: 13px; font-weight: 500; }
+.ts { fill: var(--muted); font-family: var(--font-mono); font-size: 11px; }
+.tl { fill: var(--muted); font-family: var(--font-mono); font-size: 11px; }
+.tw { fill: var(--warn); font-family: var(--font-mono); font-size: 11px; }
+.ta { fill: var(--accent); font-family: var(--font-mono); font-size: 11px; }
+.tg { fill: var(--fg); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; }
+.ln { stroke: var(--muted); stroke-width: 1.3; fill: none; }
+.ln-acc { stroke: var(--accent); stroke-width: 1.6; fill: none; }
+.ln-warn { stroke: var(--warn); stroke-width: 1.4; fill: none; stroke-dasharray: 5 3; }
+.ln-faint { stroke: var(--line); stroke-width: 1; fill: none; }
+.fill-muted { fill: var(--muted); }
+.fill-acc { fill: var(--accent); }
+.fill-warn { fill: var(--warn); }
+.fill-line { fill: var(--line); }
+.slab { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; }
+.slab-out { fill: var(--accent); stroke: var(--accent); }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.94rem; }
+th, td { text-align: start; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.6; }
+th { font-family: var(--font-display); font-weight: 600; font-size: var(--step--1); color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td.num { font-family: var(--font-mono); direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.pill { display: inline-block; font-family: var(--font-mono); font-size: 11.5px; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; direction: ltr; unicode-bidi: isolate; white-space: nowrap; }
+.p-ok { color: var(--accent); }
+.p-warn { color: var(--warn); }
+.p-mut { color: var(--muted); }
+
+.note { border-inline-start: 3px solid var(--warn); padding: 4px 16px; color: var(--fg); max-width: 68ch; }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 28px; }
+.cols > div { min-width: 0; display: grid; gap: 10px; align-content: start; }
+
+footer { color: var(--muted); font-size: var(--step--1); border-top: 1px solid var(--line); padding-top: 20px; }
+
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<main dir="rtl" lang="ar">
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">DEPI OCR team · Egyptian national ID · front side</div>
+  <h1>Fixed14: قراءة الرقم القومي من صورة البطاقة</h1>
+  <p class="lede">مراجعة معمارية كاملة للمشروع: الخدمة، مسار الصورة، الموديل من جوه، القرار، التدريب والتقييم، والقرارات الهندسية اللي ورا كل جزء والتمن بتاعها.</p>
+  <div class="idstrip" aria-label="هيكل الرقم القومي: 14 خانة">
+    <span class="c">C</span><span>Y</span><span>Y</span><span>M</span><span>M</span><span>D</span><span>D</span><span class="c">G</span><span class="c">G</span><span>S</span><span>S</span><span>S</span><span class="c">♂♀</span><span class="k">K</span>
+  </div>
+  <p class="meta">القرن · تاريخ الميلاد · المحافظة · المسلسل (الخانة 13 بتحدد النوع) · رقم التحقق. المصدر: الريبو <code>asmaasamyhagag22-design/OCR-IDs</code> على commit <code>e6803f8</code>، والوثائق والتقارير اللي جواه.</p>
+</header>
+
+<section aria-labelledby="s-numbers">
+  <h2 id="s-numbers">الصورة في أرقام</h2>
+  <div class="stats">
+    <div class="stat"><b>113,439</b><span>parameter في الموديل كله، والـ weights حجمها 538KB</span></div>
+    <div class="stat"><b>27 ms</b><span>median زمن الموديل لوحده على الشريط (CPU، من غير TTA)</span></div>
+    <div class="stat"><b>95.48%</b><span>القراءة طابقت الرقم المكتوب في 44,305 متقدم. ده حد أدنى</span></div>
+    <div class="stat"><b>98.58%</b><span>طلعلهم قراءة سليمة هيكلياً (coverage)</span></div>
+    <div class="stat"><b>342/377</b><span>نتيجة الـ audit الرسمية = 90.7%، واتفتح مرة واحدة بس</span></div>
+  </div>
+  <p class="meta">أرقام الإنتاج من أول تشغيل كامل يوم 2026-10-11 (<code>docs/DEPLOYMENT_GUIDE.md §13</code>). المقارنة فيها مع الرقم اللي المتقدم كتبه، مش مع رقم اتراجع، فجزء من الاختلافات غلط كتابة من المتقدمين.</p>
+</section>
+
+<section aria-labelledby="s-context">
+  <div class="prose">
+    <h2 id="s-context">1. السياق: المشروع بيتكلم مع مين</h2>
+    <p>فيه طريقين بيوصلوا لنفس الـ recognizer. <strong>طريق الـ batch</strong> هو اللي اتشغّل على الإنتاج: الـ API client بيسحب المتقدمين من MongoDB، وينزّل صورهم من media server، ويبعتهم دفعات (كل دفعة 10) لـ <code>POST /engine</code>، ويكتب النتيجة في <code>Auto Id_Validation</code>. <strong>طريق الـ verify</strong> (v1) بيستقبل الصورة ومعاها الرقم المكتوب، ويرجّع قرار.</p>
+    <p>أهم حدود في الرسمة هو السهم الأصفر: <strong>الرقم المكتوب بيروح للـ decider بس</strong>. الـ recognizer بياخد الصورة لوحدها (<code>recognize(image: bytes)</code>)، وفيه test بيمشي على الـ syntax tree عشان يثبت إن ده مش هيتكسر.</p>
+  </div>
+  <figure>
+    <div class="fig-scroll">
+      <svg viewBox="0 0 970 390" role="img" aria-label="رسمة السياق: طريق الـ batch من MongoDB للـ API client للـ engine وبعدين الـ workers والـ recognizer، وطريق الـ verify اللي الرقم المكتوب فيه بيروح للـ decider بس" direction="ltr">
+        <defs>
+          <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fill-muted"/></marker>
+          <marker id="a1w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fill-warn"/></marker>
+          <marker id="a1a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fill-acc"/></marker>
+        </defs>
+        <text x="20" y="24" class="tg">BATCH PATH · production run</text>
+        <text x="20" y="276" class="tg">VERIFY PATH · /v1</text>
+
+        <!-- row A -->
+        <rect x="20" y="40" width="160" height="56" rx="4" class="bx"/>
+        <text x="100" y="64" text-anchor="middle" class="tt">MongoDB</text>
+        <text x="100" y="82" text-anchor="middle" class="ts">applicants</text>
+
+        <rect x="290" y="40" width="160" height="56" rx="4" class="bx"/>
+        <text x="370" y="64" text-anchor="middle" class="tt">API client</text>
+        <text x="370" y="82" text-anchor="middle" class="ts">batches of 10</text>
+
+        <rect x="560" y="40" width="160" height="56" rx="4" class="bx"/>
+        <text x="640" y="64" text-anchor="middle" class="tt">POST /engine</text>
+        <text x="640" y="82" text-anchor="middle" class="ts">engine.py · :8081</text>
+
+        <rect x="790" y="40" width="160" height="56" rx="4" class="bx"/>
+        <text x="870" y="64" text-anchor="middle" class="tt">engine_pool</text>
+        <text x="870" y="82" text-anchor="middle" class="ts">spawn workers</text>
+
+        <!-- row B -->
+        <rect x="290" y="170" width="160" height="56" rx="4" class="bx"/>
+        <text x="370" y="194" text-anchor="middle" class="tt">Media server</text>
+        <text x="370" y="212" text-anchor="middle" class="ts">Nid_Front.jpg</text>
+
+        <rect x="790" y="170" width="160" height="56" rx="4" class="bx-acc"/>
+        <text x="870" y="194" text-anchor="middle" class="tt">Recognizer</text>
+        <text x="870" y="212" text-anchor="middle" class="ts">frozen models</text>
+
+        <!-- row C -->
+        <rect x="20" y="290" width="160" height="56" rx="4" class="bx"/>
+        <text x="100" y="314" text-anchor="middle" class="tt">Backend</text>
+        <text x="100" y="332" text-anchor="middle" class="ts">applicant API</text>
+
+        <rect x="290" y="290" width="160" height="56" rx="4" class="bx"/>
+        <text x="370" y="314" text-anchor="middle" class="tt">app.py /verify</text>
+        <text x="370" y="332" text-anchor="middle" class="ts">API key · limits</text>
+
+        <rect x="560" y="290" width="160" height="56" rx="4" class="bx"/>
+        <text x="640" y="314" text-anchor="middle" class="tt">decider.py</text>
+        <text x="640" y="332" text-anchor="middle" class="ts">bcfinal_only</text>
+
+        <!-- batch arrows -->
+        <line x1="180" y1="58" x2="288" y2="58" class="ln" marker-end="url(#a1)"/>
+        <text x="234" y="51" text-anchor="middle" class="tl">query</text>
+        <line x1="288" y1="80" x2="182" y2="80" class="ln" marker-end="url(#a1)"/>
+        <text x="234" y="96" text-anchor="middle" class="tl">write status</text>
+
+        <line x1="450" y1="58" x2="558" y2="58" class="ln" marker-end="url(#a1)"/>
+        <text x="504" y="51" text-anchor="middle" class="tl">≤10 × base64</text>
+        <line x1="558" y1="80" x2="452" y2="80" class="ln" marker-end="url(#a1)"/>
+        <text x="504" y="96" text-anchor="middle" class="tl">finding+codes</text>
+
+        <line x1="720" y1="68" x2="788" y2="68" class="ln" marker-end="url(#a1)"/>
+        <text x="754" y="61" text-anchor="middle" class="tl">dispatch</text>
+
+        <line x1="870" y1="96" x2="870" y2="168" class="ln-acc" marker-end="url(#a1a)"/>
+        <text x="862" y="137" text-anchor="end" class="ta">recognize(bytes)</text>
+
+        <line x1="355" y1="96" x2="355" y2="168" class="ln" marker-end="url(#a1)"/>
+        <text x="347" y="137" text-anchor="end" class="tl">GET</text>
+        <line x1="385" y1="168" x2="385" y2="98" class="ln" marker-end="url(#a1)"/>
+        <text x="393" y="137" class="tl">image bytes</text>
+
+        <!-- verify arrows -->
+        <line x1="180" y1="318" x2="288" y2="318" class="ln" marker-end="url(#a1)"/>
+        <text x="234" y="310" text-anchor="middle" class="tl">image + ID</text>
+
+        <path d="M450,302 H505 V198 H788" class="ln-acc" marker-end="url(#a1a)"/>
+        <text x="645" y="190" text-anchor="middle" class="ta">image bytes only</text>
+
+        <path d="M870,226 V318 H722" class="ln" marker-end="url(#a1)"/>
+        <text x="796" y="310" text-anchor="middle" class="tl">reading+margin</text>
+
+        <line x1="450" y1="334" x2="558" y2="334" class="ln-warn" marker-end="url(#a1w)"/>
+        <text x="504" y="326" text-anchor="middle" class="tw">typed ID</text>
+
+        <text x="640" y="374" text-anchor="middle" class="ts">MATCH · MISMATCH_CONFIDENT · NEEDS_REVIEW · UNREADABLE</text>
+      </svg>
+    </div>
+    <figcaption>الطريقين بيستخدموا نفس الـ Recognizer. الرقم المكتوب (السهم الأصفر المتقطع) بيقف عند الـ decider وما بيوصلش للموديلات أبداً. الـ /engine ما بيقارنش بالرقم المكتوب أصلاً: بيرجّع القراءة والـ error codes بس، والمقارنة بتحصل بعدين في الـ downstream.</figcaption>
+  </figure>
+</section>
+
+<section aria-labelledby="s-pipeline">
+  <div class="prose">
+    <h2 id="s-pipeline">2. مسار الصورة جوه الـ Recognizer</h2>
+    <p>الطريق الرئيسي <strong>frozen</strong>: ستة عشر ملف ما بيتعدّلوش، والـ hash بتاعهم بيتشيّك وقت التحميل. كل التحسينات اللي اتعملت بعد التجميد (F1v وF8 وF9) <strong>ما بتعدّلش الكود المتجمّد</strong>. هي بتشغّله تاني بنفسه على مدخل متغيّر: صورة عليها padding، أو متلفّة، أو مقصوصة، أو quad ثابت.</p>
+    <p>وفيه قاعدة أمان بتحكم الثلاثة: <strong>القراءة السليمة اللي الـ margin بتاعها ≥ T عمرها ما بتتغيّر</strong>. الإنقاذ بيشتغل بس على فشل.</p>
+  </div>
+  <figure>
+    <div class="fig-scroll">
+      <svg viewBox="0 0 970 380" role="img" aria-label="مسار الـ recognizer: decode، بعدين DocCornerNet، بعدين الاتجاه، بعدين قص الشريط، بعدين BC-final، بعدين الـ decider. تحته ثلاث خطوات إنقاذ: F1v وF8 وF9، وكل واحدة بتشتغل بشرط معيّن" direction="ltr">
+        <defs>
+          <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fill-muted"/></marker>
+          <marker id="a2a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fill-acc"/></marker>
+          <marker id="a2w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="fill-warn"/></marker>
+        </defs>
+        <text x="10" y="30" class="tg">FROZEN FIRST PASS · compare_image()</text>
+
+        <rect x="10"  y="46" width="135" height="74" rx="4" class="bx"/>
+        <text x="77" y="72" text-anchor="middle" class="tt">Decode</text>
+        <text x="77" y="90" text-anchor="middle" class="ts">magic bytes</text>
+        <text x="77" y="105" text-anchor="middle" class="ts">EXIF · HEIC · PDF</text>
+
+        <rect x="172" y="46" width="135" height="74" rx="4" class="bx-acc"/>
+        <text x="239" y="72" text-anchor="middle" class="tt">DocCornerNet</text>
+        <text x="239" y="90" text-anchor="middle" class="ts">4 corners</text>
+        <text x="239" y="105" text-anchor="middle" class="ts">quad gates</text>
+
+        <rect x="334" y="46" width="135" height="74" rx="4" class="bx-acc"/>
+        <text x="401" y="72" text-anchor="middle" class="tt">Orientation</text>
+        <text x="401" y="90" text-anchor="middle" class="ts">PP-OCRv5</text>
+        <text x="401" y="105" text-anchor="middle" class="ts">quarter turn</text>
+
+        <rect x="496" y="46" width="135" height="74" rx="4" class="bx"/>
+        <text x="563" y="72" text-anchor="middle" class="tt">Band</text>
+        <text x="563" y="90" text-anchor="middle" class="ts">350,430,1000,610</text>
+        <text x="563" y="105" text-anchor="middle" class="ts">→ 160×576</text>
+
+        <rect x="658" y="46" width="135" height="74" rx="4" class="bx-acc"/>
+        <text x="725" y="72" text-anchor="middle" class="tt">BC-final</text>
+        <text x="725" y="90" text-anchor="middle" class="ts">14×10 logits</text>
+        <text x="725" y="105" text-anchor="middle" class="ts">+ weakest margin</text>
+
+        <rect x="820" y="46" width="135" height="74" rx="4" class="bx"/>
+        <text x="887" y="72" text-anchor="middle" class="tt">Decider</text>
+        <text x="887" y="90" text-anchor="middle" class="ts">T = 0.966875</text>
+        <text x="887" y="105" text-anchor="middle" class="ts">4 outcomes</text>
+
+        <line x1="145" y1="83" x2="170" y2="83" class="ln-acc" marker-end="url(#a2a)"/>
+        <line x1="307" y1="83" x2="332" y2="83" class="ln-acc" marker-end="url(#a2a)"/>
+        <line x1="469" y1="83" x2="494" y2="83" class="ln-acc" marker-end="url(#a2a)"/>
+        <line x1="631" y1="83" x2="656" y2="83" class="ln-acc" marker-end="url(#a2a)"/>
+        <line x1="793" y1="83" x2="818" y2="83" class="ln-acc" marker-end="url(#a2a)"/>
+
+        <text x="10" y="186" class="tg">RESCUE · trigger-only</text>
+
+        <!-- F1v -->
+        <line x1="239" y1="120" x2="239" y2="208" class="ln-warn" marker-end="url(#a2w)"/>
+        <text x="247" y="160" class="tw">document_not_found</text>
+        <rect x="120" y="210" width="200" height="64" rx="4" class="bx-warn"/>
+        <text x="220" y="234" text-anchor="middle" class="tt">F1v</text>
+        <text x="220" y="254" text-anchor="middle" class="ts">relax · pad · turns · crops</text>
+
+        <!-- F8 -->
+        <path d="M700,120 V146 H500 V208" class="ln-warn" marker-end="url(#a2w)"/>
+        <text x="600" y="140" text-anchor="middle" class="tw">impossible reading</text>
+        <rect x="400" y="210" width="200" height="64" rx="4" class="bx-warn"/>
+        <text x="500" y="234" text-anchor="middle" class="tt">F8</text>
+        <text x="500" y="254" text-anchor="middle" class="ts">other 3 turns, 180° first</text>
+
+        <!-- F9 -->
+        <line x1="750" y1="120" x2="750" y2="208" class="ln-warn" marker-end="url(#a2w)"/>
+        <text x="742" y="178" text-anchor="end" class="tw">none · invalid · m&lt;T</text>
+        <rect x="680" y="210" width="220" height="64" rx="4" class="bx-warn"/>
+        <text x="790" y="234" text-anchor="middle" class="tt">F9 region search</text>
+        <text x="790" y="254" text-anchor="middle" class="ts">validity first, then margin</text>
+
+        <line x1="600" y1="242" x2="678" y2="242" class="ln" marker-end="url(#a2)"/>
+        <text x="639" y="235" text-anchor="middle" class="tl">still weak</text>
+
+        <line x1="880" y1="210" x2="880" y2="122" class="ln" marker-end="url(#a2)"/>
+        <text x="888" y="170" class="tl">accept</text>
+        <text x="888" y="184" class="tl">rule</text>
+
+        <!-- shared bracket -->
+        <path d="M120,300 V312 H900 V300" class="ln-faint"/>
+        <text x="510" y="334" text-anchor="middle" class="ts">each one re-runs the unchanged compare_image on a padded / turned / cropped input or a fixed quad</text>
+        <text x="510" y="354" text-anchor="middle" class="ts">a valid reading with margin ≥ T never reaches F9 · F8 cannot replace a correct reading</text>
+      </svg>
+    </div>
+    <figcaption>الصف الأول هو الطريق المتجمّد. الصناديق الصفراء المتقطعة ما بتشتغلش غير لو الشرط المكتوب على السهم اتحقق. F9 ما بيستبدلش قراءة سليمة ضعيفة غير بقراءة سليمة <em>مختلفة</em> الـ margin بتاعها ≥ T. والترتيب ثابت، فالنتيجة بتطلع زي ما هي كل مرة (deterministic).</figcaption>
+  </figure>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>المرحلة</th><th>بتشتغل إمتى</th><th>اتعملت ليه</th><th>فين في الكود</th></tr></thead>
+      <tbody>
+        <tr><td>Decode</td><td>دايماً</td><td>الموبايلات بترفع HEIC باسم <code>.jpg</code>، فنوع الملف بيتعرف من الـ bytes مش من الاسم. الفيديو بيرجع كنتيجة مش كـ error. وفيه حد 60MP بيتشيّك من الـ header قبل الـ decode، عشان يقفل الباب قدام decompression bomb.</td><td><code>image_decode.py</code></td></tr>
+        <tr><td>F1v</td><td>الـ detector ما لقاش البطاقة</td><td>بطاقات بتضيع لأن الـ quad فشل في gate بفرق صغير. الحل شروط أخف، وpadding، ولف، وقصّ. والقراءة المستحيلة بتترفض.</td><td><code>admission_second_pass.py</code></td></tr>
+        <tr><td>F8</td><td>قراءة مستحيلة: قرن أو تاريخ أو محافظة غلط</td><td>القراءة المستحيلة أكيد غلط، وغالباً سببها لفّة غلط. والقراءة الصح عمرها ما تبقى مستحيلة، فـ F8 مش ممكن يكسر قراءة صح.</td><td><code>validity_reread.py</code></td></tr>
+        <tr><td>F9</td><td>مفيش قراءة، أو القراءة مش سليمة، أو سليمة بس m &lt; T</td><td>الوشّين في صورة واحدة (10 حالات)، بطاقة متلفّة (5)، scan مقصوص على قد البطاقة (4).</td><td><code>region_search.py</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section aria-labelledby="s-model">
+  <div class="prose">
+    <h2 id="s-model">3. الموديل من جوه: Fixed14 / BC-final</h2>
+    <p>الفكرة الأساسية إن المشكلة اتصاغت كـ <strong>classification لعدد خانات ثابت</strong>، مش كقراءة نص. الرقم القومي دايماً 14 خانة، فالموديل بيطلّع tensor مقاسه <code>[14, 10]</code>: لكل خانة توزيع احتمالات على الأرقام من 0 لـ 9. فمفيش CTC، ولا decoding بطول متغيّر، ولا خانة ممكن تتحذف أو تتكرر.</p>
+    <p>الشكل العام: encoder خفيف بيصغّر الارتفاع بسرعة ويحافظ على العرض، وبعده attention بيلاقي سطر الأرقام في الارتفاع، وبعده طبقة <strong>ordered slots</strong> بتحط 14 anchor مترتبين على السطر. ودي أكتر حتة الشغل فيها أصلي في المشروع.</p>
+  </div>
+  <figure>
+    <div class="fig-scroll">
+      <svg viewBox="0 0 980 340" role="img" aria-label="الـ architecture بتاع الموديل: input مقاسه 160×576×3، بعده 6 طبقات convolution بتصغّر الارتفاع لـ 10، بعدها vertical attention بتطلّع sequence من 144 عمود، بعدها ordered slots بتطلّع 14 vector، وبعدها head بيطلّع logits مقاسها 14×10" direction="ltr">
+        <defs>
+          <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="fill-muted"/></marker>
+        </defs>
+        <!-- names -->
+        <text x="50"  y="40" text-anchor="middle" class="tt">input</text>
+        <text x="130" y="40" text-anchor="middle" class="ts">Conv 2×2</text>
+        <text x="210" y="40" text-anchor="middle" class="ts">SepConv</text>
+        <text x="290" y="40" text-anchor="middle" class="ts">SepConv 2×2</text>
+        <text x="370" y="40" text-anchor="middle" class="ts">SepConv</text>
+        <text x="450" y="40" text-anchor="middle" class="ts">SepConv 2×1</text>
+        <text x="530" y="40" text-anchor="middle" class="ts">SepConv 2×1</text>
+        <text x="610" y="40" text-anchor="middle" class="ts">V-attention</text>
+        <text x="690" y="40" text-anchor="middle" class="ts">Conv1D ctx</text>
+        <text x="770" y="40" text-anchor="middle" class="tt">slots</text>
+        <text x="850" y="40" text-anchor="middle" class="ts">Dense 96</text>
+        <text x="930" y="40" text-anchor="middle" class="ts">Dense 10</text>
+
+        <!-- slabs: height proportional to tensor H -->
+        <rect x="25"  y="62"  width="50" height="176" class="bx"/>
+        <rect x="110" y="106" width="40" height="88" class="slab"/>
+        <rect x="190" y="106" width="40" height="88" class="slab"/>
+        <rect x="270" y="128" width="40" height="44" class="slab"/>
+        <rect x="350" y="128" width="40" height="44" class="slab"/>
+        <rect x="430" y="139" width="40" height="22" class="slab"/>
+        <rect x="510" y="144.5" width="40" height="11" class="slab"/>
+        <rect x="590" y="147" width="40" height="6" class="slab"/>
+        <rect x="670" y="147" width="40" height="6" class="slab"/>
+
+        <!-- 14 slot cells -->
+        <g>
+          <rect x="762" y="94"  width="16" height="7" class="slab"/><rect x="762" y="102" width="16" height="7" class="slab"/>
+          <rect x="762" y="110" width="16" height="7" class="slab"/><rect x="762" y="118" width="16" height="7" class="slab"/>
+          <rect x="762" y="126" width="16" height="7" class="slab"/><rect x="762" y="134" width="16" height="7" class="slab"/>
+          <rect x="762" y="142" width="16" height="7" class="slab"/><rect x="762" y="150" width="16" height="7" class="slab"/>
+          <rect x="762" y="158" width="16" height="7" class="slab"/><rect x="762" y="166" width="16" height="7" class="slab"/>
+          <rect x="762" y="174" width="16" height="7" class="slab"/><rect x="762" y="182" width="16" height="7" class="slab"/>
+          <rect x="762" y="190" width="16" height="7" class="slab"/><rect x="762" y="198" width="16" height="7" class="slab"/>
+        </g>
+        <g>
+          <rect x="842" y="94"  width="16" height="7" class="slab"/><rect x="842" y="102" width="16" height="7" class="slab"/>
+          <rect x="842" y="110" width="16" height="7" class="slab"/><rect x="842" y="118" width="16" height="7" class="slab"/>
+          <rect x="842" y="126" width="16" height="7" class="slab"/><rect x="842" y="134" width="16" height="7" class="slab"/>
+          <rect x="842" y="142" width="16" height="7" class="slab"/><rect x="842" y="150" width="16" height="7" class="slab"/>
+          <rect x="842" y="158" width="16" height="7" class="slab"/><rect x="842" y="166" width="16" height="7" class="slab"/>
+          <rect x="842" y="174" width="16" height="7" class="slab"/><rect x="842" y="182" width="16" height="7" class="slab"/>
+          <rect x="842" y="190" width="16" height="7" class="slab"/><rect x="842" y="198" width="16" height="7" class="slab"/>
+        </g>
+        <g>
+          <rect x="922" y="94"  width="16" height="7" class="slab-out"/><rect x="922" y="102" width="16" height="7" class="slab-out"/>
+          <rect x="922" y="110" width="16" height="7" class="slab-out"/><rect x="922" y="118" width="16" height="7" class="slab-out"/>
+          <rect x="922" y="126" width="16" height="7" class="slab-out"/><rect x="922" y="134" width="16" height="7" class="slab-out"/>
+          <rect x="922" y="142" width="16" height="7" class="slab-out"/><rect x="922" y="150" width="16" height="7" class="slab-out"/>
+          <rect x="922" y="158" width="16" height="7" class="slab-out"/><rect x="922" y="166" width="16" height="7" class="slab-out"/>
+          <rect x="922" y="174" width="16" height="7" class="slab-out"/><rect x="922" y="182" width="16" height="7" class="slab-out"/>
+          <rect x="922" y="190" width="16" height="7" class="slab-out"/><rect x="922" y="198" width="16" height="7" class="slab-out"/>
+        </g>
+
+        <!-- arrows -->
+        <line x1="77"  y1="150" x2="106" y2="150" class="ln" marker-end="url(#a3)"/>
+        <line x1="152" y1="150" x2="186" y2="150" class="ln" marker-end="url(#a3)"/>
+        <line x1="232" y1="150" x2="266" y2="150" class="ln" marker-end="url(#a3)"/>
+        <line x1="312" y1="150" x2="346" y2="150" class="ln" marker-end="url(#a3)"/>
+        <line x1="392" y1="150" x2="426" y2="150" class="ln" marker-end="url(#a3)"/>
+        <line x1="472" y1="150" x2="506" y2="150" class="ln" marker-end="url(#a3)"/>
+        <line x1="552" y1="150" x2="586" y2="150" class="ln" marker-end="url(#a3)"/>
+        <line x1="632" y1="150" x2="666" y2="150" class="ln" marker-end="url(#a3)"/>
+        <line x1="712" y1="150" x2="756" y2="150" class="ln" marker-end="url(#a3)"/>
+        <line x1="780" y1="150" x2="838" y2="150" class="ln" marker-end="url(#a3)"/>
+        <line x1="860" y1="150" x2="918" y2="150" class="ln" marker-end="url(#a3)"/>
+
+        <!-- shapes -->
+        <text x="50"  y="262" text-anchor="middle" class="ts">160×576×3</text>
+        <text x="130" y="262" text-anchor="middle" class="ts">80×288×32</text>
+        <text x="210" y="262" text-anchor="middle" class="ts">80×288×48</text>
+        <text x="290" y="262" text-anchor="middle" class="ts">40×144×64</text>
+        <text x="370" y="262" text-anchor="middle" class="ts">40×144×96</text>
+        <text x="450" y="262" text-anchor="middle" class="ts">20×144×128</text>
+        <text x="530" y="262" text-anchor="middle" class="ts">10×144×128</text>
+        <text x="610" y="262" text-anchor="middle" class="ts">144×128</text>
+        <text x="690" y="262" text-anchor="middle" class="ts">144×128</text>
+        <text x="770" y="262" text-anchor="middle" class="ta">14×128</text>
+        <text x="850" y="262" text-anchor="middle" class="ts">14×96</text>
+        <text x="930" y="262" text-anchor="middle" class="ta">14×10</text>
+
+        <!-- module brackets -->
+        <path d="M25,284 V292 H550 V284" class="ln-faint"/>
+        <text x="287" y="312" text-anchor="middle" class="tl">Encoder · GroupNorm + swish · 44.6K</text>
+        <path d="M590,284 V292 H710 V284" class="ln-faint"/>
+        <text x="650" y="312" text-anchor="middle" class="tl">Sequence · 49.7K</text>
+        <path d="M752,284 V292 H788 V284" class="ln-faint"/>
+        <text x="770" y="312" text-anchor="middle" class="ta">5.8K</text>
+        <path d="M832,284 V292 H948 V284" class="ln-faint"/>
+        <text x="890" y="312" text-anchor="middle" class="tl">Head · 13.4K</text>
+        <text x="770" y="330" text-anchor="middle" class="ts">alignment</text>
+      </svg>
+    </div>
+    <figcaption>ارتفاع كل مستطيل على قد الارتفاع الحقيقي للـ tensor. الـ strides بتصغّر الارتفاع من 160 لـ 10 وبتسيب العرض 144، لأن الأرقام جنب بعض بالعرض. عدد الـ parameters لكل جزء حسبته من الموديل بعد ما بنيته من <code>scripts/phase2l_b.py:build_v2</code>، والمجموع 113,439.</figcaption>
+  </figure>
+
+  <div class="cols">
+    <div>
+      <h3>Vertical Attention Pool</h3>
+      <p>لكل عمود من الـ 144، طبقة Dense بتدّي score لكل صف من الـ 10، وبعدها <span class="mono">softmax</span> على الصفوف وجمع موزون. النتيجة إن الموديل بيتعلّم بنفسه السطر في الارتفاع، فلو قص الشريط مال حبة لفوق أو لتحت، الموديل يستحمله.</p>
+      <p class="meta"><code>[B,10,144,128] → [B,144,128]</code></p>
+    </div>
+    <div>
+      <h3>Conditioned Ordered Slots</h3>
+      <p>من الـ sequence، الطبقة بتحسب <strong>مركز السطر</strong> (soft-argmax على score لكل عمود) و<strong>عرضه</strong> (عرض أساسي مضروب في <span class="mono">exp(r·tanh(·))</span>، فالعرض ليه حدود). بعدين بتحط 14 anchor <strong>مترتبين</strong> على مسافات متساوية جوه العرض ده.</p>
+      <p>كل slot بياخد attention = Gaussian bias حوالين الـ anchor بتاعه + content term (query × key) <strong>عليه سقف</strong> (content cap)، عشان المحتوى ما يقدرش يسحب الـ slot بعيد عن مكانه. وبكده الترتيب مضمون من الـ architecture نفسها.</p>
+      <p class="meta"><code>[B,144,128] → [B,14,128]</code></p>
+    </div>
+    <div>
+      <h3>Head</h3>
+      <p>نفس الـ Dense بيتطبّق على كل slot لوحده: <span class="mono">Dense(96, swish) → Dense(10)</span>. الـ weights مشتركة بين الـ 14 خانة، فالموديل بيتعلّم "إزاي الرقم 7 شكله" مرة واحدة، مش 14 مرة.</p>
+      <p class="meta"><code>[B,14,128] → [B,14,10]</code></p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="s-margin">
+  <div class="prose">
+    <h2 id="s-margin">4. الـ Confidence: الـ weakest-position margin</h2>
+    <p>لكل خانة: <span class="mono">softmax</span>، وبعدين <strong>أعلى احتمال ناقص تاني أعلى احتمال</strong>. وبعدين <strong>أقل قيمة من الـ 14</strong> هي الـ margin بتاع القراءة كلها. الفكرة إن الرقم القومي يا كله صح يا غلط، فثقته على قد أضعف خانة فيه.</p>
+  </div>
+  <figure>
+    <div class="fig-scroll">
+      <svg viewBox="0 0 980 270" role="img" aria-label="الـ 14 خانة متقسّمين: القرن، وتاريخ الميلاد، والمحافظة، والمسلسل، ورقم التحقق. تحت كل خانة bar بالـ margin بتاعها (قيم توضيحية)، والخانة 11 هي الأضعف بـ 0.15، فبتحدد الـ margin بتاع القراءة كلها" direction="ltr">
+        <!-- segment brackets -->
+        <path d="M72,56 V48 H124 V56" class="ln-faint"/><text x="98" y="40" text-anchor="middle" class="tl">century</text>
+        <path d="M134,56 V48 H496 V56" class="ln-faint"/><text x="315" y="40" text-anchor="middle" class="tl">birth date YYMMDD</text>
+        <path d="M506,56 V48 H620 V56" class="ln-faint"/><text x="563" y="40" text-anchor="middle" class="tl">governorate</text>
+        <path d="M630,56 V48 H868 V56" class="ln-faint"/><text x="749" y="40" text-anchor="middle" class="tl">sequence · 13th = sex</text>
+        <path d="M878,56 V48 H930 V56" class="ln-faint"/><text x="904" y="40" text-anchor="middle" class="tl">check</text>
+
+        <!-- 14 cells: x = 70 + i*62 -->
+        <g>
+          <rect x="70"  y="64" width="56" height="44" rx="3" class="bx"/><text x="98"  y="91" text-anchor="middle" class="ts">1</text>
+          <rect x="132" y="64" width="56" height="44" rx="3" class="bx"/><text x="160" y="91" text-anchor="middle" class="ts">2</text>
+          <rect x="194" y="64" width="56" height="44" rx="3" class="bx"/><text x="222" y="91" text-anchor="middle" class="ts">3</text>
+          <rect x="256" y="64" width="56" height="44" rx="3" class="bx"/><text x="284" y="91" text-anchor="middle" class="ts">4</text>
+          <rect x="318" y="64" width="56" height="44" rx="3" class="bx"/><text x="346" y="91" text-anchor="middle" class="ts">5</text>
+          <rect x="380" y="64" width="56" height="44" rx="3" class="bx"/><text x="408" y="91" text-anchor="middle" class="ts">6</text>
+          <rect x="442" y="64" width="56" height="44" rx="3" class="bx"/><text x="470" y="91" text-anchor="middle" class="ts">7</text>
+          <rect x="504" y="64" width="56" height="44" rx="3" class="bx"/><text x="532" y="91" text-anchor="middle" class="ts">8</text>
+          <rect x="566" y="64" width="56" height="44" rx="3" class="bx"/><text x="594" y="91" text-anchor="middle" class="ts">9</text>
+          <rect x="628" y="64" width="56" height="44" rx="3" class="bx"/><text x="656" y="91" text-anchor="middle" class="ts">10</text>
+          <rect x="690" y="64" width="56" height="44" rx="3" class="bx-warn"/><text x="718" y="91" text-anchor="middle" class="tw">11</text>
+          <rect x="752" y="64" width="56" height="44" rx="3" class="bx"/><text x="780" y="91" text-anchor="middle" class="ts">12</text>
+          <rect x="814" y="64" width="56" height="44" rx="3" class="bx"/><text x="842" y="91" text-anchor="middle" class="ts">13</text>
+          <rect x="876" y="64" width="56" height="44" rx="3" class="bx"/><text x="904" y="91" text-anchor="middle" class="ts">14</text>
+        </g>
+
+        <!-- margin bars: baseline y=240, height = m*70 -->
+        <line x1="66" y1="240" x2="936" y2="240" class="ln-faint"/>
+        <g class="fill-acc">
+          <rect x="84"  y="170.7" width="28" height="69.3"/>
+          <rect x="146" y="171.4" width="28" height="68.6"/>
+          <rect x="208" y="170.7" width="28" height="69.3"/>
+          <rect x="270" y="172.1" width="28" height="67.9"/>
+          <rect x="332" y="170.7" width="28" height="69.3"/>
+          <rect x="394" y="170.7" width="28" height="69.3"/>
+          <rect x="456" y="171.4" width="28" height="68.6"/>
+          <rect x="518" y="170.7" width="28" height="69.3"/>
+          <rect x="580" y="172.8" width="28" height="67.2"/>
+          <rect x="642" y="170.7" width="28" height="69.3"/>
+          <rect x="766" y="171.4" width="28" height="68.6"/>
+          <rect x="828" y="170.7" width="28" height="69.3"/>
+          <rect x="890" y="172.1" width="28" height="67.9"/>
+        </g>
+        <rect x="704" y="229.5" width="28" height="10.5" class="fill-warn"/>
+        <text x="718" y="222" text-anchor="middle" class="tw">0.15</text>
+        <text x="718" y="258" text-anchor="middle" class="tw">min → margin</text>
+
+        <!-- threshold -->
+        <line x1="66" y1="172.3" x2="936" y2="172.3" class="ln-warn"/>
+        <text x="70" y="160" class="tw">T = 0.966875</text>
+        <text x="936" y="160" text-anchor="end" class="ts">illustrative values</text>
+      </svg>
+    </div>
+    <figcaption>القيم هنا للتوضيح بس. 13 خانة الموديل متأكد منهم، والخانة 11 محتار فيها بين رقمين (مثلاً 0.55 و0.40)، فالـ margin بتاع القراءة كلها بقى 0.15، وده أقل من T. فلو القراءة دي مختلفة عن الرقم المكتوب، الحالة تروح <span class="pill p-warn">NEEDS_REVIEW</span> مش <span class="pill p-mut">MISMATCH_CONFIDENT</span>. الـ decoder الهيكلي بيشيّك القرن والتاريخ والمحافظة، وما بيستخدمش رقم التحقق خالص.</figcaption>
+  </figure>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>الحالة</th><th>قرار v1 (<code>decider.py</code>)</th><th>ليه</th></tr></thead>
+      <tbody>
+        <tr><td>مفيش قراءة</td><td><span class="pill p-mut">UNREADABLE</span> ومعاه reason code</td><td>الـ admission فشل حتى بعد الإنقاذ.</td></tr>
+        <tr><td>القراءة = الرقم المكتوب</td><td><span class="pill p-ok">MATCH</span>، مهما كان الـ margin</td><td>إن قراءة ضعيفة تطابق الرقم المكتوب بالصدفة احتمال ضعيف جداً، فالتطابق في حد ذاته دليل.</td></tr>
+        <tr><td>مختلفة، والـ margin ≥ T</td><td><span class="pill p-warn">MISMATCH_CONFIDENT</span></td><td>دي الحالة الوحيدة اللي ممكن تتعلّم من غير ما إنسان يراجعها.</td></tr>
+        <tr><td>مختلفة، والـ margin &lt; T</td><td><span class="pill p-mut">NEEDS_REVIEW</span></td><td>القراءة عمرها ما بتتعدّل عشان تقرّب من الرقم المكتوب، والسيستم عمره ما بيقترح "Invalid".</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">نقطة اتكشفت في Phase 2M-H: منحنى accept/retake اللي بيطلّع 99.83% بيوصف منتج تاني. التصميم الحالي <strong>بيقارن الأول</strong>، فالـ margin عمره ما بيحدد قبول القراءة. هو بيختار بس الرسالة اللي هتظهر للمتقدم لما يحصل اختلاف.</p>
+</section>
+
+<section aria-labelledby="s-train">
+  <div class="prose">
+    <h2 id="s-train">5. التدريب: BC-final اتعمل إزاي</h2>
+    <p>BC-final هو نفس architecture النسخة v2 بالظبط. الفرق في الـ recipe بس: <strong>B</strong> = cosine LR decay + weight EMA، و<strong>C</strong> = shear augmentation، و<strong>FINAL</strong> = التدريب على الـ pool كله من غير holdout. والـ seed كان 3101.</p>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>العنصر</th><th>الاختيار</th></tr></thead>
+      <tbody>
+        <tr><td>Loss</td><td>sparse categorical cross-entropy على كل slot من الـ 14 (من الـ logits)، ومتوسطه هو الـ loss</td></tr>
+        <tr><td>Optimizer</td><td>Adam، و<code>global_clipnorm=5.0</code>، وcosine decay على عدد steps ثابت</td></tr>
+        <tr><td>EMA</td><td><code>0.999·e + 0.001·v</code>، والتقييم والحفظ بيتعملوا بأوزان الـ EMA</td></tr>
+        <tr><td>Batch</td><td>خليط ثابت: شرايط من بطاقات حقيقية بـ labels متصححة، ومعاها internal replay عشان الموديل ما ينساش</td></tr>
+        <tr><td>Augmentation</td><td>الـ augmentation المعلن في rule الـ phase، ومعاه shear ±5°</td></tr>
+        <tr><td>المراقبة</td><td>checkpoint عند كل تقييم، و<strong>memorization monitor</strong>: هل الموديل بيعيد الـ labels الغلط المعروفة؟</td></tr>
+        <tr><td>TTA</td><td>اتقاس واترفض: أبطأ ×4.08 (180ms بدل 44ms في المتوسط)، والفرق صفر بطاقات على الـ 168 control</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="prose">
+    <h3>اللي اتعرف من التجارب (Phase 2M-G)</h3>
+    <ul>
+      <li>7.5 ساعة تدريب على 6 تجارب نقلت الـ external validation من 626 لـ 628 من 647. الـ sign test على مستوى البطاقة: 4 كسب و2 خسارة، و<span class="mono">p = 0.6875</span>، يعني ده مش تحسّن يتقاس.</li>
+      <li>اتراجع 37 record غلط، و<strong>13 منهم (35%)</strong> ما ينفعش يتعملهم label أصلاً. فسقف الدقة الممكن على الداتا دي بين 636 و642 من 647، وهدف 99% على كل الـ records مش واقعي.</li>
+      <li>نتايج تحليل الغلطات اللي ظهرت على موديل لسه ما اتعلمش كفاية اختفت لما التدريب زاد. والقاعدة اللي طلعت من ده: <strong>ما تقريش error anatomy غير على موديل وصل لـ convergence</strong>.</li>
+    </ul>
+  </div>
+</section>
+
+<section aria-labelledby="s-eval">
+  <div class="prose">
+    <h2 id="s-eval">6. التقييم وحوكمة البيانات</h2>
+    <p>المشروع مقسّم الداتا بطريقة تمنع إن الموديل يتظبط على نفس البيانات اللي بيتقاس عليها. كل مجموعة ليها حالة واضحة، والحارس اللي في <code>src/governance/guard.py</code> بيرفض فتح أي كارت من المجموعات المقفولة من جوه أي سكريبت بيحاول يقراه.</p>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>المجموعة</th><th>العدد</th><th>الحالة</th><th>اتستخدمت في إيه</th></tr></thead>
+      <tbody>
+        <tr><td>Locked internal audit</td><td class="num">377</td><td><span class="pill p-warn">consumed</span></td><td>اتفتحت مرة واحدة بموافقة صاحبة المشروع. النتيجة الرسمية 342/377 = 90.7%</td></tr>
+        <tr><td>Internal validation</td><td class="num">618</td><td><span class="pill p-warn">consumed</span></td><td>ممنوع تتفتح (الـ 636 row كلهم متقفلين)</td></tr>
+        <tr><td>External test</td><td class="num">321</td><td><span class="pill p-warn">consumed</span></td><td>ممنوع تتفتح</td></tr>
+        <tr><td>External validation</td><td class="num">647</td><td><span class="pill p-mut">spent</span></td><td>اتستخدمت للاختيار، فأي رقم منها <strong>exploratory</strong> مش held-out</td></tr>
+        <tr><td>Development pool</td><td class="num">771</td><td><span class="pill p-ok">open</span></td><td>F9 اتصمم واتظبط عليها: 752/771 بعد ما كان 732، ومفيش ولا بطاقة اتكسرت</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="prose">
+    <ul>
+      <li>القراءة التشخيصية للـ audit بالـ pipeline النهائي طلّعت 367/377، يعني 25 اتصلحوا و0 اتكسروا. لكن <strong>الرقم الرسمي فضل 342/377</strong>، لأن الـ audit مسموح يتحسب مرة واحدة بس.</li>
+      <li>أي rule بيتعمله commit <strong>قبل</strong> حساب أي رقم يأثر على قرار. والتعديلات append-only وبيتكتب سببها، حتى اللي اتكتبت بعد ظهور نتيجة.</li>
+      <li>الـ confidence intervals بتتحسب بـ cluster bootstrap حسب identity group، والقرار على مستوى البطاقة كلها مش الخانة.</li>
+    </ul>
+  </div>
+</section>
+
+<section aria-labelledby="s-decisions">
+  <div class="prose">
+    <h2 id="s-decisions">7. القرارات الهندسية والتمن بتاعها</h2>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>القرار</th><th>الفايدة</th><th>التمن</th></tr></thead>
+      <tbody>
+        <tr><td>14 slot ثابتين بدل CTC</td><td>الطول مضمون، والترتيب مضمون، والـ margin لكل خانة واضح</td><td>محتاج طبقة alignment تتعلم مكان السطر، ومش هينفع لأي رقم بطول تاني</td></tr>
+        <tr><td>الموديلات وملفاتها frozen ومتأكد منهم بالـ hash</td><td>كل قراءة ممكن تتعاد بنفس النتيجة، والـ audit بيحكم على حاجة ثابتة</td><td>أي تحسين لازم يشتغل حوالين الكود (F1v وF8 وF9) مش جواه</td></tr>
+        <tr><td>Golden self-test قبل ما <code>/ready</code> يرجّع 200</td><td>container ببيئة libraries مختلفة يفشل بدل ما يطلّع قراءات مختلفة من غير ما حد ياخد باله</td><td>جهاز الشغل CPU بتاعه من غير AVX-512 فشل في التشغيل، والحل كان توسيع الـ tolerance بتاع الـ margin بس (D-106)</td></tr>
+        <tr><td>الرقم المكتوب معزول عن الـ recognizer</td><td>القراءة مستقلة عن اللي المتقدم كتبه، ومفيش confirmation bias</td><td>مفيش "تصحيح ذكي" باستخدام الرقم المكتوب، وده متعمّد</td></tr>
+        <tr><td>الإنقاذ بيشتغل بشرط بس، وبترتيب ثابت</td><td>الـ latency ليها حد، والنتيجة deterministic، والقراءة السليمة القوية ما بتتغيّرش</td><td>F9 طلّع 2 قراءات واثقة جديدة على 191 صورة من غير بطاقة (1%)</td></tr>
+        <tr><td>Inference واحد في نفس الوقت لكل worker، وspawn processes</td><td>الذاكرة متوقعة، وworker بيعلق بيتبدّل، والـ timeout مشترك</td><td>الـ throughput على قد عدد الـ workers، وكل worker بيحمّل نسخة من الموديلات</td></tr>
+        <tr><td>Logs بـ allowlist، وأي 14 رقم أو أكتر بيتشالوا</td><td>الرقم القومي ما يوصلش لأي log، حتى لو جه من رسالة library</td><td>الـ debugging أصعب، والـ client log اللي فيه أرقام بيتعمل بصلاحية 600 على جهاز الشغل بس</td></tr>
+        <tr><td>من غير TTA</td><td>أسرع 4 مرات</td><td>ممكن كان يكسب 2 بطاقات على الـ external validation، والكسب ده مش مثبت</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section aria-labelledby="s-open">
+  <div class="cols">
+    <div>
+      <h2 id="s-open">8. حدود معروفة</h2>
+      <ul>
+        <li>الدقة مقاسة مقابل الرقم اللي المتقدم كتبه، مش رقم اتراجع، فهي حد أدنى. لو شلنا الحالات اللي واضح إنها غلط كتابة، التقدير حوالي 96.4%، وده لسه ما اتراجعش.</li>
+        <li>الـ CPUs اللي من غير AVX-512 بتطلّع margin مختلف بفرق لحد حوالي 0.0022. واللي من غير AVX2 ما اتجربوش خالص.</li>
+        <li><code>success</code> في الـ client معناه قراءة سليمة هيكلياً، مش إنها مثبتة صح.</li>
+        <li>فيه نقطتين مفتوحتين في <code>image_decode.py</code> (D-080): الـ <code>MAX_BYTES</code> مربوط بحد الرفع، وheader قصير بيبدأ بـ ftyp بيعمل error.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>قرارات مستنية صاحبة المشروع</h2>
+      <ol>
+        <li><strong>437 مسار غلط:</strong> نصلّح <code>download folder path</code> في الداتابيز، ولا ننقل الفولدرات؟</li>
+        <li><strong>222 من غير صورة:</strong> نطلب منهم يرفعوا الصورة تاني؟</li>
+        <li><strong>نسبة غلط الـ OCR بالظبط:</strong> نراجع عيّنة من الـ 1,401 قراءة المختلفة، عشان نفرّق بين غلط الـ OCR وغلط الكتابة؟</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="s-map">
+  <div class="prose">
+    <h2 id="s-map">9. خريطة الكود: تبدأي منين</h2>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>الطبقة</th><th>الملفات</th><th>ينفع يتعدّل؟</th></tr></thead>
+      <tbody>
+        <tr><td>HTTP و batch engine</td><td><code>src/service/app.py</code> · <code>engine.py</code> · <code>engine_pool.py</code> · <code>engine_worker.py</code></td><td><span class="pill p-ok">editable</span></td></tr>
+        <tr><td>الـ pipeline المشترك</td><td><code>src/service/recognizer.py</code> · <code>region_search.py</code> · <code>decider.py</code> · <code>versions.py</code></td><td><span class="pill p-ok">editable</span></td></tr>
+        <tr><td>الإنقاذ</td><td><code>src/extraction/admission_second_pass.py</code> · <code>validity_reread.py</code></td><td><span class="pill p-ok">editable</span></td></tr>
+        <tr><td>Runtime و self-test</td><td><code>src/service/runtime.py</code> · <code>golden.py</code> · <code>logs.py</code> · <code>hardening.py</code></td><td><span class="pill p-ok">editable</span></td></tr>
+        <tr><td>الموديل و compare_image</td><td><code>src/extraction/fixed14_bcfinal_shadow.py</code> · <code>fixed14_v3_shadow.py</code> · <code>fixed14_demo_adapter.py</code> · <code>scripts/phase2l_b.py</code></td><td><span class="pill p-warn">frozen</span></td></tr>
+        <tr><td>Geometry</td><td><code>src/geometry/doccornernet.py</code> · <code>quadrilateral.py</code> · <code>src/extraction/registration.py</code> · <code>canonicalize.py</code></td><td><span class="pill p-warn">frozen</span></td></tr>
+        <tr><td>التشيّك</td><td><code>bash scripts/test_service.sh</code> (213 test في حوالي 12 ثانية هنا) · <code>scripts/lint_shipped.sh</code> · <code>scripts/phase4_final_equivalence.py</code></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  الصفحة دي مكتوبة من الكود والوثائق اللي في الريبو: <code>docs/ARCHITECTURE.md</code> و<code>docs/CODE_WALKTHROUGH.md</code> و<code>docs/DEPLOYMENT_GUIDE.md</code> و<code>reports/phase2m_g.md</code> و<code>reports/phase2m_h.md</code> و<code>reports/phase4_final.md</code>. عدد الـ parameters حسبته من الموديل بعد ما بنيته. ومفيش فيها أي رقم قومي حقيقي ولا صورة بطاقة.
+</footer>
+
+</div>
+</main>
