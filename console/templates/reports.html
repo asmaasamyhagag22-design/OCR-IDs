@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block main %}
+{% set proj = o.projected() %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">الإشراف</p>
+    <h1>التقارير</h1>
+    <p class="sub">ملخص الدقة للإدارة، وملفات للفرق المعنية. يُسجَّل كل تصدير باسمك في سجل العمليات.</p>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel-head"><h2>ملخص الدقة</h2><span class="muted small">على مستوى المتقدم، وبطريقة الاحتساب نفسها في <span class="mono">team_accuracy_report.py</span></span></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>البند</th><th>العدد</th><th>النسبة</th></tr></thead>
+      <tbody>
+        <tr><td>متقدمون خضعوا للتقييم (صورة ورقم مُدخل)</td><td class="n">{{ o.evaluated|num }}</td><td></td></tr>
+        <tr><td>القراءة مطابقة للرقم المُدخل</td><td class="n">{{ o.categories['match']|num }}</td><td class="n">{{ o.lower|pct }}</td></tr>
+        <tr><td>مختلفة، وأكّد المراجِع صحة القراءة (خطأ إدخال أو بطاقة شخص آخر)</td><td class="n">{{ o.mismatch_ocr_right|num }}</td><td></td></tr>
+        <tr><td>مختلفة، وأكّد المراجِع خطأ القراءة</td><td class="n">{{ o.mismatch_ocr_wrong|num }}</td><td></td></tr>
+        <tr><td>مختلفة ولم تُراجَع بعد</td><td class="n">{{ o.mismatch_pending|num }}</td><td></td></tr>
+        <tr><td>تعذّرت قراءتها</td><td class="n">{{ o.categories['unreadable']|num }}</td><td></td></tr>
+        <tr class="em"><td>دقة القراءة المؤكَّدة</td><td></td><td class="n">{{ o.confirmed|pct }}</td></tr>
+        <tr><td>الحد الأعلى (إن صحّت كل الحالات غير المراجَعة)</td><td></td><td class="n">{{ o.upper|pct }}</td></tr>
+        <tr><td>الدقة المتوقعة عند اكتمال المراجعة (فترة ثقة 95%)</td><td></td><td class="n">{% if proj %}{{ proj[0]|pct(1) }} ({{ proj[1]|pct(1) }} – {{ proj[2]|pct(1) }}){% else %}—{% endif %}</td></tr>
+        <tr><td>متقدمون يلزم طلب صورة جديدة منهم</td><td class="n">{{ o.reupload|num }}</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="panel-body small muted">
+    تُعدّ الحالات المطابقة صحيحة، إذ لا تكون خاطئة إلا إذا أخطأ النموذج والمتقدم في الأرقام الأربعة عشر نفسها. وتفترض القيمة المتوقعة أن الحالات غير المراجَعة تشبه الحالات المراجَعة، وهو افتراض يصح ما دامت المراجعة تسير بترتيب القائمة دون انتقاء.
+  </div>
+</section>
+
+<section class="grid-3">
+  {% for name, spec in exports.items() %}
+  <div class="panel"><div class="panel-body">
+    <h2>{{ spec.title }}</h2>
+    <p class="small muted">
+      {% if name == 'decisions' %}سجل كامل لكل حالة رُوجعت: التصنيف، والقرار، والقراءة، والرقم المُدخل، والرقم الصحيح، والمراجِع، والوقت. <b>يتضمن أرقامًا قومية كاملة.</b>
+      {% elif name == 'corrections' %}المتقدمون الذين يختلف الرقم على بطاقتهم عمّا أدخلوه، لتصحيحه لدى فريق البيانات. لا يتضمن حالات «بطاقة شخص آخر». <b>يتضمن أرقامًا قومية كاملة.</b>
+      {% else %}المتقدمون الذين كانت صورتهم غير واضحة أو ليست الوجه الأمامي للبطاقة. يتضمن رقم السجل فقط، دون أرقام قومية.{% endif %}
+    </p>
+    <div class="actions">
+      <a class="btn {{ 'primary' if loop.first }}" href="/reports/{{ name }}.xlsx">تنزيل Excel</a>
+      <a class="btn ghost" href="/reports/{{ name }}.csv">CSV للأنظمة</a>
+    </div>
+  </div></div>
+  {% endfor %}
+</section>
+<p class="small muted">ملف Excel يحفظ الأرقام القومية نصًا كما هي. أما ملف CSV فمخصص للاستيراد في الأنظمة، وإذا فُتح في Excel مباشرة فقد يعرض الرقم القومي بصيغة علمية.</p>
+{% endblock %}

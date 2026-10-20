@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block main %}
+{% set errors = {'name': 'يجب أن يتكوّن اسم المستخدم من حروف إنجليزية وأرقام فقط (حتى 40 حرفًا).',
+  'exists': 'اسم المستخدم مستخدَم من قبل.', 'password': 'يجب ألا تقل كلمة المرور عن 10 أحرف.',
+  'self': 'لا يمكن إيقاف حسابك أنت.', 'missing': 'المستخدم غير موجود.', 'action': 'إجراء غير معروف.'} %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">الإشراف</p>
+    <h1>المستخدمون</h1>
+    <p class="sub">يراجع المراجِع الحالات. ويطّلع المشرف أيضًا على التقارير وسجل العمليات ويملك تعديل القرارات. ويدير مدير النظام الحسابات.</p>
+  </div>
+</div>
+{% if error %}<div class="notice bad" role="alert">{{ errors.get(error, 'حدث خطأ.') }}</div>{% endif %}
+{% if saved %}<div class="notice good" role="status">تم الحفظ.</div>{% endif %}
+
+<div class="grid-2">
+  <section class="panel">
+    <div class="panel-head"><h2>الحسابات</h2></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الصلاحية</th><th>آخر دخول</th><th></th></tr></thead>
+        <tbody>
+        {% for u in users %}
+          <tr>
+            <td>{{ u.display_name }}{% if not u.get('active', True) %} <span class="pill neutral">موقوف</span>{% endif %}</td>
+            <td class="mono">{{ u.username }}</td>
+            <td>
+              {% if u.username != user.username %}
+              <form method="post" action="/users/{{ u.username }}" class="meta-row">
+                <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="role">
+                <select name="role" aria-label="صلاحية {{ u.display_name }}" data-autosubmit>
+                  {% for r in roles %}<option value="{{ r }}" {{ 'selected' if r == u.role }}>{{ role_labels[r] }}</option>{% endfor %}
+                </select>
+                <noscript><button class="btn small" type="submit">حفظ</button></noscript>
+              </form>
+              {% else %}{{ role_labels[u.role] }}{% endif %}
+            </td>
+            <td class="n">{{ u.get('last_login')|when }}</td>
+            <td>
+              {% if u.username != user.username %}
+              <form method="post" action="/users/{{ u.username }}">
+                <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="toggle">
+                <button class="btn small" type="submit">{{ 'إيقاف' if u.get('active', True) else 'تفعيل' }}</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="decide">
+    <form class="panel" method="post" action="/users">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <div class="panel-head"><h2>إضافة مستخدم</h2></div>
+      <div class="panel-body">
+        <div class="field"><label for="nu">اسم المستخدم (بالإنجليزية)</label><input id="nu" name="username" type="text" dir="ltr" maxlength="40" required></div>
+        <div class="field"><label for="nd">الاسم المعروض</label><input id="nd" name="display_name" type="text" maxlength="80" required></div>
+        <div class="field"><label for="nr">الصلاحية</label>
+          <select id="nr" name="role">{% for r in roles %}<option value="{{ r }}">{{ role_labels[r] }}</option>{% endfor %}</select></div>
+        <div class="field"><label for="np">كلمة مرور مبدئية (10 أحرف على الأقل)</label><input id="np" name="password" type="password" dir="ltr" autocomplete="new-password" required minlength="10"></div>
+        <div><button class="btn primary" type="submit">إضافة</button></div>
+      </div>
+    </form>
+    <form class="panel" method="post" action="/users/{{ users[0].username if users else '' }}" data-reset-form>
+      <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="password">
+      <div class="panel-head"><h2>تعيين كلمة مرور لمستخدم</h2></div>
+      <div class="panel-body">
+        <div class="field"><label for="ru">المستخدم</label>
+          <select id="ru" data-reset-user>{% for u in users %}<option value="{{ u.username }}">{{ u.display_name }} ({{ u.username }})</option>{% endfor %}</select></div>
+        <div class="field"><label for="rp">كلمة المرور الجديدة</label><input id="rp" name="password" type="password" dir="ltr" autocomplete="new-password" required minlength="10"></div>
+        <p class="small muted">يُسجَّل خروج المستخدم من جميع الأجهزة، ويدخل بكلمة المرور الجديدة.</p>
+        <div><button class="btn" type="submit">تعيين كلمة المرور</button></div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

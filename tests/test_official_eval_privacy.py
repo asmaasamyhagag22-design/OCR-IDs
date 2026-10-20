@@ -233,7 +233,7 @@ def test_no_generated_report_or_output_contains_a_national_id():
 
 
 def test_the_generated_output_scan_had_something_to_scan():
-    """A skip is a failure to verify, not a pass (CLAUDE.md).
+    """A skip is a failure to verify, not a pass (a project rule).
 
     This test exists because the scan above silently checked nothing in this
     worktree until Phase 2M-H: oe.OUT_DIR resolves against PROJECT_ROOT only, so

@@ -1,0 +1,10 @@
+# The console image's build context (BuildKit reads this file for console/Dockerfile
+# instead of the root .dockerignore, which is written for the OCR service image).
+**
+!console/**
+console/tests/
+**/__pycache__
+**/*.pyc
+!config/governorates_v1.json
+!configs/phase2m_h_frozen_candidate.json
+!scripts/natid_ocr_pipeline_model_API_calling.py

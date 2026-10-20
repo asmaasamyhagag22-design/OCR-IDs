@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block main %}
+{% set action_labels = {'login': 'تسجيل دخول', 'logout': 'تسجيل خروج', 'login_failed': 'محاولة دخول فاشلة',
+  'login_blocked': 'دخول محظور مؤقتًا', 'view': 'فتح حالة', 'decide': 'قرار', 'override': 'تعديل قرار',
+  'reread': 'إعادة قراءة', 'inspect': 'فحص النموذج لحالة', 'inspect_upload': 'فحص النموذج لصورة مرفوعة',
+  'export': 'تصدير', 'user_create': 'إضافة مستخدم', 'user_toggle': 'تفعيل أو إيقاف مستخدم',
+  'user_role': 'تغيير صلاحية', 'user_password': 'تعيين كلمة مرور مستخدم', 'password_change': 'تغيير كلمة المرور'} %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">الإشراف</p>
+    <h1>سجل العمليات</h1>
+    <p class="sub">كل دخول وفتح حالة وقرار وتصدير، باسم المستخدم ووقته. يُضاف إلى هذا السجل فقط، ولا يُحذف منه شيء أو يُعدَّل، ولا يتضمن أي رقم قومي.</p>
+  </div>
+</div>
+<section class="panel">
+  <form class="filters panel-body" method="get" action="/audit">
+    <label for="user_filter">المستخدم
+      <select id="user_filter" name="user_filter" data-autosubmit>
+        <option value="">الكل</option>
+        {% for u in users %}<option value="{{ u.username }}" {{ 'selected' if u.username == user_filter }}>{{ u.display_name }}</option>{% endfor %}
+      </select></label>
+    <label for="action">العملية
+      <select id="action" name="action" data-autosubmit>
+        <option value="">الكل</option>
+        {% for k, v in action_labels.items() %}<option value="{{ k }}" {{ 'selected' if k == action }}>{{ v }}</option>{% endfor %}
+      </select></label>
+    <noscript><button class="btn small" type="submit">تطبيق</button></noscript>
+    <span class="muted small">آخر {{ entries|length }} عملية</span>
+  </form>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>الوقت</th><th>المستخدم</th><th>العملية</th><th>السجل</th><th>تفاصيل</th></tr></thead>
+      <tbody>
+      {% for e in entries %}
+        <tr>
+          <td class="n">{{ e.at|when }}</td>
+          <td>{{ e.user or '—' }}</td>
+          <td>{{ action_labels.get(e.action, e.action) }}</td>
+          <td>{% if e.target and e.action in ('view', 'decide', 'override', 'reread', 'inspect') %}<a class="mono" href="/review/{{ e.target }}">…{{ e.target[-8:] }}</a>{% else %}{{ e.target or '' }}{% endif %}</td>
+          <td class="small muted">{% for k, v in e.detail.items() %}{{ verdicts[v].label if k == 'verdict' and v in verdicts else category_labels.get(v, v) if k == 'category' else v }}{{ ' · ' if not loop.last }}{% endfor %}</td>
+        </tr>
+      {% else %}<tr><td colspan="5" class="muted">لا توجد عمليات.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

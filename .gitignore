@@ -9,6 +9,7 @@ __pycache__/
 .venv/
 .venv-ocr/
 .venv-client/
+.venv-console/
 natid_ocr_pipeline.log
 *.egg-info/
 third_party/
@@ -43,3 +44,4 @@ paddleocr_fixed_crop_bundle/
 /.venv
 /data
 /third_party
+.env
