@@ -4,7 +4,10 @@
   "use strict";
 
   const csrf = () => (document.querySelector('input[name="csrf"]') || {}).value || "";
-  const typing = (el) => el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable);
+  const NON_TEXT = ["radio", "checkbox", "button", "submit", "reset", "file"];
+  // Where a key is text being typed; a focused radio or button still takes the shortcuts.
+  const typing = (el) => !!el && (el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable ||
+    (el.tagName === "INPUT" && !NON_TEXT.includes(el.type)));
   const ARABIC = "٠١٢٣٤٥٦٧٨٩", PERSIAN = "۰۱۲۳۴۵۶۷۸۹";
   const toAscii = (s) => s.replace(/[٠-٩۰-۹]/g, (c) => String(Math.max(ARABIC.indexOf(c), PERSIAN.indexOf(c))));
 
@@ -14,9 +17,9 @@
   document.querySelectorAll("[data-fragment]").forEach(async (box) => {
     try {
       const res = await fetch(box.dataset.fragment, { credentials: "same-origin" });
-      box.innerHTML = res.ok ? await res.text() : '<p class="muted small">تعذر التحقق.</p>';
+      box.innerHTML = res.ok ? await res.text() : '<p class="muted small">تعذّر التحقق من الخدمة.</p>';
     } catch (e) {
-      box.innerHTML = '<p class="muted small">تعذر التحقق.</p>';
+      box.innerHTML = '<p class="muted small">تعذّر التحقق من الخدمة.</p>';
     }
   });
 
@@ -48,7 +51,7 @@
     img.addEventListener("error", async () => {
       img.hidden = true; msg.hidden = false;
       try { const r = await fetch(img.src, { credentials: "same-origin" }); msg.textContent = await r.text(); }
-      catch (e) { msg.textContent = "تعذر تحميل الصورة."; }
+      catch (e) { msg.textContent = "تعذّر تحميل الصورة."; }
     });
     viewer.addEventListener("wheel", (e) => { e.preventDefault(); view.zoom(e.deltaY < 0 ? 1.15 : 1 / 1.15); }, { passive: false });
     let drag = null;
@@ -87,14 +90,16 @@
   const rereadBtn = document.querySelector("[data-reread]");
   if (rereadBtn) {
     rereadBtn.addEventListener("click", async () => {
-      const box = document.querySelector("[data-reread-box]");
-      rereadBtn.disabled = true; rereadBtn.textContent = "الموديل بيقرا الصورة...";
+      const box = document.querySelector("[data-reread-out]");
+      const label = rereadBtn.textContent;
+      rereadBtn.disabled = true; rereadBtn.textContent = "جارٍ إعادة القراءة…";
       try {
         const res = await fetch(rereadBtn.dataset.reread, { method: "POST", credentials: "same-origin", headers: { "X-CSRF-Token": csrf() } });
         box.innerHTML = await res.text();
       } catch (e) {
-        box.innerHTML = '<div class="notice bad">الخدمة ما ردتش.</div>';
+        box.innerHTML = '<div class="notice bad">خدمة القراءة لا تستجيب.</div>';
       }
+      rereadBtn.disabled = false; rereadBtn.textContent = label;
     });
   }
 
@@ -102,6 +107,7 @@
   document.addEventListener("keydown", (e) => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     const active = document.activeElement;
+    if (e.key === "Enter" && active && (active.tagName === "BUTTON" || active.tagName === "A")) return;
     if (e.key === "Enter" && !typing(active)) {
       if (form) { e.preventDefault(); form.requestSubmit(); return; }
       const start = document.querySelector('a.btn.primary[href^="/review/next"]');

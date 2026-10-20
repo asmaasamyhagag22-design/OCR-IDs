@@ -16,6 +16,10 @@ The batch pipeline calls `POST /engine` on port 8081. The authenticated
 - [Engine verification and delivery record](reports/phase4_engine.md).
 - [Release decisions](docs/release/decision_log.md).
 
+**Review console and model inspector: [docs/CONSOLE_GUIDE.md](docs/CONSOLE_GUIDE.md)** (Arabic). The
+operations and human-review web application, the "inside the model" screen, and one-command start with
+`docker compose --profile engine up -d`.
+
 **Complete handover guide: [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md).** It covers requirements, Docker, the Python environment, the team API client, a full batch, the reports, troubleshooting and data protection, step by step.
 
 **New machine? Start with the [Quick start for the team](README_SERVICE.md#quick-start-for-the-team):**

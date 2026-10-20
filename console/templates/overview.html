@@ -3,49 +3,50 @@
 {% set proj = o.projected() %}
 <div class="page-head">
   <div>
+    <p class="eyebrow">لوحة المتابعة</p>
     <h1>نظرة عامة</h1>
-    <p class="sub">آخر قراءة من الـ OCR: <span class="num">{{ o.last_processed|when }}</span> · الأرقام بتتحدث كل {{ settings.stats_ttl_s }} ثانية</p>
+    <p class="sub">آخر قراءة آلية: <span class="num">{{ o.last_processed|when }}</span> بتوقيت القاهرة · تُحدَّث الأرقام كل {{ settings.stats_ttl_s }} ثانية</p>
   </div>
   <div class="actions">
     <a class="btn" href="/overview?refresh=1">تحديث الآن</a>
-    <a class="btn primary" href="/review/next">ابدأ المراجعة <kbd>↵</kbd></a>
+    <a class="btn primary" href="/review/next">بدء المراجعة <kbd>↵</kbd></a>
   </div>
 </div>
 
-<section class="kpis" aria-label="المؤشرات الأساسية">
+<section class="kpis" aria-label="المؤشرات الرئيسية">
   <div class="kpi warn">
     <span class="label">الدقة قبل المراجعة</span>
     <span class="value">{{ o.lower|pct }}</span>
-    <span class="note">القراءة = الرقم المكتوب. ده حد أدنى، لأن غلط كتابة المتقدم بيتحسب على الموديل.</span>
+    <span class="note">نسبة تطابق القراءة مع الرقم المُدخل. حدٌّ أدنى، إذ تُحتسب أخطاء إدخال المتقدمين على النموذج.</span>
   </div>
   <div class="kpi accent">
-    <span class="label">الدقة المؤكدة لحد دلوقتي</span>
+    <span class="label">الدقة المؤكَّدة حتى الآن</span>
     <span class="value">{{ o.confirmed|pct }}</span>
-    <span class="note">المطابق + الحالات اللي المراجع أكد إن الـ OCR قراها صح ({{ o.mismatch_ocr_right|num }}).</span>
+    <span class="note">الحالات المطابقة، مضافًا إليها {{ o.mismatch_ocr_right|num }} حالة أكّد المراجِع صحة قراءتها.</span>
   </div>
   <div class="kpi">
-    <span class="label">المتوقع بعد ما المراجعة تخلص</span>
+    <span class="label">الدقة المتوقعة عند اكتمال المراجعة</span>
     <span class="value">{% if proj %}{{ proj[0]|pct(1) }}{% else %}—{% endif %}</span>
-    <span class="note">{% if proj %}بثقة 95%: <span class="num">{{ proj[1]|pct(1) }} – {{ proj[2]|pct(1) }}</span>، من {{ (o.mismatch_ocr_right + o.mismatch_ocr_wrong)|num }} حالة متراجعة.{% else %}محتاج مراجعات الأول.{% endif %}</span>
+    <span class="note">{% if proj %}فترة ثقة 95%: <span class="num">{{ proj[1]|pct(1) }} – {{ proj[2]|pct(1) }}</span>، استنادًا إلى {{ (o.mismatch_ocr_right + o.mismatch_ocr_wrong)|num }} حالة محسومة.{% else %}تظهر بعد أول قرارات المراجعة.{% endif %}</span>
   </div>
   <div class="kpi">
-    <span class="label">التغطية</span>
+    <span class="label">نسبة التغطية</span>
     <span class="value">{{ o.coverage|pct }}</span>
-    <span class="note">الموديل طلّع رقم لـ {{ o.readings|num }} من {{ o.evaluated|num }} متقدم.</span>
+    <span class="note">أصدر النموذج رقمًا لـ {{ o.readings|num }} من أصل {{ o.evaluated|num }} متقدم.</span>
   </div>
   <div class="kpi">
     <span class="label">تقدّم المراجعة</span>
     <span class="value">{{ o.progress|pct(0) }}</span>
-    <span class="note">{{ o.queue_decided|num }} من {{ o.queue_total|num }} حالة · انت راجعت النهارده {{ mine_today|num }}</span>
+    <span class="note">{{ o.queue_decided|num }} من {{ o.queue_total|num }} حالة · قراراتك اليوم: {{ mine_today|num }}</span>
   </div>
 </section>
 
 {% if chart %}
 <section class="panel">
-  <div class="panel-head"><h2>الدقة الحقيقية بين فين وفين</h2><span class="muted small">كل قرار مراجعة بيضيّق المدى</span></div>
+  <div class="panel-head"><h2>نطاق الدقة الفعلية</h2><span class="muted small">يضيق النطاق مع كل قرار مراجعة</span></div>
   <div class="panel-body">
     <svg class="chart" viewBox="0 0 {{ chart.width }} 120" role="img"
-         aria-label="مقياس الدقة: الحد الأدنى {{ o.lower|pct }}، المؤكد {{ o.confirmed|pct }}، وأعلى قيمة ممكنة {{ o.upper|pct }}">
+         aria-label="مقياس الدقة: قبل المراجعة {{ o.lower|pct }}، المؤكَّدة {{ o.confirmed|pct }}، والحد الأعلى الممكن {{ o.upper|pct }}">
       {% for t in chart.ticks %}
       <line class="grid" x1="{{ t.x }}" y1="34" x2="{{ t.x }}" y2="86"/>
       <text x="{{ t.x }}" y="104" text-anchor="middle">{{ t.label }}</text>
@@ -72,10 +73,10 @@
     </svg>
     <div class="legend">
       <span><i class="sw-lower"></i>قبل المراجعة</span>
-      <span><i class="sw-confirmed"></i>مؤكد</span>
-      <span><i class="sw-range"></i>المدى الممكن لسه</span>
-      <span><i class="sw-upper"></i>لو كل الباقي طلع صح</span>
-      <span>≈ المتوقع، والمستطيل الغامق حواليه هامش ثقة 95%</span>
+      <span><i class="sw-confirmed"></i>مؤكَّدة</span>
+      <span><i class="sw-range"></i>النطاق الممكن</span>
+      <span><i class="sw-upper"></i>الحد الأعلى إن صحّت كل الحالات المتبقية</span>
+      <span>≈ القيمة المتوقعة، وحولها فترة الثقة 95%</span>
     </div>
   </div>
 </section>
@@ -83,26 +84,26 @@
 
 <div class="grid-2">
   <section class="panel">
-    <div class="panel-head"><h2>نتيجة القراءة</h2><span class="muted small num">{{ o.processed|num }} سجل</span></div>
+    <div class="panel-head"><h2>نتائج القراءة الآلية</h2><span class="muted small num">{{ o.processed|num }} سجل</span></div>
     <div class="panel-body">
       {% set total = [o.evaluated, 1]|max %}
-      <div class="stack" role="img" aria-label="مطابق {{ o.categories['match'] }}، مختلف {{ o.categories['mismatch'] }}، ما اتقراش {{ o.categories['unreadable'] }}">
+      <div class="stack" role="img" aria-label="مطابقة {{ o.categories['match'] }}، مختلفة {{ o.categories['mismatch'] }}، تعذّرت قراءتها {{ o.categories['unreadable'] }}">
         <span class="s-match" style="width: {{ 100 * o.categories['match'] / total }}%"></span>
         <span class="s-mismatch" style="width: {{ 100 * o.categories['mismatch'] / total }}%"></span>
         <span class="s-unreadable" style="width: {{ 100 * o.categories['unreadable'] / total }}%"></span>
       </div>
       <div class="legend">
-        <span><i class="sw-match"></i>مطابق <b class="num">{{ o.categories['match']|num }}</b></span>
-        <span><i class="sw-mismatch"></i>مختلف عن المكتوب <b class="num">{{ o.categories['mismatch']|num }}</b></span>
-        <span><i class="sw-unreadable"></i>ما اتقراش <b class="num">{{ o.categories['unreadable']|num }}</b></span>
+        <span><i class="sw-match"></i>مطابقة <b class="num">{{ o.categories['match']|num }}</b></span>
+        <span><i class="sw-mismatch"></i>مختلفة عن الرقم المُدخل <b class="num">{{ o.categories['mismatch']|num }}</b></span>
+        <span><i class="sw-unreadable"></i>تعذّرت قراءتها <b class="num">{{ o.categories['unreadable']|num }}</b></span>
       </div>
       <table>
         <tbody>
-          <tr><td>اتقيّم (صورة + رقم مكتوب)</td><td class="n">{{ o.evaluated|num }}</td></tr>
-          <tr><td>مفيش صورة على السيرفر</td><td class="n">{{ o.statuses['download_error']|num }}</td></tr>
-          <tr><td>طلب الـ OCR فشل (يتعاد)</td><td class="n">{{ (o.statuses['ocr_request_error'] + o.statuses['ocr_missing_in_response'])|num }}</td></tr>
-          <tr><td>مفيش رقم مكتوب</td><td class="n">{{ o.categories['no_typed']|num }}</td></tr>
-          <tr><td>لسه ما اتقراش خالص</td><td class="n">{{ o.pending_ocr|num }}</td></tr>
+          <tr><td>خضعت للتقييم (صورة ورقم مُدخل)</td><td class="n">{{ o.evaluated|num }}</td></tr>
+          <tr><td>لا توجد صورة على خادم الصور</td><td class="n">{{ o.statuses['download_error']|num }}</td></tr>
+          <tr><td>فشل طلب القراءة (يُعاد إرساله)</td><td class="n">{{ (o.statuses['ocr_request_error'] + o.statuses['ocr_missing_in_response'])|num }}</td></tr>
+          <tr><td>لا يوجد رقم مُدخل</td><td class="n">{{ o.categories['no_typed']|num }}</td></tr>
+          <tr><td>لم تُقرأ بعد</td><td class="n">{{ o.pending_ocr|num }}</td></tr>
         </tbody>
       </table>
     </div>
@@ -111,7 +112,7 @@
   <section class="panel">
     <div class="panel-head"><h2>قرارات المراجعة</h2><span class="muted small num">{{ o.queue_decided|num }} / {{ o.queue_total|num }}</span></div>
     <div class="panel-body">
-      <div class="progress" role="img" aria-label="تقدم المراجعة {{ o.progress|pct(0) }}"><span style="width: {{ 100 * (o.progress or 0) }}%"></span></div>
+      <div class="progress" role="img" aria-label="تقدّم المراجعة {{ o.progress|pct(0) }}"><span style="width: {{ 100 * (o.progress or 0) }}%"></span></div>
       {% set vmax = [o.verdicts.values()|max if o.verdicts else 0, 1]|max %}
       <div class="hbars">
         {% for name, v in verdicts.items() %}
@@ -120,32 +121,32 @@
           <span class="n">{{ o.verdicts[name]|num }}</span></div>
         {% endfor %}
       </div>
-      <p class="small muted">من الحالات المختلفة اللي اتحسمت: الـ OCR كان صح في <b class="num">{{ o.share_ocr_right|pct(0) }}</b> منها، والباقي غلط قراءة. ومحتاجين صورة جديدة لـ <b class="num">{{ o.reupload|num }}</b> متقدم.</p>
+      <p class="small muted">من الحالات المختلفة التي حُسمت، كانت القراءة الآلية صحيحة في <b class="num">{{ o.share_ocr_right|pct(0) }}</b> منها، أي أن الخطأ كان في إدخال المتقدم. ويلزم طلب صورة جديدة من <b class="num">{{ o.reupload|num }}</b> متقدم.</p>
     </div>
   </section>
 </div>
 
 <div class="grid-2">
   <section class="panel">
-    <div class="panel-head"><h2>شكل الاختلاف</h2><span class="muted small">في الحالات المختلفة عن المكتوب</span></div>
+    <div class="panel-head"><h2>طبيعة الاختلاف</h2><span class="muted small">في الحالات المختلفة عن الرقم المُدخل</span></div>
     <div class="panel-body">
       {% set kmax = [o.kinds.values()|max if o.kinds else 0, 1]|max %}
       <div class="hbars">
         {% for name, n in o.kinds.most_common() %}
         <div class="hbar"><span>{{ kind_labels[name] }}</span><span class="track"><span class="fill warn" style="width: {{ 100 * n / kmax }}%"></span></span><span class="n">{{ n|num }}</span></div>
-        {% else %}<p class="muted">مفيش حالات مختلفة.</p>{% endfor %}
+        {% else %}<p class="muted">لا توجد حالات مختلفة.</p>{% endfor %}
       </div>
-      <p class="small muted">الاختلاف في خانة أو خانتين ممكن يبقى غلط قراءة أو غلط كتابة. 3 خانات أو أكتر غالباً معناه غلط كتابة، أو بطاقة شخص تاني.</p>
+      <p class="small muted">الاختلاف في خانة أو خانتين قد يكون خطأ قراءة أو خطأ إدخال. أما الاختلاف في ثلاث خانات أو أكثر فيرجّح خطأ الإدخال أو استخدام بطاقة شخص آخر.</p>
     </div>
   </section>
   <section class="panel">
-    <div class="panel-head"><h2>ليه ما اتقراش</h2><span class="muted small">من ردود الـ OCR</span></div>
+    <div class="panel-head"><h2>أسباب تعذّر القراءة</h2><span class="muted small">بحسب ردود خدمة القراءة</span></div>
     <div class="panel-body">
       {% set emax = [o.error_codes.values()|max if o.error_codes else 0, 1]|max %}
       <div class="hbars">
         {% for code, n in o.error_codes.most_common() %}
         <div class="hbar"><span>{{ error_code_labels.get(code, code) }}</span><span class="track"><span class="fill bad" style="width: {{ 100 * n / emax }}%"></span></span><span class="n">{{ n|num }}</span></div>
-        {% else %}<p class="muted">مفيش.</p>{% endfor %}
+        {% else %}<p class="muted">لا توجد حالات.</p>{% endfor %}
       </div>
     </div>
   </section>
@@ -153,10 +154,10 @@
 
 <div class="grid-2">
   <section class="panel">
-    <div class="panel-head"><h2>المراجعات في آخر 14 يوم</h2></div>
+    <div class="panel-head"><h2>المراجعات خلال آخر 14 يومًا</h2></div>
     <div class="panel-body">
       {% set b = chart.bars if chart else {'days': o.per_day, 'max': 1} %}
-      <svg class="chart" viewBox="0 0 560 150" role="img" aria-label="عدد المراجعات في كل يوم من آخر 14 يوم">
+      <svg class="chart" viewBox="0 0 560 150" role="img" aria-label="عدد قرارات المراجعة في كل يوم من آخر 14 يومًا">
         <line class="axis" x1="10" y1="120" x2="550" y2="120"/>
         {% for day, n in b.days %}
         {% set h = 96 * n / b.max %}
@@ -168,14 +169,14 @@
     </div>
   </section>
   <section class="panel">
-    <div class="panel-head"><h2>المراجعين</h2></div>
+    <div class="panel-head"><h2>المراجِعون</h2></div>
     <div class="tablewrap">
       <table>
-        <thead><tr><th>المراجع</th><th>قرارات</th></tr></thead>
+        <thead><tr><th>المراجِع</th><th>عدد القرارات</th></tr></thead>
         <tbody>
         {% for name, n in o.reviewers.most_common() %}
           <tr><td>{{ name }}</td><td class="n">{{ n|num }}</td></tr>
-        {% else %}<tr><td colspan="2" class="muted">لسه مفيش مراجعات.</td></tr>{% endfor %}
+        {% else %}<tr><td colspan="2" class="muted">لا توجد قرارات بعد.</td></tr>{% endfor %}
         </tbody>
       </table>
     </div>
@@ -183,7 +184,7 @@
 </div>
 
 <section class="panel">
-  <div class="panel-head"><h2>حالة الأنظمة</h2><span class="muted small">OCR service و MongoDB</span></div>
-  <div class="panel-body" data-fragment="/fragments/health"><p class="muted small">بيتأكد من الخدمات...</p></div>
+  <div class="panel-head"><h2>حالة الأنظمة</h2><span class="muted small">خدمة القراءة وقاعدة البيانات</span></div>
+  <div class="panel-body" data-fragment="/fragments/health"><p class="muted small">جارٍ التحقق من الخدمات…</p></div>
 </section>
 {% endblock %}

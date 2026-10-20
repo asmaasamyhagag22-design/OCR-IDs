@@ -19,30 +19,37 @@ from . import ids
 from .config import Settings
 
 UTC = datetime.UTC
+try:
+    from zoneinfo import ZoneInfo
+
+    LOCAL = ZoneInfo("Africa/Cairo")
+except Exception:  # noqa: BLE001 - no zone data: Egypt standard time, without summer time
+    LOCAL = datetime.timezone(datetime.timedelta(hours=2), "EET")
+
 NOT_EVALUATED = ("download_error", "ocr_request_error", "ocr_missing_in_response")
 #: The two categories a reviewer works on, in queue order.
 QUEUE_CATEGORIES = ("mismatch", "unreadable")
 CATEGORY_LABELS = {
-    "mismatch": "مختلف عن المكتوب",
-    "unreadable": "ما اتقراش",
-    "match": "مطابق",
+    "mismatch": "مختلفة عن الرقم المُدخل",
+    "unreadable": "تعذّرت قراءتها",
+    "match": "مطابقة",
 }
 KIND_ORDER = {k: i for i, k in enumerate(
     ("one_digit", "two_digits", "three_plus", "typed_invalid", "typed_malformed", "no_reading"))}
 
 #: Reviewer verdicts. ``reading`` says which number is the card's real one.
 VERDICTS = {
-    "ocr_correct": {"label": "قراءة الـ OCR صح", "hint": "المتقدم كتب رقمه غلط", "key": "1",
+    "ocr_correct": {"label": "القراءة الآلية صحيحة", "hint": "أخطأ المتقدم في إدخال رقمه", "key": "1",
                     "categories": ("mismatch",), "reading": "read"},
-    "typed_correct": {"label": "المكتوب صح", "hint": "الـ OCR قرا غلط", "key": "2",
+    "typed_correct": {"label": "الرقم المُدخل صحيح", "hint": "أخطأت القراءة الآلية", "key": "2",
                       "categories": ("mismatch", "unreadable"), "reading": "typed"},
-    "other": {"label": "الاتنين غلط", "hint": "اكتب الرقم الصح من الصورة", "key": "3",
+    "other": {"label": "كلاهما غير صحيح", "hint": "يُدخَل الرقم الصحيح كما يظهر في الصورة", "key": "3",
               "categories": ("mismatch", "unreadable"), "reading": "corrected"},
-    "another_person": {"label": "بطاقة شخص تاني", "hint": "الـ OCR قرا صح، بس البطاقة مش بتاعة المتقدم",
+    "another_person": {"label": "بطاقة شخص آخر", "hint": "القراءة صحيحة، لكن البطاقة لا تخص المتقدم",
                        "key": "4", "categories": ("mismatch",), "reading": "read"},
-    "unreadable": {"label": "الصورة مش واضحة", "hint": "محتاج يرفع صورة تانية", "key": "5",
+    "unreadable": {"label": "الصورة غير واضحة", "hint": "يلزم رفع صورة جديدة", "key": "5",
                    "categories": ("mismatch", "unreadable"), "reading": None},
-    "wrong_document": {"label": "مش وش البطاقة", "hint": "ضهر البطاقة أو مستند تاني", "key": "6",
+    "wrong_document": {"label": "ليست الوجه الأمامي للبطاقة", "hint": "الوجه الخلفي أو مستند آخر", "key": "6",
                        "categories": ("mismatch", "unreadable"), "reading": None},
 }
 #: Verdicts after which the OCR reading is confirmed correct, and after which it is confirmed wrong.
@@ -61,6 +68,17 @@ def aware(value: datetime.datetime | None) -> datetime.datetime | None:
     if value is None:
         return None
     return value if value.tzinfo else value.replace(tzinfo=UTC)
+
+
+def local(value: datetime.datetime) -> datetime.datetime:
+    """A stored UTC time in Cairo time, summer time included."""
+    return aware(value).astimezone(LOCAL)
+
+
+def local_day_start(moment: datetime.datetime | None = None) -> datetime.datetime:
+    """Midnight in Cairo of the day ``moment`` falls on, as a UTC time for queries."""
+    day = local(moment or now()).date()
+    return datetime.datetime.combine(day, datetime.time(), LOCAL).astimezone(UTC)
 
 
 @dataclass
@@ -107,7 +125,7 @@ class Store:
         self.audit_log = database[settings.audit]
         self.users = database[settings.users]
         self.sessions = database[settings.sessions]
-        self._cache: tuple[float, list[Record]] | None = None
+        self._cache: tuple[float, list[Record], dict[str, Any]] | None = None
         self._lock = threading.Lock()
 
     # ------------------------------------------------------------------ setup
@@ -116,6 +134,7 @@ class Store:
         self.sessions.create_index("token")
         self.sessions.create_index("expires_at")
         self.audit_log.create_index([("at", -1)])
+        self.audit_log.create_index([("user", 1), ("action", 1), ("at", -1)])
         self.reviews.create_index("verdict")
         self.reviews.create_index("reviewed_at")
 
@@ -129,6 +148,8 @@ class Store:
     def _record(self, doc: dict[str, Any]) -> Record:
         s = self.settings
         result = doc.get(s.result_field) or {}
+        if not isinstance(result, dict):
+            result = {}
         return Record(
             id=doc["_id"],
             key=str(doc["_id"]),
@@ -141,16 +162,20 @@ class Store:
             extra={name: doc.get(name) for name in s.display_fields},
         )
 
-    def records(self, fresh: bool = False) -> list[Record]:
-        """Every applicant with an OCR result, cached for ``stats_ttl_s`` seconds."""
+    def _load(self, fresh: bool) -> tuple[list[Record], dict[str, Any]]:
         with self._lock:
             if (not fresh and self._cache is not None
                     and time.monotonic() - self._cache[0] < self.settings.stats_ttl_s):
-                return self._cache[1]
+                return self._cache[1], self._cache[2]
             query = {f"{self.settings.result_field}.status": {"$exists": True}}
             rows = [self._record(doc) for doc in self.applicants.find(query, self._projection())]
-            self._cache = (time.monotonic(), rows)
-            return rows
+            index = {row.key: row.id for row in rows}
+            self._cache = (time.monotonic(), rows, index)
+            return rows, index
+
+    def records(self, fresh: bool = False) -> list[Record]:
+        """Every applicant with an OCR result, cached for ``stats_ttl_s`` seconds."""
+        return self._load(fresh)[0]
 
     def pending_ocr(self) -> int:
         """Applicants the API client has not processed yet (the client's pending query)."""
@@ -160,10 +185,7 @@ class Store:
 
     def lookup_id(self, key: str) -> Any:
         """The applicant's real ``_id`` for a URL key, whatever its type (ObjectId, int or string)."""
-        for record in self.records():
-            if record.key == key:
-                return record.id
-        return None
+        return self._load(False)[1].get(key)
 
     def record(self, key: str) -> Record | None:
         applicant_id = self.lookup_id(key)
@@ -221,21 +243,38 @@ class Store:
         return None
 
     def claim(self, record: Record, username: str) -> bool:
-        """Claim an undecided item for ``CLAIM_MINUTES``; False when another reviewer holds it."""
+        """Claim an undecided item for ``CLAIM_MINUTES``, atomically; False when another reviewer holds it.
+
+        The update matches only an undecided document that is unclaimed, expired or already this
+        reviewer's. When the document exists but does not match, the upsert's insert collides on
+        ``_id`` and is refused, so two reviewers can never hold the same item.
+        """
+        from pymongo.errors import DuplicateKeyError
+
         current = now()
         review = self.review(record.id)
         if review and review.get("verdict"):
             return True
-        if review and review_state(review, current) == "claimed" and review["claim"]["user"] != username:
+        free = {"_id": record.id, "verdict": None, "$or": [
+            {"claim": None}, {"claim.until": {"$lte": current}}, {"claim.user": username}]}
+        try:
+            self.reviews.update_one(
+                free,
+                {"$set": {"claim": {"user": username, "until": current + datetime.timedelta(minutes=CLAIM_MINUTES)},
+                          "category": record.category},
+                 "$setOnInsert": {"history": []}},
+                upsert=True,
+            )
+        except DuplicateKeyError:
             return False
-        until = current + datetime.timedelta(minutes=CLAIM_MINUTES)
-        self.reviews.update_one(
-            {"_id": record.id},
-            {"$set": {"claim": {"user": username, "until": until}, "category": record.category},
-             "$setOnInsert": {"history": []}},
-            upsert=True,
-        )
         return True
+
+    def release(self, key: str, username: str) -> None:
+        """Give back an undecided item this reviewer skipped, so it is not held for ten minutes."""
+        applicant_id = self.lookup_id(key)
+        if applicant_id is not None:
+            self.reviews.update_one({"_id": applicant_id, "verdict": None, "claim.user": username},
+                                    {"$set": {"claim": None}})
 
     def decide(self, record: Record, username: str, verdict: str, corrected: str | None, note: str) -> dict[str, Any]:
         if verdict not in VERDICTS or record.category not in VERDICTS[verdict]["categories"]:
@@ -249,7 +288,7 @@ class Store:
         entry = {
             "verdict": verdict,
             "corrected_id": corrected,
-            "note": note.strip()[:500],
+            "note": (note or "").strip()[:500],
             "reviewer": username,
             "reviewed_at": now(),
         }
@@ -280,6 +319,9 @@ class Store:
         if action:
             query["action"] = action
         return list(self.audit_log.find(query).sort("at", -1).limit(limit))
+
+    def count_actions(self, user: str, actions: tuple[str, ...], since: datetime.datetime) -> int:
+        return self.audit_log.count_documents({"user": user, "action": {"$in": list(actions)}, "at": {"$gte": since}})
 
     # ----------------------------------------------------------------- users
     def user(self, username: str) -> dict[str, Any] | None:

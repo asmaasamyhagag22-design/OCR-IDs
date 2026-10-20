@@ -16,5 +16,7 @@ markupsafe==3.0.3
 pymongo==4.18.2
 dnspython==2.8.0
 pillow==10.4.0
+# Cairo time (summer time included) where the system has no zone data
+tzdata==2025.2
 # demonstration mode only (python -m console demo): an in-memory MongoDB
 mongomock==4.3.0

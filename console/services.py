@@ -86,6 +86,37 @@ class Health:
     seconds: float | None = None
 
 
+class Inspector:
+    """The model inspector (python -m inspector), when CONSOLE_INSPECTOR_URL names one."""
+
+    def __init__(self, settings: Settings) -> None:
+        self.settings = settings
+        self.client = httpx.Client(timeout=settings.engine_timeout_s)
+        self.headers = {"X-Inspector-Key": settings.inspector_key} if settings.inspector_key else {}
+
+    @property
+    def available(self) -> bool:
+        return bool(self.settings.inspector_url)
+
+    def inspect(self, image: bytes, key: str | None = None) -> dict[str, Any]:
+        try:
+            response = self.client.post(self.settings.inspector_url + "/inspect", content=image,
+                                        headers={**self.headers, "Content-Type": "application/octet-stream"})
+        except httpx.HTTPError as exc:
+            raise MediaError("inspector_unreachable") from exc
+        if response.status_code == 503:
+            raise MediaError("inspector_loading")
+        if response.status_code != 200:
+            detail = ""
+            try:
+                detail = str(response.json().get("detail", ""))
+            except ValueError:
+                pass
+            raise MediaError({"UndecodableImage": "undecodable", "ImageTooLarge": "too_large"}.get(
+                detail, f"inspector_http_{response.status_code}"))
+        return response.json()
+
+
 class Engine:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings

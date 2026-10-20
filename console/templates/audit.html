@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% block main %}
-{% set action_labels = {'login': 'دخول', 'logout': 'خروج', 'login_failed': 'دخول فشل', 'login_blocked': 'دخول اتمنع',
-  'view': 'فتح حالة', 'decide': 'قرار', 'override': 'تعديل قرار', 'reread': 'قراءة تانية', 'export': 'تصدير',
-  'user_create': 'إضافة مستخدم', 'user_toggle': 'تفعيل/إيقاف مستخدم', 'user_role': 'تغيير صلاحية',
-  'user_password': 'تغيير كلمة سر مستخدم', 'password_change': 'تغيير كلمة السر'} %}
+{% set action_labels = {'login': 'تسجيل دخول', 'logout': 'تسجيل خروج', 'login_failed': 'محاولة دخول فاشلة',
+  'login_blocked': 'دخول محظور مؤقتًا', 'view': 'فتح حالة', 'decide': 'قرار', 'override': 'تعديل قرار',
+  'reread': 'إعادة قراءة', 'inspect': 'فحص النموذج لحالة', 'inspect_upload': 'فحص النموذج لصورة مرفوعة',
+  'export': 'تصدير', 'user_create': 'إضافة مستخدم', 'user_toggle': 'تفعيل أو إيقاف مستخدم',
+  'user_role': 'تغيير صلاحية', 'user_password': 'تعيين كلمة مرور مستخدم', 'password_change': 'تغيير كلمة المرور'} %}
 <div class="page-head">
   <div>
+    <p class="eyebrow">الإشراف</p>
     <h1>سجل العمليات</h1>
-    <p class="sub">كل دخول وفتح حالة وقرار وتصدير، باسم المستخدم ووقته. السجل ده بيتضاف عليه بس، ومفيش حاجة فيه بتتمسح أو تتعدّل.</p>
+    <p class="sub">كل دخول وفتح حالة وقرار وتصدير، باسم المستخدم ووقته. يُضاف إلى هذا السجل فقط، ولا يُحذف منه شيء أو يُعدَّل، ولا يتضمن أي رقم قومي.</p>
   </div>
 </div>
 <section class="panel">
@@ -22,6 +24,7 @@
         <option value="">الكل</option>
         {% for k, v in action_labels.items() %}<option value="{{ k }}" {{ 'selected' if k == action }}>{{ v }}</option>{% endfor %}
       </select></label>
+    <noscript><button class="btn small" type="submit">تطبيق</button></noscript>
     <span class="muted small">آخر {{ entries|length }} عملية</span>
   </form>
   <div class="tablewrap">
@@ -33,10 +36,10 @@
           <td class="n">{{ e.at|when }}</td>
           <td>{{ e.user or '—' }}</td>
           <td>{{ action_labels.get(e.action, e.action) }}</td>
-          <td>{% if e.target and e.action in ('view', 'decide', 'override', 'reread') %}<a class="mono" href="/review/{{ e.target }}">…{{ e.target[-8:] }}</a>{% else %}{{ e.target or '' }}{% endif %}</td>
-          <td class="small muted">{% for k, v in e.detail.items() %}{{ verdicts[v].label if k == 'verdict' and v in verdicts else v }}{{ ' · ' if not loop.last }}{% endfor %}</td>
+          <td>{% if e.target and e.action in ('view', 'decide', 'override', 'reread', 'inspect') %}<a class="mono" href="/review/{{ e.target }}">…{{ e.target[-8:] }}</a>{% else %}{{ e.target or '' }}{% endif %}</td>
+          <td class="small muted">{% for k, v in e.detail.items() %}{{ verdicts[v].label if k == 'verdict' and v in verdicts else category_labels.get(v, v) if k == 'category' else v }}{{ ' · ' if not loop.last }}{% endfor %}</td>
         </tr>
-      {% else %}<tr><td colspan="5" class="muted">مفيش عمليات.</td></tr>{% endfor %}
+      {% else %}<tr><td colspan="5" class="muted">لا توجد عمليات.</td></tr>{% endfor %}
       </tbody>
     </table>
   </div>

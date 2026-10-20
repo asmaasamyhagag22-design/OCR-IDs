@@ -1,6 +1,6 @@
 # The work machine's two long-running services, started and kept running by Docker:
 #
-#   docker compose --profile engine up -d     the OCR engine and the review console
+#   docker compose --profile engine up -d     the OCR engine, the model inspector and the console
 #   docker compose up -d console              the console only (the engine already runs as
 #                                             the guide's `docker run ... fixed14-engine`)
 #
@@ -11,7 +11,7 @@ services:
   ocr:
     profiles: ["engine"]
     # the image scripts/phase4_service_docker.sh builds; put its name in .env as OCR_IMAGE
-    image: ${OCR_IMAGE:?set OCR_IMAGE to the output of "bash scripts/phase4_service_docker.sh image"}
+    image: ${OCR_IMAGE:-set-OCR_IMAGE-in-.env-see-docs-CONSOLE_GUIDE}
     container_name: fixed14-engine
     restart: unless-stopped
     ports:
@@ -31,6 +31,32 @@ services:
     mem_limit: ${OCR_MEMORY:-10g}
     pids_limit: 1024
 
+  inspector:
+    profiles: ["engine"]
+    # the OCR image plus inspector/: the console's "inside the model" page asks it on demand
+    build:
+      context: .
+      dockerfile: inspector/Dockerfile
+      args:
+        OCR_IMAGE: ${OCR_IMAGE:-set-OCR_IMAGE-in-.env-see-docs-CONSOLE_GUIDE}
+    image: fixed14-inspector:local
+    container_name: fixed14-inspector
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8082:8082"
+    environment:
+      OCR_CPU_THREADS: ${INSPECTOR_CPU_THREADS:-4}
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /home/ocr:uid=10001,gid=10001
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    ulimits:
+      core: 0
+    mem_limit: ${INSPECTOR_MEMORY:-4g}
+    pids_limit: 512
+
   console:
     build:
       context: .
@@ -44,6 +70,8 @@ services:
     env_file:
       - path: ${HOME}/.config/fixed14/console.env
         required: false
+    environment:
+      CONSOLE_INSPECTOR_URL: ${CONSOLE_INSPECTOR_URL:-http://127.0.0.1:8082}
     read_only: true
     tmpfs:
       - /tmp

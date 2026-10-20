@@ -276,6 +276,7 @@ def test_exports_are_logged_and_reupload_carries_no_ids(world):
     assert not holds_an_id(response.text, store)
     assert supervisor.get("/reports/decisions.csv").status_code == 200
     assert {e["detail"]["report"] for e in store.audit_entries(action="export")} == {"reupload", "decisions"}
+    assert supervisor.get("/reports/decisions.pdf", follow_redirects=False).status_code == 303
 
 
 def test_lists_mask_numbers_and_pages_send_security_headers(world):
@@ -309,6 +310,65 @@ def test_overview_and_health_render(world):
     assert "OCR engine" in client.get("/fragments/health").text
 
 
+@pytest.fixture()
+def inspect_world(settings):
+    database, truth = demo.make_database(settings, n=400, seed=9)
+    store = Store(settings, database)
+
+    def reading_of(key):
+        record = store.record(key)
+        return record.read if record else None
+
+    app = create_app(settings, store, demo.DemoImages(truth), DemoEngine(truth), demo.DemoInspector(truth, reading_of))
+    return store, app
+
+
+def test_the_inspector_page_for_a_record_draws_the_attention(inspect_world):
+    store, app = inspect_world
+    client = login(app, "reviewer")
+    key = next(r.key for r, _ in store.queue(category="mismatch"))
+    page = client.get(f"/inspect/record/{key}")
+    assert page.status_code == 200
+    assert "عرض توضيحي" in page.text, "a demonstration answer must say it is not a model output"
+    assert page.text.count('class="heat') > 14 and "data:image/png;base64," in page.text
+    assert store.audit_entries(action="inspect")[0]["target"] == key
+
+
+def test_an_upload_needs_the_csrf_token_and_is_not_stored(inspect_world):
+    store, app = inspect_world
+    client = login(app, "reviewer")
+    image = demo.render_card(demo.synthetic_id(random.Random(12)), "clean", "upload")
+    refused = client.post("/inspect", files={"image": ("card.jpg", image, "image/jpeg")})
+    assert refused.status_code == 403
+    token = csrf_of(client, "/inspect")
+    page = client.post("/inspect", data={"csrf": token}, files={"image": ("card.jpg", image, "image/jpeg")})
+    assert page.status_code == 200 and "data:image/jpeg;base64," in page.text
+    assert store.audit_entries(action="inspect_upload")[0]["detail"] == {"bytes": len(image)}
+    assert store.reviews.count_documents({}) == store.reviews.count_documents({"verdict": {"$exists": True}})
+
+
+def test_without_an_inspector_the_page_says_how_to_start_one(world):
+    _, app, _ = world
+    page = login(app, "reviewer").get("/inspect")
+    assert page.status_code == 200 and "python -m inspector" in page.text
+
+
+def test_an_inspector_failure_is_shown_not_raised(settings, world):
+    store, _, truth = world
+
+    class Down:
+        available = True
+
+        def inspect(self, image, key=None):
+            from console.services import MediaError
+            raise MediaError("inspector_unreachable")
+
+    app = create_app(settings, store, demo.DemoImages(truth), DemoEngine(truth), Down())
+    key = next(r.key for r, _ in store.queue(category="mismatch"))
+    page = login(app, "reviewer").get(f"/inspect/record/{key}")
+    assert page.status_code == 200 and "لا تستجيب" in page.text
+
+
 def test_admin_manages_accounts(world):
     store, app, _ = world
     admin = login(app, "admin")
@@ -321,3 +381,68 @@ def test_admin_manages_accounts(world):
     assert store.user("new.reviewer")["role"] == "reviewer"
     admin.post("/users/new.reviewer", data={"csrf": token, "action": "toggle"}, follow_redirects=False)
     assert store.user("new.reviewer")["active"] is False
+
+
+def test_skipping_releases_the_claim(world):
+    store, app, _ = world
+    client = login(app, "reviewer")
+    first = client.get("/review/next", follow_redirects=False).headers["location"]
+    key = first.split("/review/")[1].split("?")[0]
+    client.get(first)
+    assert store.review(store.lookup_id(key))["claim"]["user"] == "reviewer"
+    client.get(f"/review/next?after={key}", follow_redirects=False)
+    assert store.review(store.lookup_id(key))["claim"] is None
+    assert store.claim(store.record(key), "supervisor")
+
+
+def test_excel_export_keeps_every_id_as_text(world):
+    import io
+    import zipfile
+
+    store, app, _ = world
+    reviewer = login(app, "reviewer")
+    for record, _ in store.queue(category="mismatch", state="pending")[:3]:
+        token = csrf_of(reviewer, f"/review/{record.key}")
+        reviewer.post(f"/review/{record.key}", data={"csrf": token, "verdict": "ocr_correct"}, follow_redirects=False)
+    response = login(app, "supervisor").get("/reports/decisions.xlsx")
+    assert response.status_code == 200 and response.headers["content-type"].startswith(
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    with zipfile.ZipFile(io.BytesIO(response.content)) as book:
+        sheet = book.read("xl/worksheets/sheet1.xml").decode()
+    assert 'rightToLeft="1"' in sheet and "<v>" not in sheet, "every cell must be an inline string"
+    assert sheet.count('t="inlineStr"') >= 4 * 10, "a header row and three decisions of ten columns each"
+
+
+def test_csv_free_text_cannot_become_a_formula(world):
+    store, app, _ = world
+    reviewer = login(app, "reviewer")
+    record = store.queue(category="mismatch", state="pending")[0][0]
+    token = csrf_of(reviewer, f"/review/{record.key}")
+    reviewer.post(f"/review/{record.key}", data={"csrf": token, "verdict": "ocr_correct", "note": "=HYPERLINK(1)"},
+                  follow_redirects=False)
+    text = login(app, "supervisor").get("/reports/decisions.csv").text
+    assert "'=HYPERLINK(1)" in text and ",=HYPERLINK" not in text
+
+
+def test_days_follow_cairo_time_including_summer_time():
+    import datetime
+
+    from console.store import local_day_start
+
+    utc = datetime.UTC
+    summer = local_day_start(datetime.datetime(2026, 7, 1, 21, 30, tzinfo=utc))
+    winter = local_day_start(datetime.datetime(2026, 12, 1, 22, 30, tzinfo=utc))
+    assert summer == datetime.datetime(2026, 7, 1, 21, 0, tzinfo=utc)
+    assert winter == datetime.datetime(2026, 12, 1, 22, 0, tzinfo=utc)
+
+
+def test_a_number_stored_as_a_double_is_read_whole():
+    value = demo.synthetic_id(random.Random(13))
+    assert ids.norm(float(value)) == value
+
+
+def test_an_unknown_category_never_reaches_a_redirect(world):
+    _, app, _ = world
+    client = login(app, "reviewer")
+    response = client.get("/review/next?category=%0d%0aSet-Cookie:x", follow_redirects=False)
+    assert response.status_code == 303 and "Set-Cookie" not in response.headers["location"]

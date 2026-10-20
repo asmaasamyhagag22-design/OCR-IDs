@@ -25,7 +25,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from .store import NEEDS_REUPLOAD, NOT_EVALUATED, OCR_RIGHT, OCR_WRONG, Record, aware
+from .store import NEEDS_REUPLOAD, NOT_EVALUATED, OCR_RIGHT, OCR_WRONG, Record, local
 
 Z95 = 1.959963984540054
 
@@ -145,12 +145,12 @@ def build(records: list[Record], reviews: dict[str, dict[str, Any]], pending_ocr
             else:
                 o.mismatch_pending += 1
 
-    today = today or datetime.datetime.now(datetime.UTC).date()
+    today = today or local(datetime.datetime.now(datetime.UTC)).date()
     counts: Counter = Counter()
     for review in reviews.values():
-        at = aware(review.get("reviewed_at"))
+        at = review.get("reviewed_at")
         if review.get("verdict") and at:
-            counts[at.date()] += 1
+            counts[local(at).date()] += 1
     o.per_day = [((today - datetime.timedelta(days=i)).isoformat(), counts[today - datetime.timedelta(days=i)])
                  for i in range(days - 1, -1, -1)]
     return o

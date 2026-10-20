@@ -12,7 +12,7 @@ import random
 import sys
 
 from . import config, security
-from .services import Engine, Health, MediaHost, Reread
+from .services import Engine, Health, Inspector, MediaHost, Reread
 from .store import Store
 
 
@@ -41,15 +41,23 @@ def serve(settings: config.Settings) -> None:
     from .app import create_app
 
     if settings.demo:
-        from .demo import DemoImages, make_database
+        from .demo import DemoImages, DemoInspector, make_database
 
         database, truth = make_database(settings)
-        app = create_app(settings, Store(settings, database), DemoImages(truth), DemoEngine(truth))
+        store = Store(settings, database)
+
+        def reading_of(key: str) -> str | None:
+            record = store.record(key)
+            return record.read if record else None
+
+        inspector = Inspector(settings) if settings.inspector_url else DemoInspector(truth, reading_of)
+        app = create_app(settings, store, DemoImages(truth), DemoEngine(truth), inspector)
     else:
         from pymongo import MongoClient
 
         client = MongoClient(settings.mongo_uri, tz_aware=True, serverSelectionTimeoutMS=8000)
-        app = create_app(settings, Store(settings, client[settings.mongo_db]), MediaHost(settings), Engine(settings))
+        app = create_app(settings, Store(settings, client[settings.mongo_db]), MediaHost(settings), Engine(settings),
+                         Inspector(settings) if settings.inspector_url else None)
     uvicorn.run(app, host=settings.host, port=settings.port, log_level="info", server_header=False,
                 proxy_headers=False)
 

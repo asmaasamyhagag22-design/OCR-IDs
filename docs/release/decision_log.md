@@ -3684,3 +3684,53 @@ the OCR image, its pipeline and its thresholds are unchanged. Its accuracy
 figures are bookkeeping over the reviewers' verdicts (lower bound, confirmed,
 upper bound, and a Wilson-interval projection), not a decision instrument for
 the model, and no model decision is computed from them.
+
+## D-111 - Model inspector, review fixes and the end-to-end check (2026-10-20)
+
+The owner asked for the console to be finished, reviewed and made formal.
+
+- **Model inspector** (`inspector/`, `python -m inspector`, port 8082). It runs
+  the shared Recognizer unchanged (F1v, F8, F9 included) on a subclass of the
+  service runtime that copies each BC-final input and output. For the band
+  behind the final reading it runs `build_v2`'s inspection graph with the
+  production weights and returns per-digit probabilities, the weakest-position
+  margin, the 14 ordered-slot attention maps and the row attention. It refuses
+  to serve unless the inspection graph reproduces the production logits on the
+  sealed probe within 1e-4. Tests: that holds on all 12 golden bands, and a
+  recording runtime gives the same reading, margin and fixes as a plain one.
+  Its image is the OCR image plus `inspector/`; no sealed or shipped file and
+  no line of docker/app_code_files.txt changed.
+- **Review fixes:**
+  - Cairo time (summer time included) for days and timestamps.
+  - An atomic claim, so two reviewers can never hold one case.
+  - Skipping a case releases its claim.
+  - A focused radio button no longer swallows Enter.
+  - CSV free text is neutralised against spreadsheet formulas.
+  - Uploads are kept in memory, not spooled to disk.
+  - Query values are validated before they reach a redirect.
+  - Numbers stored as doubles are read whole.
+- **Excel export.** A CSV opened in Excel turns a 14-digit ID into a rounded
+  number, so each report is also offered as an .xlsx of text cells (right to
+  left). CSV stays for systems.
+- **Formal Arabic.** The interface and docs/CONSOLE_GUIDE.md use Modern
+  Standard Arabic.
+- **End-to-end check.** The whole chain ran together:
+  - a throwaway MongoDB 7 with synthetic applicants;
+  - a static media host;
+  - the real engine;
+  - the unchanged team client (preflight all_pass; 120 records processed);
+  - the console image (non-root, read-only);
+  - the real inspector.
+
+  A browser script passed 16 of 16 checks: claim, keyboard flow, skip release,
+  re-read, inspector parity, role refusal, Excel export, audit without IDs and
+  account creation. The applicants collection's fingerprint was identical
+  before and after.
+
+  The drawn sample cards are not read correctly by the real model (their
+  layout is unlike a real card); the inspector shows why (it picked the
+  watermark strip). Demonstrations of accuracy therefore use a real card.
+
+  Not built here: the inspector image from the OCR image, and the console
+  image's apt step (Debian mirrors unreachable in this environment). Both are
+  to be built on the work machine.

@@ -3,23 +3,28 @@
 <div class="login-wrap">
   <section class="login-art" aria-hidden="true">
     <div class="cells">
-      <span class="on">٢</span><span class="g">٠</span><span>٠</span><span>٠</span><span>٠</span><span>٠</span><span>٠</span><span class="g on">٠</span><span class="on">٠</span><span class="g">٠</span><span>٠</span><span>٠</span><span>٠</span><span class="g">٠</span>
+      <span class="on">C</span><span class="g">Y</span><span>Y</span><span>M</span><span>M</span><span>D</span><span>D</span><span class="g on">G</span><span class="on">G</span><span class="g">S</span><span>S</span><span>S</span><span>S</span><span class="g">K</span>
     </div>
-    <h1>كل رقم قومي اتقرا، وكل حالة محتاجة عين إنسان، في مكان واحد.</h1>
-    <p>الموديل بيقرا البطاقة، والمراجع بيحسم الحالات اللي القراءة فيها مختلفة عن الرقم المكتوب، والمشرف شايف الدقة الحقيقية بتتحسب مع كل قرار.</p>
+    <h1>منظومة مراجعة قراءة الرقم القومي</h1>
+    <p>يقرأ النموذج الوجه الأمامي للبطاقة، ويحسم المراجِع الحالات التي تختلف فيها القراءة عن الرقم المُدخل، ويتابع المشرف الدقة الفعلية وهي تُحتسب مع كل قرار.</p>
+    <dl class="login-facts">
+      <div><dt>14</dt><dd>خانة لكل رقم، تُقرأ معًا</dd></div>
+      <div><dt>0</dt><dd>تعديل على سجلات المتقدمين</dd></div>
+      <div><dt>100%</dt><dd>من القرارات مسجّلة باسم صاحبها</dd></div>
+    </dl>
   </section>
   <section class="login-form">
     <div>
       <h2>تسجيل الدخول</h2>
-      <p class="muted small">Fixed14 Console · للاستخدام الداخلي فقط</p>
+      <p class="muted small">للاستخدام الداخلي فقط. يُسجَّل كل دخول في سجل العمليات.</p>
     </div>
     {% if error %}<div class="notice bad" role="alert">{{ error }}</div>{% endif %}
-    {% if demo %}<div class="notice warn">وضع العرض: ادخل بـ <span class="mono">supervisor</span> أو <span class="mono">reviewer</span> أو <span class="mono">admin</span>، وكلمة السر <span class="mono">demo-password</span>.</div>{% endif %}
-    <form method="post" action="/login" class="panel-body" autocomplete="on">
+    {% if demo %}<div class="notice warn">وضع العرض: الحسابات <span class="mono nowrap">supervisor</span> و<span class="mono nowrap">reviewer</span> و<span class="mono nowrap">admin</span><br>كلمة المرور: <span class="mono nowrap">demo-password</span></div>{% endif %}
+    <form method="post" action="/login" class="stack-form" autocomplete="on">
       <input type="hidden" name="next" value="{{ next }}">
       <div class="field"><label for="username">اسم المستخدم</label>
         <input id="username" name="username" type="text" autocomplete="username" dir="ltr" required autofocus></div>
-      <div class="field"><label for="password">كلمة السر</label>
+      <div class="field"><label for="password">كلمة المرور</label>
         <input id="password" name="password" type="password" autocomplete="current-password" dir="ltr" required></div>
       <button class="btn primary" type="submit">دخول</button>
     </form>

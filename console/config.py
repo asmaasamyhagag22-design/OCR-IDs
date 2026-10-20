@@ -80,6 +80,8 @@ class Settings:
     stats_ttl_s: int = 30
     media_timeout_s: int = 15
     engine_timeout_s: int = 120
+    inspector_url: str = ""
+    inspector_key: str = ""
 
     @property
     def reviews(self) -> str:
@@ -133,7 +135,11 @@ def load(env: dict[str, str] | None = None) -> Settings:
         stats_ttl_s=_int(env, "CONSOLE_STATS_TTL_S", 30, 0, 3600),
         media_timeout_s=_int(env, "CONSOLE_MEDIA_TIMEOUT_S", 15, 1, 120),
         engine_timeout_s=_int(env, "CONSOLE_ENGINE_TIMEOUT_S", 120, 5, 600),
+        inspector_url=(env.get("CONSOLE_INSPECTOR_URL") or "").rstrip("/"),
+        inspector_key=env.get("CONSOLE_INSPECTOR_KEY") or "",
     )
     if not settings.engine_url.startswith(("http://", "https://")):
         raise ConfigError("CONSOLE_OCR_ENGINE_URL must be an http(s) URL")
+    if settings.inspector_url and not settings.inspector_url.startswith(("http://", "https://")):
+        raise ConfigError("CONSOLE_INSPECTOR_URL must be an http(s) URL")
     return settings

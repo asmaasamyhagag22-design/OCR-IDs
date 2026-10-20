@@ -1,4 +1,4 @@
-"""The console's web application: pages, forms and the two small JSON-free fragments.
+"""The console's web application: pages, forms, exports and two small HTML fragments.
 
 Every page needs a signed-in account. Reviewers work the queue; supervisors also
 see reports, exports and the audit log, and may change a decision; admins also
@@ -6,6 +6,7 @@ manage accounts. Every state change checks the session's CSRF token.
 """
 from __future__ import annotations
 
+import base64
 import csv
 import datetime
 import io
@@ -16,11 +17,12 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, RedirectResponse, Response, StreamingResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from starlette.formparsers import MultiPartParser
 
-from . import ids, security, stats
+from . import ids, inspection, security, stats, xlsx
 from .config import Settings
 from .services import Engine, ImageSource, MediaError
 from .store import (
@@ -30,6 +32,8 @@ from .store import (
     VERDICTS,
     Record,
     Store,
+    local,
+    local_day_start,
     now,
     review_state,
     true_id,
@@ -38,23 +42,49 @@ from .store import (
 HERE = Path(__file__).resolve().parent
 COOKIE = "fx_session"
 PAGE_SIZE = 50
+MAX_UPLOAD_BYTES = 25 * 1024 * 1024
+#: Uploaded card images stay in memory: Starlette would otherwise spool a part over 1 MB to a
+#: temporary file on disk.
+MultiPartParser.spool_max_size = MAX_UPLOAD_BYTES + 1
 ROLE_RANK = {"reviewer": 1, "supervisor": 2, "admin": 3}
-STATE_LABELS = {"pending": "مستني", "claimed": "مع مراجع", "decided": "اتراجع"}
+STATE_LABELS = {"pending": "بانتظار المراجعة", "claimed": "قيد المراجعة", "decided": "تمت مراجعتها"}
 ERROR_CODE_LABELS = {
-    "CARD_NOT_FOUND": "البطاقة مش ظاهرة",
-    "UNREADABLE_IMAGE": "الصورة مش مقروءة",
-    "INVALID_READING": "قراءة مش سليمة",
-    "UPLOAD_IS_VIDEO": "فيديو مش صورة",
-    "IMAGE_TOO_LARGE": "الصورة كبيرة",
-    "PROCESSING_TIMEOUT": "الوقت خلص",
-    "LOW_CONFIDENCE": "ثقة ضعيفة",
-    "NO_CODE": "من غير كود",
+    "CARD_NOT_FOUND": "البطاقة غير ظاهرة في الصورة",
+    "UNREADABLE_IMAGE": "الصورة غير مقروءة",
+    "INVALID_READING": "رقم غير صالح هيكليًا",
+    "UPLOAD_IS_VIDEO": "الملف مقطع فيديو",
+    "IMAGE_TOO_LARGE": "الصورة تتجاوز الحد المسموح",
+    "PROCESSING_TIMEOUT": "انتهت مهلة المعالجة",
+    "LOW_CONFIDENCE": "ثقة منخفضة",
+    "NO_CODE": "دون رمز",
 }
 MEDIA_ERRORS = {
-    "not_found": "الصورة مش موجودة على سيرفر الصور",
-    "no_folder_path": "السجل مفيهوش مسار للصورة",
-    "empty": "ملف الصورة فاضي",
-    "too_large": "الصورة أكبر من الحد المسموح",
+    "not_found": "الصورة غير موجودة على خادم الصور.",
+    "no_folder_path": "لا يتضمن السجل مسارًا للصورة.",
+    "empty": "ملف الصورة فارغ.",
+    "too_large": "حجم الصورة يتجاوز الحد المسموح (25 ميجابايت).",
+    "undecodable": "تعذّر على النموذج قراءة هذا الملف كصورة.",
+    "inspector_unreachable": "خدمة فحص النموذج لا تستجيب.",
+    "inspector_loading": "خدمة فحص النموذج ما زالت تُحمِّل النماذج. يُرجى إعادة المحاولة بعد دقيقة.",
+}
+EXPORTS = {
+    "decisions": {
+        "title": "قرارات المراجعة",
+        "columns": ["applicant_id", "category", "kind", "verdict", "ocr_reading", "typed_id", "card_number",
+                    "reviewer", "reviewed_at", "note"],
+        "labels": ["رقم السجل", "التصنيف", "نوع الاختلاف", "القرار", "القراءة الآلية", "الرقم المُدخل",
+                   "الرقم الصحيح", "المراجِع", "وقت المراجعة", "ملاحظة"],
+    },
+    "corrections": {
+        "title": "تصحيح الرقم المُدخل",
+        "columns": ["applicant_id", "typed_id", "card_number", "verdict", "reviewer", "reviewed_at"],
+        "labels": ["رقم السجل", "الرقم المُدخل", "الرقم الصحيح", "القرار", "المراجِع", "وقت المراجعة"],
+    },
+    "reupload": {
+        "title": "طلب صورة جديدة",
+        "columns": ["applicant_id", "category", "verdict", "reviewer", "reviewed_at"],
+        "labels": ["رقم السجل", "التصنيف", "القرار", "المراجِع", "وقت المراجعة"],
+    },
 }
 
 
@@ -85,15 +115,22 @@ def num(value: int | float | None) -> str:
 
 
 def when(value: datetime.datetime | None) -> str:
-    if value is None:
-        return "—"
-    if value.tzinfo is None:
-        value = value.replace(tzinfo=datetime.UTC)
-    local = value.astimezone(datetime.timezone(datetime.timedelta(hours=3)))
-    return local.strftime("%Y-%m-%d %H:%M")
+    """A stored UTC time as Cairo local time."""
+    return "—" if value is None else local(value).strftime("%Y-%m-%d %H:%M")
 
 
-def create_app(settings: Settings, store: Store, images: ImageSource, engine: Engine | Any) -> FastAPI:
+def clean_category(value: str | None) -> str:
+    return value if value in QUEUE_CATEGORIES else ""
+
+
+def spreadsheet_safe(value: object) -> str:
+    """Free text for a CSV cell: a leading = + - @ would make Excel run it as a formula."""
+    text = "" if value is None else str(value)
+    return "'" + text if text[:1] in ("=", "+", "-", "@", "\t", "\r") else text
+
+
+def create_app(settings: Settings, store: Store, images: ImageSource, engine: Engine | Any,
+               inspector: Any = None) -> FastAPI:
     app = FastAPI(title="Fixed14 Console", docs_url=None, redoc_url=None, openapi_url=None)
     templates = Jinja2Templates(directory=str(HERE / "templates"))
     templates.env.filters.update(pct=pct, num=num, when=when, mask=ids.mask)
@@ -101,7 +138,7 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         verdicts=VERDICTS, category_labels=CATEGORY_LABELS, kind_labels=ids.KIND_LABELS,
         state_labels=STATE_LABELS, role_labels=security.ROLE_LABELS, segments=ids.SEGMENTS,
         segment_labels=ids.SEGMENT_LABELS, error_code_labels=ERROR_CODE_LABELS, demo=settings.demo,
-        threshold=margin_threshold(),
+        threshold=margin_threshold(), exports=EXPORTS,
     )
     app.mount("/static", StaticFiles(directory=str(HERE / "static")), name="static")
     throttle = security.LoginThrottle()
@@ -128,8 +165,9 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
 
     @app.exception_handler(Denied)
     async def on_denied(request: Request, exc: Denied):
-        return page(request, "error.html", {"title": "مش مسموح", "message": "الصفحة دي محتاجة صلاحية أعلى."},
-                    status=403)
+        return page(request, "error.html", {"title": "غير مسموح",
+                                            "message": "لا تملك صلاحية تنفيذ هذا الإجراء، أو انتهت صلاحية النموذج. "
+                                                       "يُرجى تحديث الصفحة والمحاولة مرة أخرى."}, status=403)
 
     def session_of(request: Request) -> tuple[dict[str, Any], dict[str, Any]] | None:
         token = request.cookies.get(COOKIE)
@@ -148,9 +186,9 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         if not found:
             target = request.url.path + (f"?{request.url.query}" if request.url.query else "")
             raise Redirect("/login?next=" + urllib.parse.quote(target, safe=""))
+        request.state.user, request.state.session = found
         if ROLE_RANK[found[0]["role"]] < ROLE_RANK[role]:
             raise Denied()
-        request.state.user, request.state.session = found
         return found
 
     async def form_with_csrf(request: Request) -> dict[str, str]:
@@ -179,12 +217,15 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
             return value
         return "/"
 
+    def with_category(path: str, category: str, joiner: str = "?") -> str:
+        return path + (f"{joiner}category={category}" if category else "")
+
     # ---------------------------------------------------------------- login
     @app.get("/login", response_class=HTMLResponse)
-    def login_form(request: Request, next: str | None = None, error: str | None = None):
+    def login_form(request: Request, next: str | None = None):
         if session_of(request):
             return RedirectResponse(safe_next(next), status_code=303)
-        return page(request, "login.html", {"title": "تسجيل الدخول", "next": safe_next(next), "error": error})
+        return page(request, "login.html", {"title": "تسجيل الدخول", "next": safe_next(next), "error": None})
 
     @app.post("/login")
     async def login(request: Request):
@@ -194,16 +235,17 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         target = safe_next(str(form.get("next", "/")))
         if not username or throttle.blocked(username):
             store.audit(username or None, "login_blocked")
-            return page(request, "login.html", {"title": "تسجيل الدخول", "next": target,
-                                                "error": "محاولات كتير غلط. استنى 5 دقايق وجرّب تاني."},
-                        status=429)
+            return page(request, "login.html", {
+                "title": "تسجيل الدخول", "next": target,
+                "error": "تجاوزت عدد المحاولات المسموح به. يُرجى الانتظار خمس دقائق ثم المحاولة مرة أخرى."},
+                status=429)
         user = store.user(username)
         ok = security.verify_or_dummy(password, user["password_hash"] if user else None)
         if not ok or not user.get("active", True):
             throttle.failed(username)
             store.audit(username, "login_failed")
             return page(request, "login.html", {"title": "تسجيل الدخول", "next": target,
-                                                "error": "اسم المستخدم أو كلمة السر غلط."}, status=401)
+                                                "error": "اسم المستخدم أو كلمة المرور غير صحيحة."}, status=401)
         throttle.succeeded(username)
         token, csrf = security.new_token(), security.new_token()
         store.purge_sessions()
@@ -236,8 +278,7 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         user, _ = require(request)
         records = store.records(fresh=bool(refresh))
         o = stats.build(records, store.review_map(), store.pending_ocr())
-        mine_today = sum(1 for e in store.audit_entries(limit=5000, user=user["username"], action="decide")
-                         if e["at"].date() == now().date())
+        mine_today = store.count_actions(user["username"], ("decide", "override"), local_day_start())
         return page(request, "overview.html", {"title": "نظرة عامة", "o": o, "mine_today": mine_today,
                                                "settings": settings, "chart": overview_chart(o)})
 
@@ -256,8 +297,9 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
     @app.get("/queue", response_class=HTMLResponse)
     def queue(request: Request, category: str = "", state: str = "pending", kind: str = "", page_no: int = 1):
         require(request)
-        category = category if category in QUEUE_CATEGORIES else ""
+        category = clean_category(category)
         state = state if state in ("pending", "decided", "all") else "pending"
+        kind = kind if kind in ids.KIND_LABELS else ""
         rows = store.queue(category=category or None, state=None if state == "all" else state, kind=kind or None)
         pages = max(1, math.ceil(len(rows) / PAGE_SIZE))
         page_no = min(max(1, page_no), pages)
@@ -280,11 +322,13 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
     @app.get("/review/next")
     def review_next(request: Request, category: str = "", after: str = ""):
         user, _ = require(request)
+        category = clean_category(category)
+        if after:
+            store.release(after, user["username"])
         key = store.next_pending(user["username"], category=category or None, after=after or None)
         if key is None:
-            return RedirectResponse("/queue?done=1" + (f"&category={category}" if category else ""), status_code=303)
-        suffix = f"?category={category}" if category else ""
-        return RedirectResponse(f"/review/{urllib.parse.quote(key)}{suffix}", status_code=303)
+            return RedirectResponse(with_category("/queue?done=1", category, "&"), status_code=303)
+        return RedirectResponse(with_category(f"/review/{urllib.parse.quote(key)}", category), status_code=303)
 
     def load_record(key: str) -> Record:
         record = store.record(key)
@@ -295,6 +339,7 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
     @app.get("/review/{key}", response_class=HTMLResponse)
     def review(request: Request, key: str, category: str = "", error: str = ""):
         user, _ = require(request)
+        category = clean_category(category)
         record = load_record(key)
         claimed = store.claim(record, user["username"])
         current_review = store.review(record.id)
@@ -305,12 +350,12 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         can_change = ROLE_RANK[user["role"]] >= ROLE_RANK["supervisor"] or not (
             current_review and current_review.get("verdict"))
         return page(request, "review.html", {
-            "title": "مراجعة", "r": record, "rv": current_review, "claimed": claimed,
+            "title": "مراجعة حالة", "r": record, "rv": current_review, "claimed": claimed,
             "read_cells": ids.cells(record.read), "typed_cells": ids.cells(record.typed),
             "diff": set(record.differing), "read_info": ids.decode(record.read),
             "typed_info": ids.decode(record.typed), "allowed": allowed, "remaining": remaining,
-            "category": category, "error": error, "can_change": can_change,
-            "true_id": true_id(record, current_review),
+            "category": category, "error": error if error in ("claimed", "invalid") else "",
+            "can_change": can_change, "true_id": true_id(record, current_review),
         })
 
     @app.post("/review/{key}")
@@ -318,23 +363,23 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         user, _ = require(request)
         form = await form_with_csrf(request)
         record = load_record(key)
+        category = clean_category(form.get("category"))
         existing = store.review(record.id)
         if existing and existing.get("verdict") and ROLE_RANK[user["role"]] < ROLE_RANK["supervisor"]:
             raise Denied()
-        if not existing or not existing.get("verdict"):
-            if not store.claim(record, user["username"]):
-                return RedirectResponse(f"/review/{urllib.parse.quote(key)}?error=claimed", status_code=303)
-        category = form.get("category", "")
+        if not (existing and existing.get("verdict")) and not store.claim(record, user["username"]):
+            return RedirectResponse(with_category(f"/review/{urllib.parse.quote(key)}?error=claimed", category, "&"),
+                                    status_code=303)
         try:
             store.decide(record, user["username"], form.get("verdict", ""), form.get("corrected"),
                          form.get("note", ""))
         except ValueError:
-            return RedirectResponse(f"/review/{urllib.parse.quote(key)}?error=invalid"
-                                    + (f"&category={category}" if category else ""), status_code=303)
+            return RedirectResponse(with_category(f"/review/{urllib.parse.quote(key)}?error=invalid", category, "&"),
+                                    status_code=303)
         if form.get("then") == "stay":
             return RedirectResponse(f"/review/{urllib.parse.quote(key)}", status_code=303)
-        return RedirectResponse(f"/review/next?after={urllib.parse.quote(key)}"
-                                + (f"&category={category}" if category else ""), status_code=303)
+        return RedirectResponse(with_category(f"/review/next?after={urllib.parse.quote(key)}", category, "&"),
+                                status_code=303)
 
     @app.get("/media/{key}/front")
     def media(request: Request, key: str):
@@ -343,7 +388,7 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         try:
             data, mime = images.front(record.folder, record.key)
         except MediaError as exc:
-            return Response(MEDIA_ERRORS.get(exc.reason, "تعذر تحميل الصورة"), status_code=502,
+            return Response(MEDIA_ERRORS.get(exc.reason, "تعذّر تحميل الصورة."), status_code=502,
                             media_type="text/plain; charset=utf-8")
         return Response(data, media_type=mime, headers={"Cache-Control": "private, no-store"})
 
@@ -356,7 +401,7 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
             data, _ = images.front(record.folder, record.key)
             result = engine.reread(data, record.key)
         except MediaError as exc:
-            return page(request, "_reread.html", {"error": MEDIA_ERRORS.get(exc.reason, "الخدمة ما ردتش"),
+            return page(request, "_reread.html", {"error": MEDIA_ERRORS.get(exc.reason, "خدمة القراءة لا تستجيب."),
                                                   "res": None, "r": record})
         store.audit(user["username"], "reread", target=record.key,
                     detail={"same_as_stored": result.finding == record.read})
@@ -368,47 +413,48 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
     @app.get("/reports", response_class=HTMLResponse)
     def reports(request: Request):
         require(request, "supervisor")
-        records = store.records()
-        reviews = store.review_map()
-        o = stats.build(records, reviews, store.pending_ocr())
+        o = stats.build(store.records(), store.review_map(), store.pending_ocr())
         return page(request, "reports.html", {"title": "التقارير", "o": o})
 
-    @app.get("/reports/{name}.csv")
-    def export(request: Request, name: str):
-        user, _ = require(request, "supervisor")
-        if name not in ("decisions", "reupload", "corrections"):
-            raise Redirect("/reports")
+    def export_rows(name: str, arabic: bool) -> list[list[str]]:
         reviews = store.review_map()
-        out = io.StringIO()
-        writer = csv.writer(out)
-        rows = 0
-        if name == "decisions":
-            writer.writerow(["applicant_id", "category", "kind", "verdict", "ocr_reading", "typed_id",
-                             "card_number", "reviewer", "reviewed_at", "note"])
-        elif name == "reupload":
-            writer.writerow(["applicant_id", "category", "verdict", "reviewer", "reviewed_at"])
-        else:
-            writer.writerow(["applicant_id", "typed_id", "card_number", "verdict", "reviewer", "reviewed_at"])
+        rows = []
         for record in store.records():
             rv = reviews.get(record.key)
             if not rv or not rv.get("verdict") or record.category not in QUEUE_CATEGORIES:
                 continue
             card = true_id(record, rv)
+            verdict = VERDICTS[rv["verdict"]]["label"] if arabic else rv["verdict"]
+            category = CATEGORY_LABELS.get(record.category, record.category) if arabic else record.category
             at = when(rv.get("reviewed_at"))
             if name == "decisions":
-                writer.writerow([record.key, record.category, record.kind, rv["verdict"], record.read or "",
-                                 record.typed or "", card or "", rv.get("reviewer"), at, rv.get("note", "")])
+                kind = ids.KIND_LABELS.get(record.kind, record.kind) if arabic else record.kind
+                rows.append([record.key, category, kind, verdict, record.read or "", record.typed or "",
+                             card or "", rv.get("reviewer", ""), at, rv.get("note", "")])
             elif name == "reupload" and rv["verdict"] in NEEDS_REUPLOAD:
-                writer.writerow([record.key, record.category, rv["verdict"], rv.get("reviewer"), at])
+                rows.append([record.key, category, verdict, rv.get("reviewer", ""), at])
             elif name == "corrections" and card and card != record.typed:
-                writer.writerow([record.key, record.typed or "", card, rv["verdict"], rv.get("reviewer"), at])
-            else:
-                continue
-            rows += 1
-        store.audit(user["username"], "export", detail={"report": name, "rows": rows})
-        stamp = now().strftime("%Y%m%d-%H%M")
-        return StreamingResponse(iter(["﻿" + out.getvalue()]), media_type="text/csv; charset=utf-8",
-                                 headers={"Content-Disposition": f'attachment; filename="{name}-{stamp}.csv"'})
+                rows.append([record.key, record.typed or "", card, verdict, rv.get("reviewer", ""), at])
+        return rows
+
+    @app.get("/reports/{name}.{fmt}")
+    def export(request: Request, name: str, fmt: str):
+        user, _ = require(request, "supervisor")
+        if name not in EXPORTS or fmt not in ("csv", "xlsx"):
+            raise Redirect("/reports")
+        spec = EXPORTS[name]
+        rows = export_rows(name, arabic=fmt == "xlsx")
+        stamp = local(now()).strftime("%Y%m%d-%H%M")
+        store.audit(user["username"], "export", detail={"report": name, "format": fmt, "rows": len(rows)})
+        disposition = {"Content-Disposition": f'attachment; filename="{name}-{stamp}.{fmt}"'}
+        if fmt == "xlsx":
+            return Response(xlsx.workbook(spec["title"], spec["labels"], rows), headers=disposition,
+                            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        out = io.StringIO()
+        writer = csv.writer(out)
+        writer.writerow(spec["columns"])
+        writer.writerows([[spreadsheet_safe(v) for v in row] for row in rows])
+        return Response("﻿" + out.getvalue(), media_type="text/csv; charset=utf-8", headers=disposition)
 
     @app.get("/audit", response_class=HTMLResponse)
     def audit(request: Request, user_filter: str = "", action: str = ""):
@@ -422,7 +468,7 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
     @app.get("/users", response_class=HTMLResponse)
     def users(request: Request, error: str = "", saved: str = ""):
         require(request, "admin")
-        return page(request, "users.html", {"title": "المستخدمين", "users": store.list_users(),
+        return page(request, "users.html", {"title": "المستخدمون", "users": store.list_users(),
                                             "error": error, "saved": saved, "roles": security.ROLES})
 
     @app.post("/users")
@@ -431,7 +477,8 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         form = await form_with_csrf(request)
         username = form.get("username", "").strip().lower()
         role = form.get("role", "reviewer")
-        if not username.replace(".", "").replace("_", "").replace("-", "").isalnum() or role not in security.ROLES:
+        plain = username.replace(".", "").replace("_", "").replace("-", "")
+        if not (plain.isascii() and plain.isalnum() and len(username) <= 40) or role not in security.ROLES:
             return RedirectResponse("/users?error=name", status_code=303)
         if store.user(username):
             return RedirectResponse("/users?error=exists", status_code=303)
@@ -439,7 +486,7 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
             password_hash = security.hash_password(form.get("password", ""))
         except ValueError:
             return RedirectResponse("/users?error=password", status_code=303)
-        store.create_user(username, form.get("display_name", ""), role, password_hash)
+        store.create_user(username, form.get("display_name", "")[:80], role, password_hash)
         store.audit(user["username"], "user_create", target=username, detail={"role": role})
         return RedirectResponse("/users?saved=1", status_code=303)
 
@@ -490,7 +537,77 @@ def create_app(settings: Settings, store: Store, images: ImageSource, engine: En
         store.audit(user["username"], "password_change")
         return RedirectResponse("/account?saved=1", status_code=303)
 
+    # ------------------------------------------------------------ inspector
+    def inspector_page(request: Request, payload: dict[str, Any] | None, image_src: str | None,
+                       error: str | None, record: Record | None = None) -> HTMLResponse:
+        return page(request, "inspect.html", {
+            "title": "داخل النموذج", "v": inspection.view(payload) if payload else None, "image_src": image_src,
+            "error": error, "record": record, "available": bool(inspector and inspector.available),
+            "illustrative": bool(payload and payload.get("illustrative")),
+        })
+
+    @app.get("/inspect", response_class=HTMLResponse)
+    def inspect_form(request: Request):
+        require(request)
+        return inspector_page(request, None, None, None)
+
+    @app.post("/inspect", response_class=HTMLResponse)
+    async def inspect_upload(request: Request):
+        user, _ = require(request)
+        declared = request.headers.get("content-length", "")
+        if declared.isdigit() and int(declared) > MAX_UPLOAD_BYTES + 65536:
+            return inspector_page(request, None, None, MEDIA_ERRORS["too_large"])
+        form = await request.form(max_files=1, max_fields=4)
+        try:
+            if not security.same(str(form.get("csrf", "")), request.state.session.get("csrf")):
+                raise Denied()
+            upload = form.get("image")
+            data = await upload.read(MAX_UPLOAD_BYTES + 1) if upload is not None and hasattr(upload, "read") else b""
+        finally:
+            await form.close()
+        if not data:
+            return inspector_page(request, None, None, "يُرجى اختيار صورة أولًا.")
+        if len(data) > MAX_UPLOAD_BYTES:
+            return inspector_page(request, None, None, MEDIA_ERRORS["too_large"])
+        if not (inspector and inspector.available):
+            return inspector_page(request, None, None, None)
+        try:
+            payload = inspector.inspect(data)
+        except MediaError as exc:
+            return inspector_page(request, None, preview(data), MEDIA_ERRORS.get(exc.reason, "حدث خطأ في الخدمة."))
+        store.audit(user["username"], "inspect_upload", detail={"bytes": len(data)})
+        return inspector_page(request, payload, preview(data), None)
+
+    @app.get("/inspect/record/{key}", response_class=HTMLResponse)
+    def inspect_record(request: Request, key: str):
+        user, _ = require(request)
+        record = load_record(key)
+        if not (inspector and inspector.available):
+            return inspector_page(request, None, None, None, record)
+        try:
+            data, _ = images.front(record.folder, record.key)
+            payload = inspector.inspect(data, record.key)
+        except MediaError as exc:
+            return inspector_page(request, None, None, MEDIA_ERRORS.get(exc.reason, "حدث خطأ في الخدمة."), record)
+        store.audit(user["username"], "inspect", target=record.key)
+        return inspector_page(request, payload, f"/media/{urllib.parse.quote(record.key)}/front", None, record)
+
     return app
+
+
+def preview(data: bytes, longest: int = 1600) -> str | None:
+    """A display copy of an uploaded image as a data URI, kept in the page only, never stored."""
+    from PIL import Image, ImageOps
+
+    try:
+        with Image.open(io.BytesIO(data)) as image:
+            image = ImageOps.exif_transpose(image).convert("RGB")
+            image.thumbnail((longest, longest))
+            out = io.BytesIO()
+            image.save(out, "JPEG", quality=85)
+    except Exception:  # noqa: BLE001 - a format Pillow cannot open simply has no preview
+        return None
+    return "data:image/jpeg;base64," + base64.b64encode(out.getvalue()).decode()
 
 
 def overview_chart(o: stats.Overview) -> dict[str, Any]:

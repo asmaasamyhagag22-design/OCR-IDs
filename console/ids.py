@@ -45,6 +45,8 @@ def norm(value: object) -> str | None:
     """The stored value as a digit string: Arabic-Indic digits folded, integers stringified."""
     if value is None or value == "":
         return None
+    if isinstance(value, float) and value.is_integer():  # a number stored as a double
+        value = int(value)
     return str(value).translate(DIGITS).strip() or None
 
 
@@ -110,11 +112,11 @@ def mismatch_kind(read: str | None, typed: str | None) -> str:
 
 KIND_LABELS = {
     "one_digit": "خانة واحدة",
-    "two_digits": "خانتين",
-    "three_plus": "3 خانات أو أكتر",
-    "typed_invalid": "المكتوب مش رقم قومي سليم",
-    "typed_malformed": "المكتوب مش 14 رقم",
-    "no_reading": "مفيش قراءة",
+    "two_digits": "خانتان",
+    "three_plus": "ثلاث خانات أو أكثر",
+    "typed_invalid": "الرقم المُدخل غير صالح هيكليًا",
+    "typed_malformed": "الرقم المُدخل ليس 14 رقمًا",
+    "no_reading": "لا توجد قراءة",
 }
 
 

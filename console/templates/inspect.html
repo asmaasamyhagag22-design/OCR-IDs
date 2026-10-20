@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% import "_idgrid.html" as idg %}
+{% block main %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">الشفافية</p>
+    <h1>داخل النموذج</h1>
+    <p class="sub">ما الذي رآه النموذج في الصورة، وأين ركّز عند قراءة كل خانة، وأين تردّد. كل رقم في هذه الصفحة صادر عن النموذج نفسه المستخدم في الإنتاج.</p>
+  </div>
+  <div class="actions">
+    {% if record %}<a class="btn" href="/review/{{ record.key }}">العودة إلى المراجعة</a>{% endif %}
+    {% if v %}<a class="btn" href="/inspect">فحص صورة أخرى</a>{% endif %}
+  </div>
+</div>
+
+{% if error %}<div class="notice bad" role="alert">{{ error }}</div>{% endif %}
+{% if not available %}
+<div class="notice warn">خدمة فحص النموذج غير مشغّلة على هذا الجهاز. تُشغَّل بالأمر <span class="mono">docker compose --profile engine up -d</span> أو <span class="mono">python -m inspector</span>، ويُضبط عنوانها في <span class="mono">CONSOLE_INSPECTOR_URL</span> (الدليل، القسم 6).</div>
+{% endif %}
+{% if illustrative %}
+<div class="notice warn"><b>عرض توضيحي:</b> خدمة فحص النموذج غير موصولة في وضع العرض هذا، لذا فالأرقام والخرائط أدناه مرسومة لتوضيح الشاشة فقط ولا تصدر عن النموذج. للحصول على نتائج فعلية تُشغَّل <span class="mono">python -m inspector</span> ويُضبط <span class="mono">CONSOLE_INSPECTOR_URL</span>.</div>
+{% endif %}
+
+{% if not v %}
+<div class="grid-2">
+  <form class="panel" method="post" action="/inspect" enctype="multipart/form-data">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <div class="panel-head"><h2>رفع صورة بطاقة</h2><span class="muted small">JPEG أو PNG أو HEIC أو PDF، حتى 25 ميجابايت</span></div>
+    <div class="panel-body">
+      <label class="drop" for="image">
+        <input id="image" name="image" type="file" accept="image/*,application/pdf" required {{ 'disabled' if not available }}>
+        <span><b>اختر صورة</b> أو اسحبها إلى هنا</span>
+        <small class="muted">تُقرأ الصورة في الذاكرة فقط، ولا تُحفظ في أي موضع.</small>
+      </label>
+      <div><button class="btn primary" type="submit" {{ 'disabled' if not available }}>عرض ما يراه النموذج</button></div>
+    </div>
+  </form>
+  <section class="panel">
+    <div class="panel-head"><h2>ما الذي تعرضه هذه الشاشة</h2></div>
+    <div class="panel-body">
+      <ol class="steps">
+        <li><b>مسار الصورة:</b> كيف حُدِّدت البطاقة، وكم دُوِّرت، وهل عملت خطوات الاستدراك (F1v وF8 وF9).</li>
+        <li><b>الشريط الذي قرأه النموذج</b> بمقاس 160×576 بعد التصحيح، وعليه المواضع الأربعة عشر التي خصّصها النموذج للخانات، ومستوى انتباهه لكل صف.</li>
+        <li><b>خريطة الانتباه:</b> الأعمدة التي اعتمد عليها النموذج لقراءة كل خانة من الخانات الأربع عشرة.</li>
+        <li><b>الثقة في كل خانة:</b> الاحتمال الأعلى، والبديل الأقرب، وأضعف خانة، وهي التي تحدد ثقة الرقم كله.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+{% else %}
+{% set p = v.p %}
+{% set b = v.band %}
+<div class="inspect-top">
+  <section class="panel">
+    <div class="panel-head"><h2>الصورة ومسار المعالجة</h2>
+      <span class="pill {{ 'ok' if p.admitted else 'unreadable' }}">{{ 'قُرئت' if p.admitted else 'لم تُقبل' }}</span></div>
+    <div class="panel-body">
+      {% if image_src %}<div class="thumb"><img src="{{ image_src }}" alt="الصورة التي فُحصت"></div>{% endif %}
+      <ol class="trail">
+        <li class="ok"><b>فتح الصورة</b><span>حُدِّد نوعها من محتواها، وصُحِّح اتجاهها وفق بيانات الكاميرا.</span></li>
+        <li class="{{ 'ok' if p.geometry_source else 'bad' }}"><b>تحديد البطاقة</b><span>{% if p.geometry_source == 'detector' %}حدّد نموذج DocCornerNet أركان البطاقة الأربعة.{% elif p.geometry_source %}البطاقة تملأ الصورة، فاعتُمدت الصورة كاملة.{% else %}{{ v.reason or 'لم تُحدَّد البطاقة.' }}{% endif %}</span></li>
+        {% for code, text, tone in v.fixes %}
+        <li class="{{ tone }}"><b>{{ code }}</b><span>{{ text }}</span></li>
+        {% endfor %}
+        <li class="{{ 'ok' if b else 'bad' }}"><b>BC-final</b><span>{% if b %}قرأ النموذج {{ p.bands_read }} شريطًا، وصدرت النتيجة عن الشريط المعروض أدناه.{% else %}لا يوجد شريط للقراءة.{% endif %}</span></li>
+      </ol>
+      <p class="small muted"><span class="num">{{ '%.0f'|format(p.processing_ms) }} ms</span> · <span class="mono">{{ p.model_version }}</span> · <span class="mono">{{ p.pipeline_version }}</span></p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>القراءة ودرجة الثقة</h2>
+      {% if b %}<span class="pill {{ 'ok' if b.parity else 'unreadable' }}" title="الفرق بين مخرجات هذه الشاشة ومخرجات الإنتاج">{{ 'مطابق لنموذج الإنتاج' if b.parity else 'غير مطابق لنموذج الإنتاج' }}</span>{% endif %}</div>
+    <div class="panel-body">
+      {% if b %}
+      <div class="idstack">
+        {{ idg.row(b.digits|list, [b.weakest_slot], 'read', 'القراءة') }}
+        {{ idg.labels(segments, segment_labels) }}
+      </div>
+      {% set m = b.margin %}
+      <div class="gauge" role="img" aria-label="الثقة {{ '%.4f'|format(m) }} وحد القرار {{ threshold }}">
+        <div class="gauge-track"><span class="gauge-fill {{ 'low' if threshold and m < threshold }}" style="width: {{ 100 * m }}%"></span>
+          {% if threshold %}<i class="gauge-mark" style="left: {{ 100 * threshold }}%"></i>{% endif %}</div>
+        <div class="gauge-legend"><span>الثقة (أضعف خانة) <b class="num">{{ '%.4f'|format(m) }}</b></span>{% if threshold %}<span>حد القرار <b class="num">{{ threshold }}</b></span>{% endif %}</div>
+      </div>
+      {% set w = b.slots[b.weakest_slot] %}
+      {% if threshold and m >= threshold %}
+      <div class="notice good">قراءة عالية الثقة: الخانات الأربع عشرة جميعها فوق حد القرار. فإن اختلف هذا الرقم عن الرقم المُدخل، صُنِّف الاختلاف «مؤكَّدًا».</div>
+      {% else %}
+      <div class="notice warn">أضعف خانة هي <b>الخانة {{ b.weakest_slot + 1 }}</b>، إذ تردّد النموذج فيها بين <b class="num">{{ w.top[0][0] }}</b> (<span class="num">{{ '%.0f'|format(100 * w.top[0][1]) }}%</span>) و<b class="num">{{ w.top[1][0] }}</b> (<span class="num">{{ '%.0f'|format(100 * w.top[1][1]) }}%</span>)؛ ولذلك تُحال الحالة إلى المراجِع.</div>
+      {% endif %}
+      <p class="small muted">{{ b.source_label }} توافق النموذجين: {{ 'نعم' if p.models_agree else 'لا' }}. الفرق بين هذه الشاشة ونموذج الإنتاج: <span class="num">{{ '%.1e'|format(b.parity_gap) }}</span>.</p>
+      {% else %}
+      <div class="notice bad">{{ v.reason or 'لم يعثر النموذج على سطر الرقم القومي.' }}</div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+
+{% if b %}
+{% set W = b.width %}{% set H = b.height %}{% set L = 44 %}{% set T = 30 %}{% set R = 92 %}
+{% set HT = T + H + 26 %}{% set RH = 11 %}
+<section class="panel">
+  <div class="panel-head"><h2>أين نظر النموذج</h2><span class="muted small">الشريط كما رآه النموذج تمامًا، وأسفله خريطة الانتباه لكل خانة</span></div>
+  <div class="panel-body">
+    <div class="attn-scroll">
+      <svg class="attn" viewBox="0 0 {{ L + W + R }} {{ HT + 14 * RH + 34 }}" role="img"
+           aria-label="الشريط الذي قرأه النموذج، وأسفله خريطة لمواضع انتباه كل خانة من الخانات الأربع عشرة">
+        <image href="{{ b.src }}" x="{{ L }}" y="{{ T }}" width="{{ W }}" height="{{ H }}" preserveAspectRatio="none"/>
+        <rect class="frame" x="{{ L }}" y="{{ T }}" width="{{ W }}" height="{{ H }}"/>
+        {% for s in b.heat %}
+        <line class="{{ 'slot-line weak' if s.k == b.weakest_slot else 'slot-line' }}" x1="{{ L + s.center }}" y1="{{ T - 4 }}" x2="{{ L + s.center }}" y2="{{ T + H }}"/>
+        <text class="{{ 'slot-num weak' if s.k == b.weakest_slot else 'slot-num' }}" x="{{ L + s.center }}" y="{{ T - 9 }}" text-anchor="middle">{{ s.k + 1 }}</text>
+        {% endfor %}
+        {% for r in b.profile %}
+        <rect class="row-bar" x="{{ L + W + 10 }}" y="{{ T + loop.index0 * b.row_h + 1 }}" width="{{ 4 + 56 * r }}" height="{{ b.row_h - 2 }}" rx="1.5"/>
+        {% endfor %}
+        <text class="cap" x="{{ L + W + 10 }}" y="{{ T + H + 14 }}">انتباه الصفوف</text>
+        {% for s in b.heat %}
+        {% set y = HT + s.k * RH %}
+        <text class="{{ 'slot-num weak' if s.k == b.weakest_slot else 'slot-num' }}" x="{{ L - 8 }}" y="{{ y + 8.5 }}" text-anchor="end">{{ s.k + 1 }}</text>
+        <rect class="heat-bg" x="{{ L }}" y="{{ y }}" width="{{ W }}" height="{{ RH - 2 }}"/>
+        {% for c in s.cells %}<rect class="{{ 'heat weak' if s.k == b.weakest_slot else 'heat' }}" x="{{ L + c.x }}" y="{{ y }}" width="{{ b.step + 0.3 }}" height="{{ RH - 2 }}" fill-opacity="{{ c.o }}"/>{% endfor %}
+        <text class="slot-digit" x="{{ L + W + 10 }}" y="{{ y + 8.5 }}">{{ b.slots[s.k].digit }} · {{ '%.0f'|format(100 * b.slots[s.k].top[0][1]) }}%</text>
+        {% endfor %}
+        <text class="cap" x="{{ L }}" y="{{ HT + 14 * RH + 22 }}">← أعمدة الشريط (144 عمودًا، عرض كل عمود 4 بكسل) →</text>
+      </svg>
+    </div>
+    <div class="explain">
+      <p><b>الخطوط الرأسية المرقّمة</b> هي المواضع الأربعة عشر التي خصّصها النموذج للخانات. يحسب النموذج مركز السطر وعرضه ثم يقسمه إلى أربعة عشر جزءًا مرتّبًا، فلا يمكن أن تسبق الخانة الثالثة الخانة الثانية.</p>
+      <p><b>الخريطة السفلية</b> صفّ لكل خانة. كلما اشتدّ لون المربع، زاد اعتماد النموذج على ذلك العمود في قراءة الخانة. والصف الملوّن بالكهرماني هو أضعف خانة.</p>
+      <p><b>انتباه الصفوف</b> إلى الجانب يوضّح الارتفاع الذي ركّز عليه النموذج داخل الشريط، والمتوقع أن يقع على سطر الأرقام نفسه.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-head"><h2>الثقة في كل خانة</h2><span class="muted small">الاحتمال الأعلى، والبديل الأقرب، والفرق بينهما</span></div>
+  <div class="tablewrap">
+    <table class="slots">
+      <thead><tr><th>الخانة</th>{% for s in b.slots %}<th class="{{ 'weak' if loop.index0 == b.weakest_slot }}">{{ loop.index }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        <tr><td>الرقم</td>{% for s in b.slots %}<td class="digit {{ 'weak' if loop.index0 == b.weakest_slot }}">{{ s.digit }}</td>{% endfor %}</tr>
+        <tr><td>الاحتمال %</td>{% for s in b.slots %}<td class="{{ 'weak' if loop.index0 == b.weakest_slot }}"><span class="vbar"><i style="height: {{ 100 * s.top[0][1] }}%"></i></span><span class="num">{{ '%.1f'|format(100 * s.top[0][1]) }}</span></td>{% endfor %}</tr>
+        <tr><td>البديل</td>{% for s in b.slots %}<td class="{{ 'weak' if loop.index0 == b.weakest_slot }}"><span class="num">{{ s.top[1][0] }}</span> <span class="muted num">{{ '%.1f'|format(100 * s.top[1][1]) }}</span></td>{% endfor %}</tr>
+        <tr><td>الفرق</td>{% for s in b.slots %}<td class="num {{ 'weak' if loop.index0 == b.weakest_slot }}">{{ '%.3f'|format(s.margin) }}</td>{% endfor %}</tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+{% endif %}
+{% endblock %}

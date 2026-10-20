@@ -58,7 +58,7 @@ def mutate(value: str, rng: random.Random, n: int) -> str:
 def build_records(rng: random.Random, n: int) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]:
     """Applicant documents shaped like the real collection, plus each card's hidden truth."""
     docs, truth = [], {}
-    base = now() - datetime.timedelta(days=9)
+    base = now() - datetime.timedelta(minutes=n * 0.8 + 60)  # the whole run finished an hour ago
     for i in range(n):
         key = object_id(rng)
         card = synthetic_id(rng)
@@ -79,7 +79,7 @@ def build_records(rng: random.Random, n: int) -> tuple[list[dict[str, Any]], dic
             quality = rng.choice(("blur", "dark", "back", "rotated"))
         elif roll < 0.0508:                            # no image on the media host
             read, status, codes = None, "download_error", []
-        processed = base + datetime.timedelta(minutes=i * 2.7)
+        processed = base + datetime.timedelta(minutes=i * 0.8)
         docs.append({
             "_id": key,
             "National Id": int(typed) if typed.isdigit() and rng.random() < 0.7 else typed,
@@ -112,7 +112,7 @@ def seed_reviews(store: Store, rng: random.Random, truth: dict[str, dict[str, An
             verdict = "other"
         entry = {"verdict": verdict, "corrected_id": card if verdict == "other" else None, "note": "",
                  "reviewer": rng.choice(("reviewer", "reviewer", "supervisor")),
-                 "reviewed_at": now() - datetime.timedelta(days=rng.randint(0, 6), minutes=rng.randint(0, 600))}
+                 "reviewed_at": now() - datetime.timedelta(minutes=rng.randint(5, 60 * 24 * 3))}
         assert record.category in VERDICTS[verdict]["categories"]
         store.reviews.insert_one({"_id": record.id, **entry, "category": record.category,
                                   "read_at_review": record.read, "typed_at_review": record.typed,
@@ -160,6 +160,23 @@ class DemoImages:
         if entry is None:
             raise MediaError("not_found")
         return render_card(entry["card"], entry["quality"], key), "image/jpeg"
+
+
+class DemoInspector:
+    """Stands in for the model inspector when none is configured; every answer is marked illustrative."""
+
+    available = True
+
+    def __init__(self, truth: dict[str, dict[str, Any]], reading_of) -> None:
+        self.truth = truth
+        self.reading_of = reading_of
+
+    def inspect(self, image: bytes, key: str | None = None) -> dict[str, Any]:
+        from .inspection import illustrative
+
+        entry = self.truth.get(key or "", {})
+        return illustrative(self.reading_of(key) if key else None, entry.get("quality", "clean"),
+                            key or str(len(image)), font(54))
 
 
 def render_card(number: str, quality: str, key: str) -> bytes:

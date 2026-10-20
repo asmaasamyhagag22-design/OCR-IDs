@@ -17,7 +17,7 @@ import time
 SCRYPT_N, SCRYPT_R, SCRYPT_P = 2 ** 14, 8, 1
 MIN_PASSWORD_LENGTH = 10
 ROLES = ("reviewer", "supervisor", "admin")
-ROLE_LABELS = {"reviewer": "مراجع", "supervisor": "مشرف", "admin": "مدير النظام"}
+ROLE_LABELS = {"reviewer": "مراجِع", "supervisor": "مشرف", "admin": "مدير النظام"}
 
 
 def _b64(raw: bytes) -> str:
