@@ -9,6 +9,7 @@ __pycache__/
 .venv/
 .venv-ocr/
 .venv-client/
+.venv-console/
 natid_ocr_pipeline.log
 *.egg-info/
 third_party/
