@@ -3657,3 +3657,175 @@ The run showed that, since D-108, team_reread_found_images.py --write printed
 each record's reading to the terminal through the client's logger. The script
 now detaches the client's terminal handler, so the terminal shows counts only
 and the per-record lines go to the private log file only.
+
+## D-110 - Review console for the operational review of the first run (2026-10-20)
+
+The owner asked for an application the work machine runs for the agency: the
+reviewers settle the readings that differ from the typed ID (about 1,400 on the
+first run) and those that could not be read, a supervisor sees the accuracy
+that the reviews establish, and the operations team sees the state of the run.
+This is operational review of production records requested by the owner, not
+new labelling for model development; the project's "no new human review
+sheets" rule governs the research sets and is unchanged.
+
+Decisions taken with the owner:
+- Decisions go to new collections (`ocr_reviews`, append-only
+  `ocr_review_audit`, `console_users`, `console_sessions`). The applicants
+  collection and the client's `Auto Id_Validation` field are never written.
+- Only mismatches and unreadable records are reviewed. Matches are counted
+  correct, because a wrong match needs the OCR and the applicant to produce the
+  same wrong 14 digits. No sample of matches is drawn.
+- Server-rendered pages (FastAPI and Jinja templates), no build step and no
+  external assets, so the machine needs no Node.js and no internet at run time.
+
+The console (`console/`, `compose.yaml`, docs/CONSOLE_GUIDE.md) loads no model,
+imports no shipped OCR module, and changes no file in docker/app_code_files.txt;
+the OCR image, its pipeline and its thresholds are unchanged. Its accuracy
+figures are bookkeeping over the reviewers' verdicts (lower bound, confirmed,
+upper bound, and a Wilson-interval projection), not a decision instrument for
+the model, and no model decision is computed from them.
+
+## D-111 - Model inspector, review fixes and the end-to-end check (2026-10-20)
+
+The owner asked for the console to be finished, reviewed and made formal.
+
+- **Model inspector** (`inspector/`, `python -m inspector`, port 8082). It runs
+  the shared Recognizer unchanged (F1v, F8, F9 included) on a subclass of the
+  service runtime that copies each BC-final input and output. For the band
+  behind the final reading it runs `build_v2`'s inspection graph with the
+  production weights and returns per-digit probabilities, the weakest-position
+  margin, the 14 ordered-slot attention maps and the row attention. It refuses
+  to serve unless the inspection graph reproduces the production logits on the
+  sealed probe within 1e-4. Tests: that holds on all 12 golden bands, and a
+  recording runtime gives the same reading, margin and fixes as a plain one.
+  Its image is the OCR image plus `inspector/`; no sealed or shipped file and
+  no line of docker/app_code_files.txt changed.
+- **Review fixes:**
+  - Cairo time (summer time included) for days and timestamps.
+  - An atomic claim, so two reviewers can never hold one case.
+  - Skipping a case releases its claim.
+  - A focused radio button no longer swallows Enter.
+  - CSV free text is neutralised against spreadsheet formulas.
+  - Uploads are kept in memory, not spooled to disk.
+  - Query values are validated before they reach a redirect.
+  - Numbers stored as doubles are read whole.
+- **Excel export.** A CSV opened in Excel turns a 14-digit ID into a rounded
+  number, so each report is also offered as an .xlsx of text cells (right to
+  left). CSV stays for systems.
+- **Formal Arabic.** The interface and docs/CONSOLE_GUIDE.md use Modern
+  Standard Arabic.
+- **End-to-end check.** The whole chain ran together:
+  - a throwaway MongoDB 7 with synthetic applicants;
+  - a static media host;
+  - the real engine;
+  - the unchanged team client (preflight all_pass; 120 records processed);
+  - the console image (non-root, read-only);
+  - the real inspector.
+
+  A browser script passed 16 of 16 checks: claim, keyboard flow, skip release,
+  re-read, inspector parity, role refusal, Excel export, audit without IDs and
+  account creation. The applicants collection's fingerprint was identical
+  before and after.
+
+  The drawn sample cards are not read correctly by the real model (their
+  layout is unlike a real card); the inspector shows why (it picked the
+  watermark strip). Demonstrations of accuracy therefore use a real card.
+
+  Not built here: the inspector image from the OCR image, and the console
+  image's apt step (Debian mirrors unreachable in this environment). Both are
+  to be built on the work machine.
+
+## D-112 - Senior inspection of the console before the work machine (2026-10-20)
+
+The owner asked for everything that can be finished before access to the work
+machine, under a senior-level inspection.
+
+**Added:**
+- **Found images.** The console reads found_front_images.json from
+  team_download_problems.py, so the records stored outside their recorded
+  path show the image the OCR read, with a badge. Paths outside the media root
+  are refused.
+- **Preflight.** `python -m console check` covers connections, field names,
+  writable console collections, an admin account, one media image, the found
+  file, the engine and the inspector. It prints counts only.
+- **Operations.** Optional HTTPS, with an HTTP(S) health check that pins the
+  console's own certificate. Backup and restore commands for the console's
+  collections. Windows and Linux demo launchers. A graceful page when MongoDB
+  is unavailable.
+
+**A code review found ten defects, all fixed, each with a regression test:**
+- The corrections export offered another person's number for an applicant's
+  record.
+- The relocated badge appeared on records whose found path was unusable.
+- A found file fixed in place was not re-read.
+- The index builder retried permanent errors forever.
+- The preflight passed unreadable files.
+- A password change did not end the user's other sessions.
+- The login throttle grew without bound.
+- The health check accepted a bare TCP connect.
+- compose.yaml overrode console.env.
+- An empty login form was reported as a lockout.
+
+**Further checks:**
+- An accessibility scan (axe-core, WCAG 2.1 AA) found 26 violations on 10
+  pages in two themes. All were fixed, and the rescan found none.
+- pip-audit found advisories for pillow, anyio, pip, setuptools and wheel in
+  the console image. The console now pins pillow 12.3.0, anyio 4.14.2 and
+  pip 26.2.1, and drops the unused build tools; the rescan found none.
+
+**Verified with Docker here:**
+- The OCR image was built from its Dockerfile. Debian mirrors are blocked in
+  this environment, so the same bookworm packages were copied from the full
+  python:3.11.9 image instead of apt.
+- The inspector image was built from that OCR image through compose.
+- The whole stack ran under `docker compose --profile engine up -d`. Engine,
+  inspector and console were healthy; the engine passed its golden self-test
+  in the container and the inspector its parity check.
+- A browser script passed 18 of 18 checks, including relocated images.
+- A concurrency test ran 20 simultaneous claims on each of 30 cases and got
+  one winner every time.
+- A database outage, a process crash (Docker restarted it), HTTPS, and backup
+  and restore each behaved as documented.
+
+**Owner decision pending.** The OCR image (and therefore the inspector)
+pins pillow 10.4.0, which has published advisories about image decoding.
+Raising it changes a frozen pin and needs the golden parity re-established.
+This work does not do it.
+
+## D-113 - The AI assistant's tooling leaves the repository (2026-10-20)
+
+The owner asked that nothing in the repository or its commits name the AI
+assistant used on this work.
+
+**Removed on `feature/review-console`:**
+- The assistant's configuration directory at the repository root: its two
+  agent definitions, its settings, and its two tool-call hooks (the data guard
+  and the commit guard).
+- The assistant's instruction file at the repository root.
+- `tests/test_governance_hooks.py`, which tested those hooks.
+
+**Kept:**
+- The blocklist builder moves, unchanged except for its usage lines, to
+  `scripts/governance/build_blocklist.py`. `src/governance/guard.py` reads the
+  blocklist it writes, and the in-process guard does not depend on any
+  assistant.
+- Its tests move to `tests/test_governance_blocklist.py`.
+- Four docstrings that cited the instruction file now cite the project rule
+  itself: `tests/conftest.py`, `tests/test_official_eval_privacy.py`,
+  `scripts/phase2m_h_verify.py` and `scripts/phase2m_h_error_gallery.py`.
+- `src/governance/guard.py` is shipped in the OCR image and is not edited. Its
+  "blocklist cannot be trusted" message still names the builder's old path.
+  The command is now `python scripts/governance/build_blocklist.py`.
+  **Owner decision:** the message is corrected in the next release of the OCR
+  image, not in this one.
+
+**What this changes:**
+- The hooks enforced the data governance on the assistant's own tool calls. The
+  in-process guard, the privacy scan and the governance rules in the phase rule
+  files still apply to every process.
+- The commits on both branches were rewritten to the owner's GitHub identity,
+  and their attribution trailers were removed. Only the author, committer and
+  message changed. Both branches were force-pushed.
+- `docs/architecture-explainer` only adds a page, so it removes nothing. Its
+  page now credits the data governance to `src/governance/guard.py`.
+- `main` keeps these files until `feature/review-console` is merged.

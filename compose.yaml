@@ -1,0 +1,90 @@
+# The work machine's two long-running services, started and kept running by Docker:
+#
+#   docker compose --profile engine up -d     the OCR engine, the model inspector and the console
+#   docker compose up -d console              the console only (the engine already runs as
+#                                             the guide's `docker run ... fixed14-engine`)
+#
+# Both restart after a crash or a reboot; no terminal has to stay open.
+# Before the first start: see docs/CONSOLE_GUIDE.md (image name, key files, first account).
+
+services:
+  ocr:
+    profiles: ["engine"]
+    # the image scripts/phase4_service_docker.sh builds; put its name in .env as OCR_IMAGE
+    image: ${OCR_IMAGE:-set-OCR_IMAGE-in-.env-see-docs-CONSOLE_GUIDE}
+    container_name: fixed14-engine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:8081"
+    env_file:
+      - ${HOME}/.config/fixed14/ocr.env
+    environment:
+      OCR_ENGINE_WORKERS: ${OCR_ENGINE_WORKERS:-5}
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /home/ocr:uid=10001,gid=10001
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    ulimits:
+      core: 0
+    mem_limit: ${OCR_MEMORY:-10g}
+    pids_limit: 1024
+
+  inspector:
+    profiles: ["engine"]
+    # the OCR image plus inspector/: the console's "inside the model" page asks it on demand
+    build:
+      context: .
+      dockerfile: inspector/Dockerfile
+      args:
+        OCR_IMAGE: ${OCR_IMAGE:-set-OCR_IMAGE-in-.env-see-docs-CONSOLE_GUIDE}
+    image: fixed14-inspector:local
+    container_name: fixed14-inspector
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8082:8082"
+    environment:
+      OCR_CPU_THREADS: ${INSPECTOR_CPU_THREADS:-4}
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /home/ocr:uid=10001,gid=10001
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    ulimits:
+      core: 0
+    mem_limit: ${INSPECTOR_MEMORY:-4g}
+    pids_limit: 512
+
+  console:
+    build:
+      context: .
+      dockerfile: console/Dockerfile
+    image: fixed14-console:local
+    container_name: fixed14-console
+    restart: unless-stopped
+    # run as the machine's own user (CONSOLE_USER=$(id -u):$(id -g) in .env), so the private files
+    # in ~/.config/fixed14/console (mode 600) can be read without loosening their permissions
+    user: ${CONSOLE_USER:-10002:10002}
+    # host networking: MongoDB, the media server (nginx) and the engine are reached exactly
+    # as the API client reaches them from this machine (127.0.0.1 or the configured hosts)
+    network_mode: host
+    env_file:
+      - path: ${HOME}/.config/fixed14/console.env
+        required: false
+    # defaults only: the same names without DEFAULT_, in console.env, take precedence
+    environment:
+      CONSOLE_DEFAULT_INSPECTOR_URL: ${CONSOLE_INSPECTOR_URL:-http://127.0.0.1:8082}
+      CONSOLE_DEFAULT_FOUND_IMAGES: /run/fixed14/found_front_images.json
+    # read-only: found_front_images.json (team_download_problems.py) and, for HTTPS, tls.crt and tls.key
+    volumes:
+      - ${HOME}/.config/fixed14/console:/run/fixed14:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    ulimits:
+      core: 0
+    mem_limit: 1g

@@ -4,11 +4,14 @@ artifacts/
 *.jpg
 *.jpeg
 *.png
+# README screenshots from the console's synthetic demonstration data only, never a card
+!docs/images/*.png
 __pycache__/
 .pytest_cache/
 .venv/
 .venv-ocr/
 .venv-client/
+.venv-console/
 natid_ocr_pipeline.log
 *.egg-info/
 third_party/
@@ -43,3 +46,4 @@ paddleocr_fixed_crop_bundle/
 /.venv
 /data
 /third_party
+.env

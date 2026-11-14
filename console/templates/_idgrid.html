@@ -1,0 +1,20 @@
+{# The 14-cell national-ID strip, grouped by the number's parts: century | birth date | governorate | sequence | check.
+   Every row is the same 19-column grid, so the rows and the part labels line up at any width. #}
+{% macro row(values, diff, cls, label) -%}
+<div class="idgrid {{ cls }}">
+  {%- for v in values -%}
+  {%- if loop.index0 in (1, 7, 9, 13) %}<i class="sp"></i>{% endif -%}
+  <span class="cell {{ 'diff' if loop.index0 in diff }} {{ 'empty' if not v }}">{{ v or '·' }}</span>
+  {%- endfor -%}
+  <span class="rowlabel">{{ label }}</span>
+</div>
+{%- endmacro %}
+
+{% macro labels(segments, segment_labels) -%}
+<div class="idgrid labels" aria-hidden="true">
+  {%- set starts = {'century': 1, 'birth_date': 3, 'governorate': 10, 'sequence': 13, 'check': 18} -%}
+  {%- for name, a, b in segments -%}
+  <span style="grid-column: {{ starts[name] }} / span {{ b - a }}">{{ segment_labels[name] }}</span>
+  {%- endfor -%}
+</div>
+{%- endmacro %}

@@ -1,9 +1,8 @@
 """The in-process half of the data governance guarantee.
 
-The PreToolUse hooks in .claude/hooks/ are tested in test_governance_hooks.py.
-They read a tool call's arguments and cannot see what `python scripts/foo.py`
-opens. These tests cover src/governance/guard.py, which refuses the read inside
-the process that makes it.
+These tests cover src/governance/guard.py, which refuses a read of a blocked
+card inside the process that makes it, whatever started that process. The
+blocklist it reads is tested in test_governance_blocklist.py.
 
 Nothing here prints a card id or a national ID. A card id identifies a card in a
 forbidden set, so the tests take ids from the blocklist at runtime and assert on
@@ -160,9 +159,8 @@ def test_an_override_declared_in_a_settings_file_is_refused(blocklist, tmp_path,
 
 
 def test_no_settings_file_in_this_repository_declares_the_override():
-    for settings in (PROJECT_ROOT / ".claude" / "settings.json",
-                     PROJECT_ROOT / ".claude" / "settings.local.json"):
-        if settings.is_file():
+    for settings in guard.SETTINGS_FILES:
+        if settings.is_file() and settings.resolve().is_relative_to(PROJECT_ROOT.resolve()):
             declared = json.loads(settings.read_text(encoding="utf-8")).get("env", {})
             assert guard.OVERRIDE_VAR not in declared
 

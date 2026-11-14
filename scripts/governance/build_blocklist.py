@@ -22,8 +22,8 @@ guard closed rather than silently narrowing it.
 No value written here identifies a person: card_ids and neutral names are
 hashes. The annotation targets in the external manifest are never read.
 
-    python .claude/hooks/build_blocklist.py            # write the blocklist
-    python .claude/hooks/build_blocklist.py --verify   # check it is current
+    python scripts/governance/build_blocklist.py            # write the blocklist
+    python scripts/governance/build_blocklist.py --verify   # check it is current
 """
 from __future__ import annotations
 

@@ -6,7 +6,7 @@ cannot run without it. When - and only when - the private tree's governance
 blocklist is absent, they are skipped and the session ends with a loud summary
 (a published snapshot carries the model files under artifacts/, nothing else).
 A worktree that has the blocklist but is missing a file still fails them: a
-skip must never hide a broken owner worktree (CLAUDE.md: a skip is a failure to
+skip must never hide a broken owner worktree (project rule: a skip is a failure to
 verify). The NEEDS_HISTORY tests are skipped only in a one-commit snapshot.
 
 The list is the exact set that failed on a fresh clone on 2026-09-27. A new

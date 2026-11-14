@@ -11,7 +11,7 @@ machine the bundle cannot load at all:
 That is a Windows policy blocking a dependency of the detector, not a defect in
 the models or in this integration. So the checks split in two, and the ones that
 cannot run say so rather than being quietly skipped - a skip is a failure to
-verify, not a pass (CLAUDE.md).
+verify, not a pass (a project rule).
 
 Runs here:
     the 18 frozen hash checks

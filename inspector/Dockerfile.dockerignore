@@ -1,0 +1,5 @@
+# The inspector image's build context: only the inspector package (the rest comes from the OCR image).
+**
+!inspector/**
+**/__pycache__
+**/*.pyc

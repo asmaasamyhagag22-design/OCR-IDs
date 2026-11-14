@@ -9,7 +9,7 @@ the original photograph it was cut from. Nothing is predicted anew; the readings
 are the ones Phase 2M-G and 2M-H already materialized.
 
 Everything lands under artifacts/phase2m_h/error_gallery/, which git ignores -
-card-level material lives nowhere else (CLAUDE.md). No file name and no line of
+card-level material lives nowhere else (a project rule). No file name and no line of
 the index carries a national ID or any digit of one: only the card's hash id,
 the weakest-position margin, the positions of the wrong slots, and which message
 the release design would show at the frozen primary threshold. The images
