@@ -49,66 +49,129 @@ committed to the repository before the set was opened, read once
 
 ## The system
 
+Two ways in, one recognizer. The batch path serves the agency's MongoDB
+pipeline. The `/v1` path verifies one upload and returns a decision. Both run
+the same `Recognizer`, whose only input is `recognize(image: bytes)`.
+
 ```mermaid
 flowchart LR
-    subgraph Ingest
-        U[Applicant upload<br/>image + typed ID] --> M[(MongoDB<br/>applicants)]
-        M --> B[Batch client]
+    subgraph Data["MongoDB"]
+        A[(applicants<br/>card image + typed ID)]
+        RV[(ocr_reviews<br/>+ audit log)]
     end
-    subgraph Engine["OCR service · FastAPI · Docker"]
-        B -->|POST /engine| D[Decode<br/>JPEG · PNG · HEIC · AVIF · PDF]
-        D --> G[DocCornerNet<br/>card corners]
-        G --> O[PP-OCRv5<br/>orientation]
-        O --> R[BC-final<br/>14-digit reader]
-        R -. no card .-> F1v[F1v<br/>wider search]
-        R -. impossible ID .-> F8[F8<br/>re-turn]
-        R -. low margin .-> F9[F9<br/>region search]
+    subgraph Service["OCR service · FastAPI · Docker"]
+        E["POST /engine<br/>batch of 1–10 images"]
+        V["POST /v1/national-id/verify<br/>one image + typed ID"]
+        REC["Recognizer<br/>image bytes only"]
+        DEC["Decider"]
     end
-    R --> C{Compare with<br/>typed ID}
-    C -->|match| OK[Accepted]
-    C -->|mismatch or unreadable| Q[Review console]
-    Q --> H[Human verdict<br/>+ audit log]
-    Q -.-> I[Model inspector<br/>attention maps]
+    CL["Team batch client"]
+    CON["Review console"]
+    INS["Model inspector"]
+
+    A -->|images| CL -->|front images| E --> REC
+    REC -->|reading + margin| CL
+    CL -->|"reading, compared with typed ID"| A
+    V --> REC --> DEC
+    V -. typed ID .-> DEC
+    A -->|"mismatches and unreadables"| CON
+    CON -->|human verdicts| RV
+    CON -->|why this reading?| INS
 ```
 
-**Design rules:**
+**The decider** (`/v1` only). The threshold T = 0.966875 was frozen before
+the audit.
+
+| Reading | Decision | What the backend does |
+|---|---|---|
+| No reading | `UNREADABLE`, with a reason code | leaves it to a validator |
+| Equals the typed ID | `MATCH` | marks the ID valid |
+| Differs, and margin ≥ T | `MISMATCH_CONFIDENT` | flags it for a validator, and never marks it invalid automatically |
+| Differs, and margin < T | `NEEDS_REVIEW` | leaves it to a validator |
+
+The reading is never "corrected" toward the typed ID.
+
+### The recognition cascade
+
+```mermaid
+flowchart TD
+    IN([image bytes]) --> DEC{"Decode by magic bytes<br/>JPEG · PNG · WebP · HEIC · AVIF · PDF p.1"}
+    DEC -->|video or undecodable| UNR([UNREADABLE])
+    DEC --> DET["DocCornerNet<br/>card corners → upright warp"]
+    DET -->|card found| ORI["PP-OCRv5 picks the quarter turn<br/>number band → 160×576"]
+    DET -->|document_not_found| F1V["F1v · wider detector search<br/>relaxed gates · pad · turns · crops"]
+    F1V -->|band found| ORI
+    F1V -->|still no card| F9
+    ORI --> BC["BC-final reads 14 digits<br/>margin = weakest position"]
+    BC --> VAL{"Structurally valid?<br/>century · date · governorate"}
+    VAL -->|no| F8["F8 · the other three turns,<br/>then the F1v cascade"]
+    F8 --> CONF
+    VAL -->|yes| CONF{"Valid and<br/>margin ≥ T?"}
+    CONF -->|yes| OUT([reading + margin])
+    CONF -->|no| F9["F9 · region search<br/>quad turns · card-shaped regions · re-detection"]
+    F9 -->|"replaces only with a valid reading ≥ T"| OUT
+```
+
+**Each recovery stage runs only on its own trigger:**
+- **F1v** runs when no card was found. A structurally impossible reading
+  from it is refused, so the card stays not found.
+- **F8** runs when a found card gives an impossible reading. A correct reading
+  is never impossible, so F8 can never overwrite one.
+- **F9** runs when there is no reading, an invalid reading, or a margin below
+  T. It picks validity first, then margin.
+
+A valid reading at or above T goes straight out. All three stages run the
+unchanged frozen code on a different input: a padded, turned or cropped image,
+or a fixed quad.
+
+**What protects the design:**
 - **The typed ID never reaches the model.** `recognize(image: bytes)` has no
-  parameter for it, and a test checks the source tree for this. A reading
-  cannot be pulled toward the answer it is being checked against.
-- **Every recovery stage is gated.**
-  - F1v runs only when no card was found.
-  - F8 runs only on a structurally impossible reading: bad century, date or
-    governorate.
-  - F9 runs only below the confidence threshold.
-  - A valid, confident reading is never touched.
+  parameter for it, and a test checks the source tree for this.
 - **The models are frozen.** 16 sealed files are hash-checked at load time.
   `/ready` stays 503 until a golden self-test reproduces the expected outputs.
 
-Read the full request path in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+The stage-by-stage reference is [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ### The model: BC-final
 
-A fixed-length reader, not a general OCR: the national ID is always 14 digits,
-so the architecture assumes it.
+A fixed-length reader, not a general OCR. The Egyptian national ID is always
+14 digits (century, birth date, governorate, sequence, check digit), and the
+architecture builds that in. It has 113,439 parameters, and the weights take
+538 KB.
 
-```
-band 160×576×3
-  → CNN encoder, separable convs + GroupNorm + swish    (44.6K params)
-  → vertical attention pool       [B,10,144,128] → [B,144,128]
-  → conditioned ordered slots     [B,144,128]    → [B,14,128]
-  → shared per-slot head          Dense(96) → Dense(10)
-  → logits                        [B,14,10]
+```mermaid
+flowchart TB
+    X["number band<br/>160 × 576 × 3"] --> ENC
+    subgraph ENC["Encoder · 44.6K params"]
+        direction TB
+        C["Conv 3×3 + 5 separable convs<br/>GroupNorm(8) + swish each<br/>strides shrink height 16×, width 4×"]
+    end
+    ENC -->|"[B, 10, 144, 128]"| VAP["Vertical attention pool<br/>softmax over the 10 rows, per column"]
+    VAP -->|"[B, 144, 128]"| CTX["Conv1D context + LayerNorm<br/>49.5K params"]
+    CTX -->|"[B, 144, 128]"| SLOT["Conditioned ordered slots · 5.8K params<br/>14 ordered anchors from the image's line centre and width,<br/>Gaussian position bias + capped content attention"]
+    SLOT -->|"[B, 14, 128]"| HEAD["Shared per-slot head · 13.4K params<br/>Dense(96, swish) → Dense(10)"]
+    HEAD -->|"[B, 14, 10] logits"| M["softmax per slot<br/>margin = min over slots of (top1 − top2)"]
 ```
 
-**Why this design:**
-- **Fourteen ordered slots instead of CTC.** Length and order are guaranteed by
-  construction, and every position gets its own probability.
-- **Weakest-position margin.** The confidence is the margin at the least
-  certain digit, not an average, so one doubtful digit is enough to route a
-  mismatch to review. The operating threshold is 0.966875, frozen before the
-  audit.
-- **Vertical attention pool.** It learns where the number line sits inside the
-  band, which absorbs residual misalignment from card detection.
+**Why it is built this way:**
+- **Fourteen ordered slots instead of CTC.**
+  - The output has 14 positions, always in order, so a reading can never be
+    13 or 15 digits long.
+  - Each position has its own probability distribution.
+  - The cost: the model has to learn where the line is. The attention layers
+    do that.
+- **Vertical attention pool.** Each of the 144 columns chooses which rows to
+  trust. This absorbs residual vertical misalignment from detection and
+  warping.
+- **Conditioned ordered slots.** The 14 anchors are placed from the line's
+  centre and width in this particular image, and their order is strict. Digit
+  3 can never be read from a position to the left of digit 2.
+- **Shared head.** One classifier serves all 14 slots, so the shape of each
+  digit is learned once rather than 14 times.
+- **Weakest-position margin.**
+  - The confidence is set by the least certain digit, not by an average.
+  - One doubtful digit is enough to keep a mismatch out of
+    `MISMATCH_CONFIDENT`.
 
 ---
 
