@@ -4,6 +4,8 @@ artifacts/
 *.jpg
 *.jpeg
 *.png
+# README screenshots from the console's synthetic demonstration data only, never a card
+!docs/images/*.png
 __pycache__/
 .pytest_cache/
 .venv/
