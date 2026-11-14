@@ -55,29 +55,24 @@ the same `Recognizer`, whose only input is `recognize(image: bytes)`.
 
 ```mermaid
 flowchart LR
-    subgraph Data["MongoDB"]
-        A[(applicants<br/>card image + typed ID)]
-        RV[(ocr_reviews<br/>+ audit log)]
-    end
-    subgraph Service["OCR service · FastAPI · Docker"]
-        E["POST /engine<br/>batch of 1–10 images"]
-        V["POST /v1/national-id/verify<br/>one image + typed ID"]
-        REC["Recognizer<br/>image bytes only"]
-        DEC["Decider"]
-    end
+    A[("MongoDB · applicants<br/>image path + typed ID")]
     CL["Team batch client"]
+    E["OCR service<br/>POST /engine · Recognizer"]
     CON["Review console"]
     INS["Model inspector"]
+    RV[("MongoDB · ocr_reviews<br/>+ audit log")]
 
-    A -->|images| CL -->|front images| E --> REC
-    REC -->|reading + margin| CL
-    CL -->|"reading, compared with typed ID"| A
-    V --> REC --> DEC
-    V -. typed ID .-> DEC
-    A -->|"mismatches and unreadables"| CON
-    CON -->|human verdicts| RV
-    CON -->|why this reading?| INS
+    A -->|"1 · records to read"| CL
+    CL -->|"2 · batch of 1–10"| E
+    E -->|"3 · reading + margin"| CL
+    CL -->|"4 · reading saved,<br/>compared with typed ID"| A
+    A -->|"5 · mismatches<br/>and unreadables"| CON
+    CON -->|"6 · human verdicts"| RV
+    CON -.->|"why this reading?"| INS
 ```
+
+The single-upload path, `POST /v1/national-id/verify`, runs the same
+Recognizer and adds the decider below.
 
 **The decider** (`/v1` only). The threshold T = 0.966875 was frozen before
 the audit.
