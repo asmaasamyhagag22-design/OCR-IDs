@@ -47,6 +47,20 @@ committed to the repository before the set was opened, read once
 
 ---
 
+## Review console
+
+Mismatches and unreadable cards go to a human. In the first production run,
+about 1,400 records differed from the typed ID. The console is an Arabic,
+right-to-left web application for the reviewers who settle those cases and the
+supervisors who track accuracy.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/overview-dark.png">
+  <img alt="Console overview: accuracy bounds, reading outcomes, review progress and system health (synthetic demonstration data)" src="docs/images/overview-light.png">
+</picture>
+
+<sub>Demonstration mode: 6,000 synthetic applicants. No real record appears.</sub>
+
 ## The system
 
 Two ways in, one recognizer. The batch path serves the agency's MongoDB
@@ -169,20 +183,6 @@ flowchart TB
     `MISMATCH_CONFIDENT`.
 
 ---
-
-## Review console
-
-Mismatches and unreadable cards go to a human. In the first production run,
-about 1,400 records differed from the typed ID. The console is an Arabic,
-right-to-left web application for the reviewers who settle those cases and the
-supervisors who track accuracy.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/overview-dark.png">
-  <img alt="Console overview: accuracy bounds, reading outcomes, review progress and system health (synthetic demonstration data)" src="docs/images/overview-light.png">
-</picture>
-
-<sub>Demonstration mode: 6,000 synthetic applicants. No real record appears.</sub>
 
 **Features:**
 - **Accuracy that tightens as reviews come in.** The overview reports:
