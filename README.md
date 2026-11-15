@@ -15,8 +15,7 @@ national ID. Fixed14 finds the card, reads the number with a purpose-built
 go to a human review console. The system has to work on whatever phones
 produce: HEIC files saved as `.jpg`, rotated photos, both card sides in one
 picture, and scans on a white page.
-
-Developed by the DEPI OCR team. Project owner:
+ Project owner:
 [@asmaasamyhagag22-design](https://github.com/asmaasamyhagag22-design).
 
 ---
